@@ -42,8 +42,15 @@
   @keyframes bob{0%,100%{transform:translateY(1.5px)}50%{transform:translateY(-2px)}}
   @media(prefers-reduced-motion:no-preference){ .art .surface{animation:bob 3s ease-in-out infinite} }
 
-  .meter{height:9px; background:#E8E4D7; border-radius:999px; overflow:hidden; margin:4px 6px 14px}
+  .dash{margin:8px 6px 14px}
+  .dash-row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px}
+  .d-col{display:flex; flex-direction:column; gap:2px} .d-col.right{align-items:flex-end}
+  .d-lbl{font-size:12px; color:var(--muted)}
+  .d-val{font-size:18px} .d-val.saved{color:#1c8a5b}
+  .d-pct{font-size:34px; line-height:1}
+  .meter{position:relative; height:10px; background:#E8E4D7; border-radius:999px; overflow:hidden}
   .meter i{display:block; height:100%; border-radius:999px; transition:width .6s cubic-bezier(.22,1,.36,1)}
+  .meter .tick{position:absolute; top:0; bottom:0; width:2px; margin-left:-1px; background:rgba(40,58,63,.26)}
 
   .btns{display:flex; gap:12px}
   .btn{flex:1; border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:19px; padding:20px; border-radius:var(--r); transition:transform .12s; box-shadow:var(--shadow)}
@@ -100,7 +107,14 @@
       <div class="surface" id="surface"></div>
     </div>
   </div>
-  <div class="meter"><i id="meter"></i></div>
+  <div class="dash">
+    <div class="dash-row">
+      <div class="d-col"><div class="d-lbl">모은 돈</div><div class="d-val saved jua" id="dSaved">0원</div></div>
+      <div class="d-pct jua" id="dPct">0%</div>
+      <div class="d-col right"><div class="d-lbl">목표</div><div class="d-val jua" id="dTarget">0원</div></div>
+    </div>
+    <div class="meter"><i id="meter"></i><span class="tick" style="left:25%"></span><span class="tick" style="left:50%"></span><span class="tick" style="left:75%"></span></div>
+  </div>
   <div class="btns">
     <button class="btn set" id="openSettings">목표 설정</button>
     <button class="btn save" id="saveBtn"><span>📷</span> 저축하기</button>
@@ -210,6 +224,21 @@ let children=[];
 let S={ childId:null, childName:'', activeId:null, goals:[], deposits:[] };
 const $=s=>document.querySelector(s);
 const won=n=>Number(n).toLocaleString("ko-KR");
+function wonKo(n){
+  if(n<10000) return won(n)+"원";                  /* 1만 미만은 그대로 (예: 5,000원) */
+  const man=Math.floor(n/10000), rest=n%10000; let s=man+"만";
+  if(rest){ const ch=Math.floor(rest/1000), r=rest%1000; if(ch) s+=" "+ch+"천"; if(r) s+=" "+won(r); }
+  return s+" 원";                                   /* 예: 35만 원, 32만 9천 원 */
+}
+let shown={ goalId:null, pct:0 }, pctRAF=null;
+function setPct(to, color, animate){
+  const dp=$("#dPct"); dp.style.color=color;
+  if(pctRAF){ cancelAnimationFrame(pctRAF); pctRAF=null; }
+  if(!animate || matchMedia("(prefers-reduced-motion:reduce)").matches){ dp.textContent=to+"%"; shown.pct=to; return; }
+  const from=shown.pct, t0=performance.now(), dur=650, ease=t=>1-Math.pow(1-t,3);
+  (function tick(now){ const k=Math.min(1,(now-t0)/dur); dp.textContent=Math.round(from+(to-from)*ease(k))+"%";
+    if(k<1) pctRAF=requestAnimationFrame(tick); else { dp.textContent=to+"%"; shown.pct=to; pctRAF=null; } })(performance.now());
+}
 const active=()=>S.goals.find(g=>g.id===S.activeId)||S.goals[0];
 const savedFor=id=>S.deposits.filter(d=>d.goal_id===id).reduce((a,d)=>a+d.amount,0);
 
@@ -268,11 +297,11 @@ async function loadChild(id){
 
 function render(){
   const g=active();
-  if(!g){ $("#goalName").textContent="목표를 추가해 주세요"; $("#cheer").textContent=""; $("#meter").style.width="0%"; $("#artGray").src=$("#artColor").src=""; $("#surface").style.opacity="0"; return; }
+  if(!g){ $("#goalName").textContent="목표를 추가해 주세요"; $("#cheer").textContent=""; $("#meter").style.width="0%"; $("#dSaved").textContent=$("#dTarget").textContent="0원"; $("#dPct").textContent="0%"; $("#artGray").src=$("#artColor").src=""; $("#surface").style.opacity="0"; return; }
   const saved=savedFor(g.id), pct=Math.min(100,Math.round((saved/g.price)*100)), left=Math.max(0,g.price-saved);
 
   $("#goalName").textContent=g.name;
-  $("#cheer").textContent = left<=0 ? "다 모았어요! 🎉" : (won(left)+"원만 더 모으면 돼요!");
+  $("#cheer").textContent = left<=0 ? "다 모았어요! 🎉" : (wonKo(left)+"만 더 모으면 돼요!");
 
   const a=artFor(g), base=$("#artGray"), col=$("#artColor"), wrap=$("#art");
   if(base.dataset.src!==a.src){ base.src=a.src; col.src=a.src; base.dataset.src=col.dataset.src=a.src; }
@@ -283,6 +312,10 @@ function render(){
   col.style.setProperty('--lvl', (pct>=100?112:pct)+'%');
   const surf=$("#surface"); surf.style.bottom=pct+'%'; surf.style.opacity=(pct>3&&pct<99)?'0.85':'0';
 
+  $("#dSaved").textContent=wonKo(saved);
+  $("#dTarget").textContent=wonKo(g.price);
+  setPct(pct, g.color, (shown.goalId===g.id && pct>shown.pct));
+  shown.goalId=g.id;
   const m=$("#meter"); m.style.width=pct+"%"; m.style.background=g.color;
 }
 
