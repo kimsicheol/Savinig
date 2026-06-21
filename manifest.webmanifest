@@ -1,0 +1,15 @@
+{
+  "name": "우리집 저금통",
+  "short_name": "저금통",
+  "description": "아이가 목표를 보며 모으는 시각화 저금통",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F3F1E9",
+  "theme_color": "#F4B740",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

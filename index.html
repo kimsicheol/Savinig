@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#F4B740" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="apple-touch-icon" href="./icon.svg" />
+<title>우리집 저금통</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  @property --lvl{ syntax:'<percentage>'; inherits:false; initial-value:0%; }
+  :root{
+    --paper:#F3F1E9; --card:#FFFFFF; --ink:#283A3F; --muted:#6E7E80;
+    --line:#E7E3D6; --gold:#F4B740; --go:#2DB67D; --go-soft:#E4F4EC;
+    --warn:#E2574C; --shadow:0 10px 30px rgba(40,58,63,.08); --r:20px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0; height:100%}
+  body{font-family:"Noto Sans KR",system-ui,sans-serif; background:var(--paper); color:var(--ink); -webkit-font-smoothing:antialiased}
+  .jua{font-family:"Jua",sans-serif; letter-spacing:.2px}
+
+  .app{min-height:100dvh; max-width:900px; margin:0 auto; display:flex; flex-direction:column; padding:16px 16px calc(14px + env(safe-area-inset-bottom))}
+  .head{text-align:center}
+  .goalName{font-size:26px; margin:0}
+  .cheer{font-size:14px; color:var(--muted); margin-top:4px; min-height:1.1em}
+
+  /* 그림(이미지)만 흑백→컬러, 박스를 그림 비율에 맞춰 정확히 차오름 */
+  .stage{flex:1; display:flex; align-items:center; justify-content:center; min-height:200px; padding:6px 0}
+  .art{position:relative; width:min(92vw,64vh); max-height:68vh}
+  .art .layer{position:absolute; inset:0; width:100%; height:100%; object-fit:contain}
+  .art .gray{filter:grayscale(1) contrast(1.18) brightness(1.03)}
+  .art .color{ --lvl:0%; transition:--lvl .6s cubic-bezier(.22,1,.36,1);
+    -webkit-mask-image:linear-gradient(to top,#000 0%,#000 calc(var(--lvl) - 5%),rgba(0,0,0,0) calc(var(--lvl) + 6%),rgba(0,0,0,0) 100%);
+            mask-image:linear-gradient(to top,#000 0%,#000 calc(var(--lvl) - 5%),rgba(0,0,0,0) calc(var(--lvl) + 6%),rgba(0,0,0,0) 100%); }
+  .art .surface{position:absolute; left:9%; right:9%; bottom:0; height:3px; border-radius:3px;
+    background:rgba(255,255,255,.65); box-shadow:0 0 12px 2px rgba(255,255,255,.4);
+    transition:bottom .6s cubic-bezier(.22,1,.36,1); opacity:0; pointer-events:none}
+  @keyframes bob{0%,100%{transform:translateY(1.5px)}50%{transform:translateY(-2px)}}
+  @media(prefers-reduced-motion:no-preference){ .art .surface{animation:bob 3s ease-in-out infinite} }
+
+  .meter{height:9px; background:#E8E4D7; border-radius:999px; overflow:hidden; margin:4px 6px 14px}
+  .meter i{display:block; height:100%; border-radius:999px; transition:width .6s cubic-bezier(.22,1,.36,1)}
+
+  .btns{display:flex; gap:12px}
+  .btn{flex:1; border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:19px; padding:20px; border-radius:var(--r); transition:transform .12s; box-shadow:var(--shadow)}
+  .btn:active{transform:scale(.98)}
+  .btn.save{background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; gap:10px}
+  .btn.set{background:var(--card); color:var(--ink)}
+
+  .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:14px 22px; border-radius:14px; font-size:16px; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:90; max-width:90vw; text-align:center}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)} .toast.warn{background:var(--warn)}
+
+  .scrim{position:fixed; inset:0; background:rgba(40,58,63,.5); display:none; align-items:center; justify-content:center; padding:18px; z-index:80}
+  .scrim.show{display:flex}
+  .modal{background:var(--card); border-radius:var(--r); padding:22px; width:100%; max-width:480px; max-height:90vh; overflow:auto; box-shadow:var(--shadow)}
+  .modal h2{font-size:22px; margin:0 0 4px} .modal p.sub{margin:0 0 14px; color:var(--muted); font-size:14px}
+  .modal label{display:block; font-size:14px; color:var(--muted); margin:14px 0 6px}
+  .modal input[type=text],.modal input[type=number]{width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:12px; font-size:16px; font-family:inherit; background:#FBFAF4}
+  .pills{display:flex; gap:8px; flex-wrap:wrap}
+  .pill{border:2px solid var(--line); background:#FBFAF4; color:var(--ink); font-family:inherit; font-weight:700; padding:10px 16px; border-radius:999px; cursor:pointer}
+  .pill.on{border-color:var(--go); background:var(--go-soft); color:#1c6b48}
+  .gitem{display:flex; align-items:center; gap:10px; padding:12px; border:2px solid var(--line); border-radius:14px; margin-top:8px; cursor:pointer; background:#FBFAF4}
+  .gitem.on{border-color:var(--go); background:var(--go-soft)}
+  .gitem .em{font-size:26px; width:30px; text-align:center}
+  .gitem img.em{width:30px; height:30px; object-fit:contain; font-size:0}
+  .gitem .nm{font-weight:700} .gitem .pr{font-size:13px; color:var(--muted)}
+  .gitem .now{margin-left:auto; font-size:12px; color:#1c6b48; font-weight:700}
+  .gitem .del{margin-left:auto; background:none; border:none; color:var(--warn); cursor:pointer; font-size:14px}
+  .photoRow{display:flex; align-items:center; gap:12px; margin-top:8px}
+  .photoBtn{flex:1; padding:14px; border:1.5px dashed var(--line); border-radius:12px; background:#FBFAF4; color:var(--ink); font-family:inherit; font-weight:700; font-size:15px; cursor:pointer}
+  .photoPrev{width:58px; height:58px; border-radius:12px; object-fit:contain; border:1px solid var(--line); background:#fff}
+  .hint{font-size:12px; color:var(--muted); margin:8px 0 0; line-height:1.45}
+  .orline{font-size:12px; color:var(--muted); text-align:center; margin:14px 0 6px}
+  .emojiPick{display:flex; gap:8px; flex-wrap:wrap}
+  .emojiPick button{font-size:24px; width:46px; height:46px; border-radius:12px; border:2px solid var(--line); background:#FBFAF4; cursor:pointer}
+  .emojiPick button.sel{border-color:var(--go); background:var(--go-soft)}
+  .mActions{display:flex; gap:10px; margin-top:18px}
+  .mbtn{flex:1; padding:14px; border-radius:12px; border:none; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit}
+  .mbtn.primary{background:var(--go); color:#fff} .mbtn.ghost{background:var(--paper); color:var(--ink)}
+  .camModal video{width:100%; border-radius:14px; background:#000; aspect-ratio:4/3; object-fit:cover}
+  .camHint{font-size:13px; color:var(--muted); margin:10px 0 0; text-align:center}
+  .pop{position:fixed; width:12px; height:12px; z-index:95; pointer-events:none; border-radius:3px}
+  @media(prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important} }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="head">
+    <h1 class="goalName jua" id="goalName">—</h1>
+    <div class="cheer" id="cheer"></div>
+  </div>
+  <div class="stage">
+    <div class="art" id="art">
+      <img class="layer gray"  id="artGray"  alt="" />
+      <img class="layer color" id="artColor" alt="" />
+      <div class="surface" id="surface"></div>
+    </div>
+  </div>
+  <div class="meter"><i id="meter"></i></div>
+  <div class="btns">
+    <button class="btn set" id="openSettings">목표 설정</button>
+    <button class="btn save" id="saveBtn"><span>📷</span> 저축하기</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="scrim" id="camScrim">
+  <div class="modal camModal" role="dialog" aria-modal="true" aria-label="지폐 촬영">
+    <h2 class="jua">지폐를 비춰 주세요</h2>
+    <p class="sub">일련번호가 잘 보이게 화면 안에 또렷이 담아 주세요.</p>
+    <video id="cam" playsinline autoplay muted></video>
+    <p class="camHint" id="camHint">초점이 맞으면 ‘이 지폐 저축하기’를 눌러요.</p>
+    <div class="mActions">
+      <button class="mbtn primary" id="shoot">이 지폐 저축하기</button>
+      <button class="mbtn ghost" id="camClose">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="목표 설정">
+    <h2 class="jua">목표 설정</h2>
+    <p class="sub">누구의 저금통인지 고르고, 지금 모을 목표를 정해 주세요.</p>
+    <label>아이</label>
+    <div class="pills" id="kidPills"></div>
+    <label>목표 (탭하면 ‘지금 모으는 목표’가 돼요)</label>
+    <div id="goalList"></div>
+    <label>새 목표 만들기</label>
+    <input id="gName" type="text" placeholder="목표 이름 (예: 레고 세트)" />
+    <input id="gPrice" type="number" min="0" step="1000" inputmode="numeric" placeholder="가격 (원)" style="margin-top:10px" />
+    <div class="photoRow">
+      <button class="photoBtn" id="photoBtn" type="button">📷 사진 찍기 / 올리기</button>
+      <img class="photoPrev" id="photoPrev" alt="미리보기" hidden />
+    </div>
+    <input type="file" id="photoInput" accept="image/*" capture="environment" hidden />
+    <p class="hint">장난감만 크게, 단순한 배경에서 찍어 주세요. 사진을 올리면 배경을 지우고 흑백 그림으로 바뀌어, 저축할수록 컬러로 차올라요.</p>
+    <div class="orline">사진이 없으면 아래 그림 중 하나를 골라도 돼요</div>
+    <div class="emojiPick" id="emojiPick"></div>
+    <div class="mActions"><button class="mbtn primary" id="addGoal">목표 추가하기</button></div>
+    <div class="mActions"><button class="mbtn ghost" id="closeSettings">닫기</button></div>
+  </div>
+</div>
+
+<script type="module">
+/* ═══ 설정 — 비우면 데모, 채우면 진짜(카메라·인식·저장·스토리지) ═══ */
+const CONFIG = { SUPABASE_URL:"", SUPABASE_ANON_KEY:"", RECOGNIZE_ENDPOINT:"" };
+const LIVE = !!(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY);
+let sb = null;
+
+const day=86400000, now=Date.now();
+const demoDB = {
+  children:[ {id:'c1',name:'민준',active_goal:'g1'}, {id:'c2',name:'서준',active_goal:'g4'} ],
+  goals:[
+    {id:'g1',child_id:'c1',name:'빨간 자전거',emoji:'🚲',color:'#E0564B',image:null,aspect:1,price:100000},
+    {id:'g2',child_id:'c1',name:'게임기',    emoji:'🎮',color:'#3F86C9',image:null,aspect:1,price:320000},
+    {id:'g3',child_id:'c1',name:'공룡 인형',  emoji:'🦖',color:'#2DB67D',image:null,aspect:1,price:18000},
+    {id:'g4',child_id:'c2',name:'축구화',    emoji:'⚽',color:'#3F86C9',image:null,aspect:1,price:80000},
+    {id:'g5',child_id:'c2',name:'드론',      emoji:'🚀',color:'#9B6FD4',image:null,aspect:1,price:150000},
+  ],
+  deposits:[
+    {id:'d1',child_id:'c1',goal_id:'g1',amount:50000,type:'bill',serial:'BX48273910A',t:now-1*day},
+    {id:'d2',child_id:'c1',goal_id:'g1',amount:10000,type:'bill',serial:'KD90112740C',t:now-2*day},
+    {id:'d3',child_id:'c1',goal_id:'g1',amount:5000, type:'bill',serial:'TM55093218A',t:now-3*day},
+    {id:'d4',child_id:'c2',goal_id:'g4',amount:30000,type:'bill',serial:'PA33120945B',t:now-2*day},
+  ],
+};
+const EMOJIS=["🚲","🎮","🦖","🧱","⚽","🎸","🛹","🪁","🎨","📚","🧸","🚀"];
+const COLORS=["#E0564B","#3F86C9","#2DB67D","#9B6FD4","#E08A2B","#D24B86"];
+
+/* 데이터 계층 */
+const db = {
+  async children(){ if(!LIVE) return demoDB.children.map(c=>({...c}));
+    const {data}=await sb.from('children').select('*').order('created_at'); return data||[]; },
+  async child(id){ if(!LIVE) return {...demoDB.children.find(c=>c.id===id)};
+    const {data}=await sb.from('children').select('*').eq('id',id).single(); return data; },
+  async goals(cid){ if(!LIVE) return demoDB.goals.filter(g=>g.child_id===cid).map(g=>({...g}));
+    const {data}=await sb.from('goals').select('*').eq('child_id',cid).order('sort'); return data||[]; },
+  async deposits(cid){ if(!LIVE) return demoDB.deposits.filter(d=>d.child_id===cid).map(d=>({...d}));
+    const {data}=await sb.from('deposits').select('*').eq('child_id',cid).order('created_at',{ascending:false});
+    return (data||[]).map(d=>({...d,t:Date.parse(d.created_at)})); },
+  async isDuplicate(cid,serial,amount){ if(!serial) return false;
+    if(!LIVE) return demoDB.deposits.some(d=>d.child_id===cid&&d.serial===serial&&d.amount===amount);
+    const {data}=await sb.from('deposits').select('id').eq('child_id',cid).eq('serial',serial).eq('amount',amount).limit(1);
+    return !!(data&&data.length); },
+  async insertDeposit(rec){ if(!LIVE){ demoDB.deposits.push({id:'d'+Date.now(),t:Date.now(),...rec}); return {ok:true}; }
+    const {error}=await sb.from('deposits').insert(rec); return error?{ok:false,dup:error.code==='23505'}:{ok:true}; },
+  async setActive(cid,gid){ if(!LIVE){ demoDB.children.find(c=>c.id===cid).active_goal=gid; return; }
+    await sb.from('children').update({active_goal:gid}).eq('id',cid); },
+  async addGoal(cid,g){ if(!LIVE){ demoDB.goals.push({id:'g'+Date.now(),child_id:cid,...g}); return; }
+    await sb.from('goals').insert({child_id:cid,...g}); },
+  async delGoal(gid){ if(!LIVE){ demoDB.goals=demoDB.goals.filter(g=>g.id!==gid); demoDB.deposits=demoDB.deposits.filter(d=>d.goal_id!==gid); return; }
+    await sb.from('goals').delete().eq('id',gid); },
+  async upload(canvas){                 /* 사진 → Storage 주소(LIVE) / data URL(데모) */
+    if(!LIVE) return canvasURL(canvas);
+    const blob=await canvasBlob(canvas,'image/png');
+    const path=`${S.childId}/${Date.now()}.png`;
+    const {error}=await sb.storage.from('goal-images').upload(path,blob,{contentType:'image/png',upsert:true});
+    if(error){ toast('사진 업로드 실패: '+error.message,true); return canvasURL(canvas); }
+    return sb.storage.from('goal-images').getPublicUrl(path).data.publicUrl;
+  },
+};
+
+/* 상태 */
+let children=[];
+let S={ childId:null, childName:'', activeId:null, goals:[], deposits:[] };
+const $=s=>document.querySelector(s);
+const won=n=>Number(n).toLocaleString("ko-KR");
+const active=()=>S.goals.find(g=>g.id===S.activeId)||S.goals[0];
+const savedFor=id=>S.deposits.filter(d=>d.goal_id===id).reduce((a,d)=>a+d.amount,0);
+
+/* 이미지 유틸 */
+function loadImg(file){ return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=URL.createObjectURL(file); }); }
+function toCanvas(img,max=720){ let w=img.width,h=img.height; const s=Math.min(1,max/Math.max(w,h)); w=Math.round(w*s); h=Math.round(h*s);
+  const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); return c; }
+function canvasURL(c){ return c.toDataURL('image/png'); }
+function canvasBlob(c,type='image/png',q=0.92){ return new Promise(r=>c.toBlob(b=>r(b),type,q)); }
+
+/* 가벼운 배경 제거: 네 모서리 색을 배경으로 보고 비슷한 영역을 투명 처리(플러드필) */
+function removeBackground(c, tol=44){
+  const x=c.getContext('2d'), w=c.width, h=c.height, img=x.getImageData(0,0,w,h), d=img.data;
+  const cs=[[0,0],[w-1,0],[0,h-1],[w-1,h-1]]; let br=0,bg=0,bb=0;
+  cs.forEach(([cx,cy])=>{ const i=(cy*w+cx)*4; br+=d[i]; bg+=d[i+1]; bb+=d[i+2]; }); br/=4; bg/=4; bb/=4;
+  const seen=new Uint8Array(w*h), st=[]; cs.forEach(([cx,cy])=>st.push(cy*w+cx)); const t2=tol*tol;
+  while(st.length){ const p=st.pop(); if(seen[p]) continue; seen[p]=1; const i=p*4;
+    const dr=d[i]-br,dg=d[i+1]-bg,dbl=d[i+2]-bb; if(dr*dr+dg*dg+dbl*dbl>t2) continue;
+    d[i+3]=0; const px=p%w, py=(p/w)|0;
+    if(px>0)st.push(p-1); if(px<w-1)st.push(p+1); if(py>0)st.push(p-w); if(py<h-1)st.push(p+w); }
+  x.putImageData(img,0,0); return c;
+}
+/* 투명 여백 잘라내기 → 박스가 그림에 딱 맞아 정확히 차오름 */
+function trimCanvas(c){
+  const x=c.getContext('2d'), w=c.width, h=c.height, d=x.getImageData(0,0,w,h).data;
+  let top=h,left=w,right=0,bottom=0,hit=false;
+  for(let y=0;y<h;y++) for(let xx=0;xx<w;xx++){ if(d[(y*w+xx)*4+3]>14){ hit=true;
+    if(y<top)top=y; if(y>bottom)bottom=y; if(xx<left)left=xx; if(xx>right)right=xx; } }
+  if(!hit) return {canvas:c, aspect:c.width/c.height};
+  const pad=Math.round(Math.max(right-left,bottom-top)*0.05);
+  left=Math.max(0,left-pad); top=Math.max(0,top-pad); right=Math.min(w-1,right+pad); bottom=Math.min(h-1,bottom+pad);
+  const cw=right-left+1, ch=bottom-top+1, o=document.createElement('canvas'); o.width=cw; o.height=ch;
+  o.getContext('2d').drawImage(c,left,top,cw,ch,0,0,cw,ch); return {canvas:o, aspect:cw/ch};
+}
+function emojiArt(emoji){
+  const SZ=512, c=document.createElement('canvas'); c.width=c.height=SZ; const x=c.getContext('2d');
+  x.textAlign='center'; x.textBaseline='middle';
+  x.font="400 "+Math.floor(SZ*0.78)+"px 'Apple Color Emoji','Noto Color Emoji','Segoe UI Emoji',sans-serif";
+  x.fillText(emoji,SZ/2,SZ/2); const {canvas,aspect}=trimCanvas(c); return {src:canvasURL(canvas),aspect};
+}
+async function processImage(file){
+  const img=await loadImg(file); const c=toCanvas(img,720); removeBackground(c);
+  const {canvas,aspect}=trimCanvas(c); return {canvas, aspect, preview:canvasURL(canvas)};
+}
+function artFor(g){
+  if(g._art) return g._art;
+  g._art = g.image ? { src:g.image, aspect:g.aspect||1 } : emojiArt(g.emoji||'🎯');
+  return g._art;
+}
+
+async function loadChild(id){
+  const c=await db.child(id), goals=await db.goals(id), deps=await db.deposits(id);
+  S={ childId:id, childName:c.name, activeId:c.active_goal||(goals[0]&&goals[0].id), goals, deposits:deps };
+  render();
+}
+
+function render(){
+  const g=active();
+  if(!g){ $("#goalName").textContent="목표를 추가해 주세요"; $("#cheer").textContent=""; $("#meter").style.width="0%"; $("#artGray").src=$("#artColor").src=""; $("#surface").style.opacity="0"; return; }
+  const saved=savedFor(g.id), pct=Math.min(100,Math.round((saved/g.price)*100)), left=Math.max(0,g.price-saved);
+
+  $("#goalName").textContent=g.name;
+  $("#cheer").textContent = left<=0 ? "다 모았어요! 🎉" : (won(left)+"원만 더 모으면 돼요!");
+
+  const a=artFor(g), base=$("#artGray"), col=$("#artColor"), wrap=$("#art");
+  if(base.dataset.src!==a.src){ base.src=a.src; col.src=a.src; base.dataset.src=col.dataset.src=a.src; }
+  wrap.style.aspectRatio=String(a.aspect);
+  wrap.style.width=`min(92vw, calc(64vh * ${a.aspect}))`;
+
+  /* 물이 차오르듯 부드러운 경계 */
+  col.style.setProperty('--lvl', (pct>=100?112:pct)+'%');
+  const surf=$("#surface"); surf.style.bottom=pct+'%'; surf.style.opacity=(pct>3&&pct<99)?'0.85':'0';
+
+  const m=$("#meter"); m.style.width=pct+"%"; m.style.background=g.color;
+}
+
+/* 저축 */
+async function commit(amount, serial){
+  const g=active(), before=savedFor(g.id);
+  if(serial && await db.isDuplicate(S.childId,serial,amount)){ toast("이미 저축한 지폐예요! 같은 돈은 한 번만 셀 수 있어요.", true); return; }
+  const rec={ child_id:S.childId, goal_id:g.id, amount, type:'bill', serial:serial||null };
+  S.deposits.unshift({ id:'tmp'+Date.now(), t:Date.now(), ...rec }); render();
+  const res=await db.insertDeposit(rec);
+  if(!res.ok){ S.deposits=S.deposits.filter(d=>!String(d.id).startsWith('tmp')); render();
+    toast(res.dup?"이미 저축한 지폐예요!":"저장에 실패했어요. 다시 시도해 주세요.", true); return; }
+  if(before<g.price && before+amount>=g.price){ party(); toast(g.name+" 다 모았어요! 🎉", false); }
+  else toast("+"+won(amount)+"원 저축했어요!", false);
+}
+
+/* 카메라 + Cloud Vision (없으면 예시) */
+let stream=null;
+async function onSave(){ if(!CONFIG.RECOGNIZE_ENDPOINT) return simulate();
+  try{ stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); $("#cam").srcObject=stream; $("#camScrim").classList.add("show"); }
+  catch(e){ toast("카메라를 열 수 없어 예시 모드로 진행해요.", true); simulate(); } }
+function closeCam(){ $("#camScrim").classList.remove("show"); if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } }
+async function shoot(){
+  const v=$("#cam"); if(!v.videoWidth){ toast("잠시 후 다시 눌러 주세요.", true); return; }
+  const cv=document.createElement('canvas'); cv.width=v.videoWidth; cv.height=v.videoHeight; cv.getContext('2d').drawImage(v,0,0);
+  const b64=cv.toDataURL('image/jpeg',0.85).split(',')[1]; $("#camHint").textContent="지폐를 읽는 중…";
+  try{ const r=await fetch(CONFIG.RECOGNIZE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:b64})});
+    const out=await r.json(); $("#camHint").textContent="초점이 맞으면 ‘이 지폐 저축하기’를 눌러요.";
+    if(!out.serial||!out.amount){ toast("일련번호가 안 보여요. 더 또렷하게 다시 찍어 주세요.", true); return; }
+    closeCam(); await commit(out.amount, out.serial);
+  }catch(e){ $("#camHint").textContent="초점이 맞으면 ‘이 지폐 저축하기’를 눌러요."; toast("인식 서버에 연결하지 못했어요.", true); }
+}
+function simulate(){ const btn=$("#saveBtn"); btn.disabled=true; const html=btn.innerHTML; btn.innerHTML="<span>🔎</span> 읽는 중…";
+  setTimeout(async()=>{ btn.disabled=false; btn.innerHTML=html; const d=[1000,5000,5000,10000]; await commit(d[Math.floor(Math.random()*d.length)], genSerial()); },800); }
+function genSerial(){ const L="ABCDEFGHJKLMNPRSTUVWXYZ",r=a=>a[Math.floor(Math.random()*a.length)]; let n=""; for(let i=0;i<8;i++)n+=Math.floor(Math.random()*10); return r(L)+r(L)+n+r(L); }
+
+/* 알림·축하 */
+let toastT;
+function toast(m,w){ const e=$("#toast"); e.textContent=m; e.className="toast show"+(w?" warn":""); clearTimeout(toastT); toastT=setTimeout(()=>e.className="toast"+(w?" warn":""),2200); }
+function party(){ if(matchMedia("(prefers-reduced-motion:reduce)").matches) return;
+  const cols=["#F4B740","#2DB67D","#E0564B","#3F86C9","#D24B86"];
+  for(let i=0;i<44;i++){ const p=document.createElement("div"); p.className="pop"; p.style.background=cols[i%cols.length];
+    p.style.left=(45+Math.random()*10)+"vw"; p.style.top="40vh"; document.body.appendChild(p);
+    const dx=(Math.random()-.5)*600, dy=200+Math.random()*280, rot=Math.random()*720;
+    p.animate([{transform:"translate(0,0) rotate(0)",opacity:1},{transform:`translate(${dx}px,${dy}px) rotate(${rot}deg)`,opacity:0}],{duration:1500+Math.random()*600,easing:"cubic-bezier(.2,.6,.3,1)"}).onfinish=()=>p.remove(); } }
+
+/* 설정 모달 */
+let pickEmoji=EMOJIS[0], pendingPhoto=null;
+function openSettings(){ drawKids(); drawGoals(); drawEmoji(); $("#scrim").classList.add("show"); }
+const closeSettings=()=>$("#scrim").classList.remove("show");
+function drawKids(){ $("#kidPills").innerHTML=children.map(c=>`<button class="pill ${c.id===S.childId?'on':''}" data-kid="${c.id}">${c.name}</button>`).join(""); }
+function drawGoals(){
+  $("#goalList").innerHTML=S.goals.map(g=>{
+    const ns=savedFor(g.id), pct=Math.min(100,Math.round((ns/g.price)*100)), on=g.id===S.activeId;
+    const thumb=g.image?`<img class="em" src="${g.image}" alt="">`:`<span class="em">${g.emoji||'🎯'}</span>`;
+    return `<div class="gitem ${on?'on':''}" data-go="${g.id}">${thumb}
+      <span><span class="nm">${g.name}</span><br><span class="pr">${won(ns)} / ${won(g.price)}원 · ${pct}%</span></span>
+      ${on?'<span class="now">지금 모으는 중</span>':(S.goals.length>1?`<button class="del" data-del="${g.id}">삭제</button>`:'')}</div>`;
+  }).join("") || '<div class="pr" style="color:var(--muted)">아직 목표가 없어요. 아래에서 만들어 주세요.</div>';
+}
+function drawEmoji(){ $("#emojiPick").innerHTML=EMOJIS.map(e=>`<button data-e="${e}" class="${(!pendingPhoto&&e===pickEmoji)?'sel':''}">${e}</button>`).join(""); }
+function clearPhoto(){ pendingPhoto=null; $("#photoPrev").hidden=true; $("#photoPrev").src=""; $("#photoBtn").textContent="📷 사진 찍기 / 올리기"; }
+
+/* 이벤트 */
+$("#saveBtn").onclick=onSave; $("#shoot").onclick=shoot; $("#camClose").onclick=closeCam;
+$("#camScrim").addEventListener("click",e=>{ if(e.target===$("#camScrim")) closeCam(); });
+$("#openSettings").onclick=openSettings; $("#closeSettings").onclick=closeSettings;
+$("#scrim").addEventListener("click",e=>{ if(e.target===$("#scrim")) closeSettings(); });
+$("#kidPills").addEventListener("click",e=>{ const b=e.target.closest("[data-kid]"); if(b) loadChild(b.dataset.kid).then(openSettings); });
+$("#goalList").addEventListener("click",async e=>{
+  const del=e.target.closest("[data-del]");
+  if(del){ e.stopPropagation(); await db.delGoal(del.dataset.del); await loadChild(S.childId); openSettings(); return; }
+  const it=e.target.closest("[data-go]");
+  if(it){ S.activeId=it.dataset.go; await db.setActive(S.childId,S.activeId); render(); drawGoals(); }
+});
+$("#photoBtn").onclick=()=>$("#photoInput").click();
+$("#photoInput").addEventListener("change", async e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f) return;
+  $("#photoBtn").textContent="배경 지우는 중…";
+  try{ pendingPhoto=await processImage(f); const pv=$("#photoPrev"); pv.src=pendingPhoto.preview; pv.hidden=false; $("#photoBtn").textContent="📷 사진 바꾸기"; drawEmoji(); }
+  catch(err){ $("#photoBtn").textContent="📷 사진 찍기 / 올리기"; toast("사진을 불러오지 못했어요.", true); }
+  e.target.value="";
+});
+$("#emojiPick").addEventListener("click",e=>{ const b=e.target.closest("[data-e]"); if(b){ pickEmoji=b.dataset.e; clearPhoto(); drawEmoji(); }});
+$("#addGoal").onclick=async()=>{
+  const name=$("#gName").value.trim(), price=Number($("#gPrice").value)||0;
+  if(!name||price<=0){ toast("이름과 가격을 정해 주세요.", true); return; }
+  let image=null, aspect=1;
+  if(pendingPhoto){ toast("사진 올리는 중…", false); image=await db.upload(pendingPhoto.canvas); aspect=pendingPhoto.aspect; }
+  const g={ name, color:COLORS[S.goals.length%COLORS.length], price, sort:S.goals.length, emoji:pendingPhoto?null:pickEmoji, image, aspect };
+  await db.addGoal(S.childId, g);
+  $("#gName").value=""; $("#gPrice").value=""; clearPhoto();
+  await loadChild(S.childId);
+  const mine=S.goals.filter(x=>x.name===name); if(mine.length){ S.activeId=mine[mine.length-1].id; await db.setActive(S.childId,S.activeId); render(); }
+  openSettings(); toast("새 목표 '"+name+"'을(를) 추가했어요.", false);
+};
+
+/* 시작 + 서비스워커 */
+async function init(){
+  if(LIVE){ const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2'); sb=createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY); }
+  children=await db.children();
+  if(children.length) await loadChild(children[0].id);
+  if('serviceWorker' in navigator){ try{ await navigator.serviceWorker.register('./sw.js'); }catch(e){} }
+}
+init();
+</script>
+</body>
+</html>
