@@ -485,14 +485,18 @@ async function loadChild(id){
 
 function render(){
   const g=active();
-  if(!g){ $("#goalName").textContent="목표를 추가해 주세요"; $("#cheer").textContent=""; $("#meter").style.width="0%"; $("#dSaved").textContent=$("#dTarget").textContent="0원"; $("#dPct").textContent="0%"; $("#artGray").src=$("#artColor").src=""; $("#surface").style.opacity="0"; $("#nextGoalBtn").hidden=true; return; }
+  if(!g){ $("#goalName").textContent="목표를 추가해 주세요"; $("#cheer").textContent=""; $("#meter").style.width="0%"; $("#dSaved").textContent=$("#dTarget").textContent="0원"; $("#dPct").textContent="0%"; $("#artGray").src=$("#artColor").src=""; $("#artGray").dataset.src=$("#artColor").dataset.src=""; $("#surface").style.opacity="0"; $("#nextGoalBtn").hidden=true; return; }
   const saved=savedFor(g.id), pct=Math.min(100,Math.round((saved/g.price)*100)), left=Math.max(0,g.price-saved);
 
   $("#goalName").textContent=g.name;
   $("#cheer").textContent = left<=0 ? "다 모았어요! 🎉" : (wonKo(left)+"만 더 모으면 돼요!");
 
   const a=artFor(g), base=$("#artGray"), col=$("#artColor"), wrap=$("#art");
-  if(base.dataset.src!==a.src){ base.src=a.src; col.style.opacity='0'; col.onload=()=>{ col.style.opacity='1'; }; col.src=a.src; setTimeout(()=>{ col.style.opacity='1'; },500); base.dataset.src=col.dataset.src=a.src; }
+  const changed = base.dataset.src!==a.src;
+  base.src=a.src;
+  if(changed){ col.style.opacity='0'; col.onload=()=>{ col.style.opacity='1'; }; setTimeout(()=>{ col.style.opacity='1'; },500); }
+  else col.style.opacity='1';
+  col.src=a.src; base.dataset.src=col.dataset.src=a.src;
   wrap.style.aspectRatio=String(a.aspect);
   wrap.style.width=artW(a.aspect);
 
@@ -570,7 +574,7 @@ function previewSrc(){ if(pendingPhoto) return {src:pendingPhoto.preview, aspect
   const ic=iconFromName($("#gName").value.trim()); return ART[ic||'gift'](newColorSel); }
 function artW(asp){ return document.body.classList.contains('sheet') ? `min(64vw, calc(30vh * ${asp}))` : `min(92vw, calc(64vh * ${asp}))`; }
 function setMainArt(a){ const base=$("#artGray"), col=$("#artColor"), wrap=$("#art");
-  if(base.dataset.src!==a.src){ base.src=a.src; col.src=a.src; base.dataset.src=col.dataset.src=a.src; }
+  base.src=a.src; col.src=a.src; base.dataset.src=col.dataset.src=a.src;
   wrap.style.aspectRatio=String(a.aspect); wrap.style.width=artW(a.aspect);
   col.style.opacity='1'; col.style.setProperty('--lvl','112%'); $("#surface").style.opacity='0'; }
 function updatePreview(){ const a=previewSrc(); $("#formPrevImg").src=a.src; $("#art").style.setProperty('--prevcol', newColorSel); if(document.body.classList.contains('sheet')) setMainArt(a); }
