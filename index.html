@@ -29,11 +29,11 @@
   .cheer{font-size:14px; color:var(--muted); margin-top:4px; min-height:1.1em}
 
   /* 그림(이미지)만 흑백→컬러, 박스를 그림 비율에 맞춰 정확히 차오름 */
-  .stage{flex:1; display:flex; align-items:center; justify-content:center; min-height:200px; padding:6px 0}
-  .art{position:relative; width:min(92vw,64vh); max-height:68vh}
+  .stage{flex:1; display:flex; align-items:center; justify-content:center; min-height:200px; padding:6px 0; transition:max-height .34s cubic-bezier(.22,1,.36,1)}
+  .art{position:relative; width:min(92vw,64vh); max-height:68vh; transition:width .34s cubic-bezier(.22,1,.36,1)}
   .art .layer{position:absolute; inset:0; width:100%; height:100%; object-fit:contain}
   .art .gray{filter:grayscale(1) contrast(1.18) brightness(1.03)}
-  .art .color{ --lvl:0%; transition:--lvl .6s cubic-bezier(.22,1,.36,1);
+  .art .color{ --lvl:0%; opacity:1; transition:--lvl .6s cubic-bezier(.22,1,.36,1), opacity .45s ease;
     -webkit-mask-image:linear-gradient(to top,#000 0%,#000 calc(var(--lvl) - 5%),rgba(0,0,0,0) calc(var(--lvl) + 6%),rgba(0,0,0,0) 100%);
             mask-image:linear-gradient(to top,#000 0%,#000 calc(var(--lvl) - 5%),rgba(0,0,0,0) calc(var(--lvl) + 6%),rgba(0,0,0,0) 100%); }
   .art .surface{position:absolute; left:9%; right:9%; bottom:0; height:3px; border-radius:3px;
@@ -57,13 +57,17 @@
   .btn:active{transform:scale(.98)}
   .btn.save{background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; gap:10px}
   .btn.set{background:var(--card); color:var(--ink)}
+  .btn.next{background:var(--gold); color:var(--ink); width:100%; margin-bottom:10px; animation:risein .42s ease}
+  @keyframes risein{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
 
   .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:14px 22px; border-radius:14px; font-size:16px; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:90; max-width:90vw; text-align:center}
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0)} .toast.warn{background:var(--warn)}
 
-  .scrim{position:fixed; inset:0; background:rgba(40,58,63,.5); display:none; align-items:center; justify-content:center; padding:18px; z-index:80}
-  .scrim.show{display:flex}
-  .modal{background:var(--card); border-radius:var(--r); padding:22px; width:100%; max-width:480px; max-height:90vh; overflow:auto; box-shadow:var(--shadow)}
+  .scrim{position:fixed; inset:0; background:rgba(40,58,63,.5); display:flex; align-items:center; justify-content:center; padding:18px; z-index:80; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .28s ease, visibility .28s ease}
+  .scrim.show{opacity:1; visibility:visible; pointer-events:auto}
+  .modal{background:var(--card); border-radius:var(--r); padding:22px; width:100%; max-width:480px; max-height:90vh; overflow:auto; box-shadow:var(--shadow); transform:translateY(14px) scale(.98); transition:transform .32s cubic-bezier(.22,1,.36,1)}
+  .scrim.show .modal{transform:none}
+  @media (prefers-reduced-motion:reduce){ .scrim,.modal{transition:none} }
   .modal h2{font-size:22px; margin:0 0 4px} .modal p.sub{margin:0 0 14px; color:var(--muted); font-size:14px}
   .modal label{display:block; font-size:14px; color:var(--muted); margin:14px 0 6px}
   .modal input[type=text],.modal input[type=number]{width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:12px; font-size:16px; font-family:inherit; background:#FBFAF4}
@@ -77,6 +81,12 @@
   .gitem .nm{font-weight:700} .gitem .pr{font-size:13px; color:var(--muted)}
   .gitem .now{margin-left:auto; font-size:12px; color:#1c6b48; font-weight:700}
   .gitem .del{margin-left:auto; background:none; border:none; color:var(--warn); cursor:pointer; font-size:14px}
+  .shelf{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px}
+  .done{width:96px; padding:10px 8px; border:2px solid var(--line); border-radius:14px; background:#FBFAF4; text-align:center; cursor:pointer; position:relative}
+  .done.on{border-color:var(--go); background:var(--go-soft)}
+  .done img{width:62px; height:62px; object-fit:contain; display:block; margin:0 auto 4px}
+  .done .dn{display:block; font-size:12px; font-weight:700; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .done .ck{display:block; font-size:11px; color:#1c8a5b; font-weight:700; margin-top:2px}
   .photoRow{display:flex; align-items:center; gap:12px; margin-top:8px}
   .photoBtn{flex:1; padding:14px; border:1.5px dashed var(--line); border-radius:12px; background:#FBFAF4; color:var(--ink); font-family:inherit; font-weight:700; font-size:15px; cursor:pointer}
   .photoPrev{width:58px; height:58px; border-radius:12px; object-fit:contain; border:1px solid var(--line); background:#fff}
@@ -85,6 +95,33 @@
   .emojiPick{display:flex; gap:8px; flex-wrap:wrap}
   .emojiPick button{font-size:24px; width:46px; height:46px; border-radius:12px; border:2px solid var(--line); background:#FBFAF4; cursor:pointer}
   .emojiPick button.sel{border-color:var(--go); background:var(--go-soft)}
+  .colorPick{display:flex; gap:8px; flex-wrap:wrap}
+  .colorPick button{width:34px; height:34px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1px var(--line); cursor:pointer; padding:0}
+  .colorPick button.sel{box-shadow:0 0 0 3px var(--go)}
+  .iconPick{display:flex; gap:8px; flex-wrap:wrap}
+  .iconPick button{width:56px; height:56px; border-radius:12px; border:2px solid var(--line); background:#FBFAF4; cursor:pointer; padding:6px; display:flex; align-items:center; justify-content:center}
+  .iconPick button.sel{border-color:var(--go); background:var(--go-soft)}
+  .iconPick img{max-width:100%; max-height:100%; object-fit:contain}
+  .iconTabs{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px}
+  .iconTabs button{border:none; background:var(--paper); color:var(--muted); font-family:inherit; font-weight:700; font-size:13px; padding:7px 13px; border-radius:999px; cursor:pointer}
+  .iconTabs button.on{background:var(--ink); color:#fff}
+  .formPrev{display:flex; justify-content:center; margin:10px 0 2px}
+  .formPrev img{height:118px; max-width:78%; object-fit:contain}
+  body.sheet .stage{max-height:34vh; align-items:flex-start; padding-top:2px}
+  #scrim{align-items:flex-end}
+  #scrim .modal{width:100%; max-width:640px; max-height:66vh; border-radius:22px 22px 0 0; transform:translateY(100%)}
+  #scrim.show .modal{transform:translateY(0)}
+  .previewTag{display:none}
+  body.sheet .previewTag{display:block; text-align:center; color:var(--muted); font-weight:700; font-size:13px; margin-top:8px}
+  body.sheet .art{outline:3px dashed var(--prevcol, #F4B740); outline-offset:10px; border-radius:14px}
+  @keyframes pop{0%{transform:scale(1)}38%{transform:scale(1.09)}68%{transform:scale(.975)}100%{transform:scale(1)}}
+  @keyframes popbig{0%{transform:scale(1)}35%{transform:scale(1.16)}65%{transform:scale(.95)}100%{transform:scale(1)}}
+  .art.pop{animation:pop .62s cubic-bezier(.22,1,.36,1)}
+  .art.pop.big{animation:popbig .7s cubic-bezier(.22,1,.36,1)}
+  .burst{position:absolute; inset:0; pointer-events:none; z-index:3}
+  .burst span{position:absolute; left:50%; top:46%; font-size:24px; animation:spark .9s ease-out forwards}
+  @keyframes spark{0%{opacity:0; transform:translate(-50%,-50%) scale(.4)}20%{opacity:1}100%{opacity:0; transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.1)}}
+  @media (prefers-reduced-motion:reduce){ .art.pop{animation:none} .burst{display:none} .stage,.art{transition:none} }
   .mActions{display:flex; gap:10px; margin-top:18px}
   .mbtn{flex:1; padding:14px; border-radius:12px; border:none; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit}
   .mbtn.primary{background:var(--go); color:#fff} .mbtn.ghost{background:var(--paper); color:var(--ink)}
@@ -106,6 +143,7 @@
       <img class="layer color" id="artColor" alt="" />
       <div class="surface" id="surface"></div>
     </div>
+    <div class="previewTag" id="previewTag">✨ 이렇게 보여요</div>
   </div>
   <div class="dash">
     <div class="dash-row">
@@ -115,6 +153,7 @@
     </div>
     <div class="meter"><i id="meter"></i><span class="tick" style="left:25%"></span><span class="tick" style="left:50%"></span><span class="tick" style="left:75%"></span></div>
   </div>
+  <button class="btn next" id="nextGoalBtn" hidden>🎯 다음 목표 정하기</button>
   <div class="btns">
     <button class="btn set" id="openSettings">목표 설정</button>
     <button class="btn save" id="saveBtn"><span>📷</span> 저축하기</button>
@@ -144,6 +183,10 @@
     <div class="pills" id="kidPills"></div>
     <label>목표 (탭하면 ‘지금 모으는 목표’가 돼요)</label>
     <div id="goalList"></div>
+    <div class="orline" style="margin-top:10px">지금 목표 색 바꾸기</div>
+    <div class="colorPick" id="goalColor"></div>
+    <div class="orline" id="doneTitle" hidden style="margin-top:14px">🏆 내가 이룬 목표</div>
+    <div id="doneList" class="shelf"></div>
     <label>새 목표 만들기</label>
     <input id="gName" type="text" placeholder="목표 이름 (예: 레고 세트)" />
     <input id="gPrice" type="number" min="0" step="1000" inputmode="numeric" placeholder="가격 (원)" style="margin-top:10px" />
@@ -153,7 +196,13 @@
     </div>
     <input type="file" id="photoInput" accept="image/*" capture="environment" hidden />
     <p class="hint">장난감만 크게, 단순한 배경에서 찍어 주세요. 사진을 올리면 배경을 지우고 흑백 그림으로 바뀌어, 저축할수록 컬러로 차올라요.</p>
-    <div class="orline">사진이 없으면 아래 그림 중 하나를 골라도 돼요</div>
+    <div class="orline" style="margin-top:14px">그림 색</div>
+    <div class="colorPick" id="newColor"></div>
+    <div class="formPrev" id="formPrev"><img id="formPrevImg" alt="미리보기" /></div>
+    <div class="orline">사진이 없으면 그림을 골라요</div>
+    <div class="iconTabs" id="iconTabs"></div>
+    <div class="iconPick" id="iconPick"></div>
+    <div class="orline">또는 이모지</div>
     <div class="emojiPick" id="emojiPick"></div>
     <div class="mActions"><button class="mbtn primary" id="addGoal">목표 추가하기</button></div>
     <div class="mActions"><button class="mbtn ghost" id="closeSettings">닫기</button></div>
@@ -167,13 +216,145 @@ const LIVE = !!(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY);
 let sb = null;
 
 const day=86400000, now=Date.now();
+
+/* 예시용 벡터 일러스트 — 직접 그려 어떤 크기에서도 선명, 색도 바꿀 수 있음 */
+const PAL=['#E0564B','#E08A2B','#F4B740','#2DB67D','#3F86C9','#9B6FD4','#D24B86'];
+function darken(hex,f){ const n=parseInt(hex.slice(1),16); let r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  r=Math.round(r*(1-f)); g=Math.round(g*(1-f)); b=Math.round(b*(1-f)); return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1); }
+const IDLE_CSS='<style>.idle{transform-box:fill-box;transform-origin:center;animation:breathe 3.6s ease-in-out infinite}.ey{transform-box:fill-box;transform-origin:center;animation:blink 4.2s ease-in-out infinite}@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}@keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}@media(prefers-reduced-motion:reduce){.idle,.ey{animation:none}}</style>';
+function wrap(vb,inner){ const p=vb.split(' ');
+  return { src:"data:image/svg+xml,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}">${IDLE_CSS}<g class="idle">${inner}</g></svg>`), aspect:Number(p[2])/Number(p[3]) }; }
+const ART={
+  bike(color){
+    const r=96, R={x:113,y:267}, F={x:447,y:267};
+    const spokes=(c)=>{ let s=''; for(let i=0;i<8;i++){ const a=i*Math.PI/4;
+      s+=`<line x1="${c.x}" y1="${c.y}" x2="${(c.x+Math.cos(a)*(r-12)).toFixed(1)}" y2="${(c.y+Math.sin(a)*(r-12)).toFixed(1)}"/>`; } return s; };
+    const wheel=(c)=>`<circle cx="${c.x}" cy="${c.y}" r="${r}" fill="none" stroke="#2A2B30" stroke-width="18"/>`
+      +`<circle cx="${c.x}" cy="${c.y}" r="${r-14}" fill="#FBF7F0" stroke="#C6C8CE" stroke-width="4"/>`
+      +`<g stroke="#AEB2BB" stroke-width="2.2">${spokes(c)}</g><circle cx="${c.x}" cy="${c.y}" r="9" fill="#8C9097"/>`;
+    const inner=wheel(R)+wheel(F)
+      +`<path d="M280,267 L116,267" fill="none" stroke="#71747C" stroke-width="4" opacity="0.8" transform="translate(0,7)"/>`
+      +`<g fill="none" stroke="${color}" stroke-linecap="round" stroke-linejoin="round">`
+      +`<path d="M220,40 L372,70" stroke-width="13"/><path d="M280,267 L372,70" stroke-width="13"/>`
+      +`<path d="M280,267 L220,40" stroke-width="13"/><path d="M220,40 L113,267" stroke-width="9"/>`
+      +`<path d="M280,267 L113,267" stroke-width="9"/><path d="M372,70 L447,267" stroke-width="11"/></g>`
+      +`<g fill="none" stroke="#3A3B40" stroke-linecap="round" stroke-width="9"><path d="M372,70 L388,20"/><path d="M352,16 L416,30"/></g>`
+      +`<g stroke="#1F2024" stroke-linecap="round" stroke-width="13"><path d="M348,15 L360,18"/><path d="M408,28 L420,31"/></g>`
+      +`<path d="M196,30 q24,-15 50,-2 q-7,13 -27,13 q-18,0 -23,-11 z" fill="#2B2B2E"/>`
+      +`<circle cx="280" cy="267" r="19" fill="none" stroke="#9A9DA6" stroke-width="6"/><circle cx="280" cy="267" r="6" fill="#7E818A"/>`
+      +`<path d="M280,267 L300,302" fill="none" stroke="#3A3B40" stroke-linecap="round" stroke-width="7"/><rect x="292" y="300" width="23" height="9" rx="3" fill="#1F2024"/>`;
+    return wrap("0 0 560 380", inner);
+  },
+  game(color){
+    const d=darken(color,.18);
+    const inner=`<rect x="20" y="20" width="130" height="320" rx="55" fill="${color}"/>`
+      +`<rect x="370" y="20" width="130" height="320" rx="55" fill="${color}"/>`
+      +`<rect x="150" y="20" width="220" height="320" rx="20" fill="#20232A"/>`
+      +`<rect x="168" y="42" width="184" height="276" rx="10" fill="#2E3440"/>`
+      +`<circle cx="85" cy="118" r="26" fill="${d}"/><circle cx="85" cy="118" r="15" fill="#3A3D44"/>`
+      +`<g fill="${d}"><rect x="70" y="232" width="30" height="12" rx="4"/><rect x="79" y="223" width="12" height="30" rx="4"/></g>`
+      +`<circle cx="435" cy="242" r="26" fill="${d}"/><circle cx="435" cy="242" r="15" fill="#3A3D44"/>`
+      +`<g fill="${d}"><circle cx="435" cy="100" r="11"/><circle cx="435" cy="140" r="11"/><circle cx="415" cy="120" r="11"/><circle cx="455" cy="120" r="11"/></g>`;
+    return wrap("0 0 520 360", inner);
+  },
+  dino(color){
+    const d=darken(color,.14);
+    const inner=`<path d="M100,250 Q40,255 30,205 Q55,235 110,238 Z" fill="${color}"/>`
+      +`<rect x="150" y="305" width="44" height="80" rx="20" fill="${d}"/><rect x="238" y="305" width="44" height="80" rx="20" fill="${d}"/>`
+      +`<ellipse cx="200" cy="255" rx="125" ry="84" fill="${color}"/>`
+      +`<circle cx="298" cy="180" r="72" fill="${color}"/>`
+      +`<rect x="350" y="172" width="52" height="46" rx="20" fill="${color}"/>`
+      +`<rect x="298" y="252" width="20" height="44" rx="10" fill="${d}"/>`
+      +`<g fill="${d}"><path d="M150,182 L168,150 L186,182 Z"/><path d="M188,170 L206,140 L224,170 Z"/><path d="M226,178 L244,150 L262,178 Z"/></g>`
+      +`<circle cx="320" cy="158" r="15" fill="#fff" class="ey"/><circle cx="324" cy="160" r="7.5" fill="#20232A" class="ey"/>`
+      +`<path d="M352,206 q22,8 46,1" fill="none" stroke="${d}" stroke-width="4" stroke-linecap="round"/>`;
+    return wrap("0 0 420 400", inner);
+  },
+  ball(color){
+    const dk='#2A2B30', cx=180, cy=180;
+    const pent=(x,y,r,rot)=>{ let p=''; for(let i=0;i<5;i++){ const a=(rot-90+i*72)*Math.PI/180; p+=(i?'L':'M')+(x+Math.cos(a)*r).toFixed(1)+','+(y+Math.sin(a)*r).toFixed(1);} return p+'Z'; };
+    let seams='', outs='';
+    for(let i=0;i<5;i++){ const a=(-90+i*72)*Math.PI/180, ox=cx+Math.cos(a)*104, oy=cy+Math.sin(a)*104, vx=cx+Math.cos(a)*50, vy=cy+Math.sin(a)*50;
+      seams+=`<line x1="${vx.toFixed(1)}" y1="${vy.toFixed(1)}" x2="${ox.toFixed(1)}" y2="${oy.toFixed(1)}"/>`;
+      outs+=`<path d="${pent(ox,oy,30,180+i*72)}" fill="${color}"/>`; }
+    const inner=`<circle cx="${cx}" cy="${cy}" r="160" fill="#FBFAF6" stroke="${dk}" stroke-width="4"/>`
+      +`<g stroke="${dk}" stroke-width="3">${seams}</g>${outs}<path d="${pent(cx,cy,50,0)}" fill="${color}"/>`;
+    return wrap("0 0 360 360", inner);
+  },
+  drone(color){
+    const ring='#4A4D55', body='#2E3138', dk=darken(color,.18), cx=240, cy=180, cs=[[90,80],[390,80],[90,280],[390,280]];
+    let arms='', rot='';
+    cs.forEach(([x,y])=>{ arms+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}"/>`;
+      rot+=`<circle cx="${x}" cy="${y}" r="46" fill="${body}" stroke="${ring}" stroke-width="7"/>`
+        +`<ellipse cx="${x}" cy="${y}" rx="42" ry="9" fill="#C2C5CC" opacity="0.55"/>`
+        +`<ellipse cx="${x}" cy="${y}" rx="9" ry="42" fill="#C2C5CC" opacity="0.55"/>`
+        +`<circle cx="${x}" cy="${y}" r="8" fill="${ring}"/>`; });
+    const inner=`<g stroke="${color}" stroke-width="18" stroke-linecap="round">${arms}</g>${rot}`
+      +`<rect x="176" y="136" width="128" height="88" rx="26" fill="${color}"/>`
+      +`<rect x="196" y="150" width="88" height="34" rx="12" fill="${dk}"/>`
+      +`<circle cx="240" cy="208" r="15" fill="#20232A"/>`;
+    return wrap("0 0 480 360", inner);
+  },
+  gift(color){ const d=darken(color,.16);
+    const inner=`<rect x="64" y="150" width="232" height="168" rx="14" fill="${color}"/>`
+      +`<rect x="48" y="104" width="264" height="54" rx="12" fill="${d}"/>`
+      +`<rect x="164" y="104" width="32" height="214" fill="#FBFAF6"/>`
+      +`<path d="M180,98 C150,55 112,72 138,100 Z" fill="${d}"/><path d="M180,98 C210,55 248,72 222,100 Z" fill="${d}"/><circle cx="180" cy="100" r="14" fill="${d}"/>`;
+    return wrap("0 0 360 360", inner); },
+  robot(color){ const d=darken(color,.16);
+    const inner=`<line x1="180" y1="40" x2="180" y2="16" stroke="${d}" stroke-width="6"/><circle cx="180" cy="12" r="9" fill="${d}"/>`
+      +`<rect x="110" y="38" width="140" height="120" rx="26" fill="${color}"/>`
+      +`<rect x="128" y="66" width="104" height="64" rx="14" fill="#20232A"/>`
+      +`<circle cx="156" cy="98" r="13" fill="#6CE5C8" class="ey"/><circle cx="204" cy="98" r="13" fill="#6CE5C8" class="ey"/>`
+      +`<rect x="92" y="168" width="176" height="150" rx="26" fill="${color}"/>`
+      +`<rect x="128" y="196" width="104" height="64" rx="12" fill="${d}"/>`
+      +`<rect x="50" y="180" width="34" height="110" rx="17" fill="${d}"/><rect x="276" y="180" width="34" height="110" rx="17" fill="${d}"/>`
+      +`<rect x="120" y="318" width="40" height="64" rx="16" fill="${d}"/><rect x="200" y="318" width="40" height="64" rx="16" fill="${d}"/>`;
+    return wrap("0 0 360 400", inner); },
+  guitar(color){ const d=darken(color,.18);
+    let str=''; [131,138,145,152].forEach(x=>{ str+=`<line x1="${x}" y1="22" x2="${x}" y2="330"/>`; });
+    const inner=`<rect x="114" y="16" width="52" height="34" rx="8" fill="#2A2118"/>`
+      +`<rect x="126" y="40" width="28" height="200" rx="6" fill="#3A2E22"/>`
+      +`<circle cx="140" cy="300" r="96" fill="${color}"/><circle cx="140" cy="216" r="68" fill="${color}"/>`
+      +`<circle cx="140" cy="266" r="27" fill="#20232A"/>`
+      +`<rect x="116" y="320" width="48" height="14" rx="4" fill="${d}"/>`
+      +`<g stroke="#E8E4D7" stroke-width="1.6" opacity="0.85">${str}</g>`;
+    return wrap("0 0 280 420", inner); },
+  kickboard(color){ const d=darken(color,.16);
+    const inner=`<circle cx="100" cy="300" r="34" fill="#2A2B30"/><circle cx="100" cy="300" r="13" fill="#C6C8CE"/>`
+      +`<circle cx="300" cy="300" r="34" fill="#2A2B30"/><circle cx="300" cy="300" r="13" fill="#C6C8CE"/>`
+      +`<rect x="78" y="262" width="206" height="26" rx="13" fill="${color}"/>`
+      +`<rect x="290" y="80" width="18" height="200" rx="9" fill="${color}"/>`
+      +`<rect x="250" y="64" width="110" height="18" rx="9" fill="${color}"/>`
+      +`<rect x="244" y="60" width="20" height="26" rx="8" fill="#1F2024"/><rect x="346" y="60" width="20" height="26" rx="8" fill="#1F2024"/>`;
+    return wrap("0 0 400 360", inner); },
+  teddy(color){ const d=darken(color,.14), muz='#F4E9D6';
+    const inner=`<circle cx="120" cy="64" r="30" fill="${color}"/><circle cx="220" cy="64" r="30" fill="${color}"/>`
+      +`<circle cx="120" cy="64" r="15" fill="${d}"/><circle cx="220" cy="64" r="15" fill="${d}"/>`
+      +`<ellipse cx="170" cy="252" rx="86" ry="80" fill="${color}"/>`
+      +`<ellipse cx="170" cy="262" rx="52" ry="58" fill="${muz}" opacity="0.85"/>`
+      +`<ellipse cx="92" cy="210" rx="30" ry="40" fill="${color}"/><ellipse cx="248" cy="210" rx="30" ry="40" fill="${color}"/>`
+      +`<ellipse cx="120" cy="322" rx="34" ry="30" fill="${color}"/><ellipse cx="220" cy="322" rx="34" ry="30" fill="${color}"/>`
+      +`<circle cx="170" cy="112" r="66" fill="${color}"/>`
+      +`<ellipse cx="170" cy="132" rx="34" ry="26" fill="${muz}"/>`
+      +`<ellipse cx="170" cy="120" rx="11" ry="8" fill="#2B2B2E"/>`
+      +`<circle cx="146" cy="98" r="8" fill="#2B2B2E" class="ey"/><circle cx="194" cy="98" r="8" fill="#2B2B2E" class="ey"/>`;
+    return wrap("0 0 340 360", inner); },
+};
+const ICON_KW=[['bike',['자전거','바이크','bike','세발']],['game',['게임','닌텐도','스위치','플스','콘솔','switch','playstation','엑스박스']],['dino',['공룡','다이노','dino','티라노']],['robot',['로봇','robot','변신','건담','메카']],['guitar',['기타','guitar','우쿨','베이스','악기']],['kickboard',['킥보드','스쿠터','scooter','kickboard']],['teddy',['인형','곰인형','테디','teddy','doll','피규어']],['ball',['축구','농구','야구','배구','볼','공','ball']],['drone',['드론','drone','쿼드']],['gift',['선물','gift','상자','present']]];
+const WEAK=new Set(['인형','장난감','toy','doll','피규어']);
+function iconFromName(name){ const n=(name||'').toLowerCase(); let best=null, score=-1;
+  for(const [k,ws] of ICON_KW){ for(const w of ws){ const p=n.lastIndexOf(w.toLowerCase());
+    if(p>=0){ const sc=(WEAK.has(w)?0:1000)+p; if(sc>score){ score=sc; best=k; } } } }
+  return best; }
+
 const demoDB = {
   children:[ {id:'c1',name:'민준',active_goal:'g1'}, {id:'c2',name:'서준',active_goal:'g4'} ],
   goals:[
     {id:'g1',child_id:'c1',name:'빨간 자전거',emoji:'🚲',color:'#E0564B',image:null,aspect:1,price:100000},
     {id:'g2',child_id:'c1',name:'게임기',    emoji:'🎮',color:'#3F86C9',image:null,aspect:1,price:320000},
     {id:'g3',child_id:'c1',name:'공룡 인형',  emoji:'🦖',color:'#2DB67D',image:null,aspect:1,price:18000},
-    {id:'g4',child_id:'c2',name:'축구화',    emoji:'⚽',color:'#3F86C9',image:null,aspect:1,price:80000},
+    {id:'g4',child_id:'c2',name:'축구공',    emoji:'⚽',color:'#3F86C9',image:null,aspect:1,price:80000},
     {id:'g5',child_id:'c2',name:'드론',      emoji:'🚀',color:'#9B6FD4',image:null,aspect:1,price:150000},
   ],
   deposits:[
@@ -205,6 +386,10 @@ const db = {
     const {error}=await sb.from('deposits').insert(rec); return error?{ok:false,dup:error.code==='23505'}:{ok:true}; },
   async setActive(cid,gid){ if(!LIVE){ demoDB.children.find(c=>c.id===cid).active_goal=gid; return; }
     await sb.from('children').update({active_goal:gid}).eq('id',cid); },
+  async setColor(gid,color){ if(!LIVE){ const g=demoDB.goals.find(x=>x.id===gid); if(g) g.color=color; return; }
+    await sb.from('goals').update({color}).eq('id',gid); },
+  async setMs(gid,th){ if(!LIVE){ const g=demoDB.goals.find(x=>x.id===gid); if(g) g.ms_seen=th; return; }
+    await sb.from('goals').update({ms_seen:th}).eq('id',gid); },
   async addGoal(cid,g){ if(!LIVE){ demoDB.goals.push({id:'g'+Date.now(),child_id:cid,...g}); return; }
     await sb.from('goals').insert({child_id:cid,...g}); },
   async delGoal(gid){ if(!LIVE){ demoDB.goals=demoDB.goals.filter(g=>g.id!==gid); demoDB.deposits=demoDB.deposits.filter(d=>d.goal_id!==gid); return; }
@@ -283,10 +468,13 @@ async function processImage(file){
   const img=await loadImg(file); const c=toCanvas(img,720); removeBackground(c);
   const {canvas,aspect}=trimCanvas(c); return {canvas, aspect, preview:canvasURL(canvas)};
 }
+const emojiCache={};
 function artFor(g){
-  if(g._art) return g._art;
-  g._art = g.image ? { src:g.image, aspect:g.aspect||1 } : emojiArt(g.emoji||'🎯');
-  return g._art;
+  if(g.image) return { src:g.image, aspect:g.aspect||1 };
+  const icon=g.icon||iconFromName(g.name);
+  if(icon && ART[icon]) return ART[icon](g.color||'#E0564B');
+  if(g.emoji){ if(!emojiCache[g.emoji]) emojiCache[g.emoji]=emojiArt(g.emoji); return emojiCache[g.emoji]; }
+  return ART.gift(g.color||'#E0564B');
 }
 
 async function loadChild(id){
@@ -297,16 +485,16 @@ async function loadChild(id){
 
 function render(){
   const g=active();
-  if(!g){ $("#goalName").textContent="목표를 추가해 주세요"; $("#cheer").textContent=""; $("#meter").style.width="0%"; $("#dSaved").textContent=$("#dTarget").textContent="0원"; $("#dPct").textContent="0%"; $("#artGray").src=$("#artColor").src=""; $("#surface").style.opacity="0"; return; }
+  if(!g){ $("#goalName").textContent="목표를 추가해 주세요"; $("#cheer").textContent=""; $("#meter").style.width="0%"; $("#dSaved").textContent=$("#dTarget").textContent="0원"; $("#dPct").textContent="0%"; $("#artGray").src=$("#artColor").src=""; $("#surface").style.opacity="0"; $("#nextGoalBtn").hidden=true; return; }
   const saved=savedFor(g.id), pct=Math.min(100,Math.round((saved/g.price)*100)), left=Math.max(0,g.price-saved);
 
   $("#goalName").textContent=g.name;
   $("#cheer").textContent = left<=0 ? "다 모았어요! 🎉" : (wonKo(left)+"만 더 모으면 돼요!");
 
   const a=artFor(g), base=$("#artGray"), col=$("#artColor"), wrap=$("#art");
-  if(base.dataset.src!==a.src){ base.src=a.src; col.src=a.src; base.dataset.src=col.dataset.src=a.src; }
+  if(base.dataset.src!==a.src){ base.src=a.src; col.style.opacity='0'; col.onload=()=>{ col.style.opacity='1'; }; col.src=a.src; setTimeout(()=>{ col.style.opacity='1'; },500); base.dataset.src=col.dataset.src=a.src; }
   wrap.style.aspectRatio=String(a.aspect);
-  wrap.style.width=`min(92vw, calc(64vh * ${a.aspect}))`;
+  wrap.style.width=artW(a.aspect);
 
   /* 물이 차오르듯 부드러운 경계 */
   col.style.setProperty('--lvl', (pct>=100?112:pct)+'%');
@@ -317,9 +505,12 @@ function render(){
   setPct(pct, g.color, (shown.goalId===g.id && pct>shown.pct));
   shown.goalId=g.id;
   const m=$("#meter"); m.style.width=pct+"%"; m.style.background=g.color;
+  $("#nextGoalBtn").hidden = pct<100;
 }
 
 /* 저축 */
+function msSeen(g){ return (g&&g.ms_seen)||0; }
+async function setMsSeen(g,th){ g.ms_seen=th; await db.setMs(g.id,th); }
 async function commit(amount, serial){
   const g=active(), before=savedFor(g.id);
   if(serial && await db.isDuplicate(S.childId,serial,amount)){ toast("이미 저축한 지폐예요! 같은 돈은 한 번만 셀 수 있어요.", true); return; }
@@ -328,8 +519,11 @@ async function commit(amount, serial){
   const res=await db.insertDeposit(rec);
   if(!res.ok){ S.deposits=S.deposits.filter(d=>!String(d.id).startsWith('tmp')); render();
     toast(res.dup?"이미 저축한 지폐예요!":"저장에 실패했어요. 다시 시도해 주세요.", true); return; }
-  if(before<g.price && before+amount>=g.price){ party(); toast(g.name+" 다 모았어요! 🎉", false); }
-  else toast("+"+won(amount)+"원 저축했어요!", false);
+  const bPct=Math.min(100,Math.round((before/g.price)*100)), aPct=Math.min(100,Math.round(((before+amount)/g.price)*100));
+  if(before<g.price && before+amount>=g.price){ party(); celebrate(true); toast(g.name+" 다 모았어요! 🎉", false); }
+  else { let ms=0; for(const th of [25,50,75]) if(bPct<th && aPct>=th) ms=th;
+    if(ms && ms>msSeen(g)){ await setMsSeen(g,ms); celebrate(false); toast(({25:"좋아요! 벌써 25%나 모았어요 👏",50:"절반이나 모았어요! 🙌",75:"거의 다 왔어요! 75% 돌파 🔥"})[ms], false); }
+    else toast("+"+won(amount)+"원 저축했어요!", false); }
 }
 
 /* 카메라 + Cloud Vision (없으면 예시) */
@@ -363,24 +557,52 @@ function party(){ if(matchMedia("(prefers-reduced-motion:reduce)").matches) retu
     p.animate([{transform:"translate(0,0) rotate(0)",opacity:1},{transform:`translate(${dx}px,${dy}px) rotate(${rot}deg)`,opacity:0}],{duration:1500+Math.random()*600,easing:"cubic-bezier(.2,.6,.3,1)"}).onfinish=()=>p.remove(); } }
 
 /* 설정 모달 */
-let pickEmoji=EMOJIS[0], pendingPhoto=null;
-function openSettings(){ drawKids(); drawGoals(); drawEmoji(); $("#scrim").classList.add("show"); }
-const closeSettings=()=>$("#scrim").classList.remove("show");
+let pickEmoji=null, pendingPhoto=null, newColorSel=PAL[0], pickIcon=null;
+function openSettings(){ document.body.classList.add('sheet'); drawKids(); drawGoals(); drawIconTabs(); drawIconPick(); drawEmoji(); drawColor('newColor',newColorSel); drawColor('goalColor',(active()&&active().color)||PAL[0]); updatePreview(); $("#scrim").classList.add("show"); }
+function drawColor(id,sel){ document.getElementById(id).innerHTML=PAL.map(c=>`<button data-color="${c}" class="${c===sel?'sel':''}" style="background:${c}"></button>`).join(""); }
+const CATS=[['탈것','🛴',['bike','kickboard','drone']],['동물','🦖',['dino','teddy']],['장난감','🎮',['game','robot','guitar','ball']],['선물','🎁',['gift']]];
+let catSel=0;
+function drawIconTabs(){ $("#iconTabs").innerHTML=CATS.map((c,i)=>`<button data-cat="${i}" class="${i===catSel?'on':''}">${c[1]} ${c[0]}</button>`).join(""); }
+function drawIconPick(){ $("#iconPick").innerHTML=CATS[catSel][2].map(k=>`<button data-icon="${k}" class="${pickIcon===k?'sel':''}"><img src="${ART[k](newColorSel).src}" alt="${k}"></button>`).join(""); }
+function previewSrc(){ if(pendingPhoto) return {src:pendingPhoto.preview, aspect:pendingPhoto.aspect};
+  if(pickIcon) return ART[pickIcon](newColorSel);
+  if(pickEmoji) return emojiArt(pickEmoji);
+  const ic=iconFromName($("#gName").value.trim()); return ART[ic||'gift'](newColorSel); }
+function artW(asp){ return document.body.classList.contains('sheet') ? `min(64vw, calc(30vh * ${asp}))` : `min(92vw, calc(64vh * ${asp}))`; }
+function setMainArt(a){ const base=$("#artGray"), col=$("#artColor"), wrap=$("#art");
+  if(base.dataset.src!==a.src){ base.src=a.src; col.src=a.src; base.dataset.src=col.dataset.src=a.src; }
+  wrap.style.aspectRatio=String(a.aspect); wrap.style.width=artW(a.aspect);
+  col.style.opacity='1'; col.style.setProperty('--lvl','112%'); $("#surface").style.opacity='0'; }
+function updatePreview(){ const a=previewSrc(); $("#formPrevImg").src=a.src; $("#art").style.setProperty('--prevcol', newColorSel); if(document.body.classList.contains('sheet')) setMainArt(a); }
+const closeSettings=()=>{ document.body.classList.remove('sheet'); $("#scrim").classList.remove("show"); render(); };
+function celebrate(big){ const art=$("#art"); if(!art) return;
+  art.classList.remove('pop','big'); void art.offsetWidth; art.classList.add('pop'); if(big) art.classList.add('big');
+  const marks = big ? ['✨','⭐','🎉','🌟','✨','⭐','🎉','🌟','✨','⭐'] : ['✨','⭐','🎉','✨','⭐','✨'];
+  const burst=document.createElement('div'); burst.className='burst';
+  marks.forEach((ch,i)=>{ const s=document.createElement('span'); s.textContent=ch;
+    const ang=i/marks.length*Math.PI*2, d=(big?100:72)+Math.random()*(big?60:28);
+    s.style.setProperty('--tx',(Math.cos(ang)*d).toFixed(0)+'px'); s.style.setProperty('--ty',(Math.sin(ang)*d).toFixed(0)+'px');
+    if(big) s.style.fontSize='30px';
+    s.style.animationDelay=(i*30)+'ms'; burst.appendChild(s); });
+  art.appendChild(burst); setTimeout(()=>burst.remove(), big?1500:1100); }
 function drawKids(){ $("#kidPills").innerHTML=children.map(c=>`<button class="pill ${c.id===S.childId?'on':''}" data-kid="${c.id}">${c.name}</button>`).join(""); }
 function drawGoals(){
-  $("#goalList").innerHTML=S.goals.map(g=>{
+  const act=S.goals.filter(g=>savedFor(g.id)<g.price), done=S.goals.filter(g=>savedFor(g.id)>=g.price);
+  $("#goalList").innerHTML=act.map(g=>{
     const ns=savedFor(g.id), pct=Math.min(100,Math.round((ns/g.price)*100)), on=g.id===S.activeId;
-    const thumb=g.image?`<img class="em" src="${g.image}" alt="">`:`<span class="em">${g.emoji||'🎯'}</span>`;
-    return `<div class="gitem ${on?'on':''}" data-go="${g.id}">${thumb}
+    return `<div class="gitem ${on?'on':''}" data-go="${g.id}"><img class="em" src="${artFor(g).src}" alt="">
       <span><span class="nm">${g.name}</span><br><span class="pr">${won(ns)} / ${won(g.price)}원 · ${pct}%</span></span>
       ${on?'<span class="now">지금 모으는 중</span>':(S.goals.length>1?`<button class="del" data-del="${g.id}">삭제</button>`:'')}</div>`;
-  }).join("") || '<div class="pr" style="color:var(--muted)">아직 목표가 없어요. 아래에서 만들어 주세요.</div>';
+  }).join("") || '<div class="pr" style="color:var(--muted)">진행 중인 목표가 없어요. 아래에서 새 목표를 만들어요.</div>';
+  $("#doneTitle").hidden = done.length===0;
+  $("#doneList").innerHTML = done.map(g=>`<div class="done ${g.id===S.activeId?'on':''}" data-go="${g.id}"><img src="${artFor(g).src}" alt=""><span class="dn">${g.name}</span><span class="ck">완료 ✅</span></div>`).join("");
 }
 function drawEmoji(){ $("#emojiPick").innerHTML=EMOJIS.map(e=>`<button data-e="${e}" class="${(!pendingPhoto&&e===pickEmoji)?'sel':''}">${e}</button>`).join(""); }
 function clearPhoto(){ pendingPhoto=null; $("#photoPrev").hidden=true; $("#photoPrev").src=""; $("#photoBtn").textContent="📷 사진 찍기 / 올리기"; }
 
 /* 이벤트 */
 $("#saveBtn").onclick=onSave; $("#shoot").onclick=shoot; $("#camClose").onclick=closeCam;
+$("#nextGoalBtn").onclick=openSettings;
 $("#camScrim").addEventListener("click",e=>{ if(e.target===$("#camScrim")) closeCam(); });
 $("#openSettings").onclick=openSettings; $("#closeSettings").onclick=closeSettings;
 $("#scrim").addEventListener("click",e=>{ if(e.target===$("#scrim")) closeSettings(); });
@@ -391,26 +613,34 @@ $("#goalList").addEventListener("click",async e=>{
   const it=e.target.closest("[data-go]");
   if(it){ S.activeId=it.dataset.go; await db.setActive(S.childId,S.activeId); render(); drawGoals(); }
 });
+$("#doneList").addEventListener("click",async e=>{ const it=e.target.closest("[data-go]");
+  if(it){ S.activeId=it.dataset.go; await db.setActive(S.childId,S.activeId); render(); drawGoals(); }
+});
 $("#photoBtn").onclick=()=>$("#photoInput").click();
 $("#photoInput").addEventListener("change", async e=>{
   const f=e.target.files&&e.target.files[0]; if(!f) return;
   $("#photoBtn").textContent="배경 지우는 중…";
-  try{ pendingPhoto=await processImage(f); const pv=$("#photoPrev"); pv.src=pendingPhoto.preview; pv.hidden=false; $("#photoBtn").textContent="📷 사진 바꾸기"; drawEmoji(); }
+  try{ pendingPhoto=await processImage(f); const pv=$("#photoPrev"); pv.src=pendingPhoto.preview; pv.hidden=false; $("#photoBtn").textContent="📷 사진 바꾸기"; drawEmoji(); updatePreview(); }
   catch(err){ $("#photoBtn").textContent="📷 사진 찍기 / 올리기"; toast("사진을 불러오지 못했어요.", true); }
   e.target.value="";
 });
-$("#emojiPick").addEventListener("click",e=>{ const b=e.target.closest("[data-e]"); if(b){ pickEmoji=b.dataset.e; clearPhoto(); drawEmoji(); }});
+$("#iconTabs").addEventListener("click",e=>{ const b=e.target.closest("[data-cat]"); if(b){ catSel=+b.dataset.cat; drawIconTabs(); drawIconPick(); }});
+$("#iconPick").addEventListener("click",e=>{ const b=e.target.closest("[data-icon]"); if(b){ pickIcon=b.dataset.icon; pickEmoji=null; clearPhoto(); drawIconPick(); drawEmoji(); updatePreview(); }});
+$("#emojiPick").addEventListener("click",e=>{ const b=e.target.closest("[data-e]"); if(b){ pickEmoji=b.dataset.e; pickIcon=null; clearPhoto(); drawEmoji(); drawIconPick(); updatePreview(); }});
+$("#newColor").addEventListener("click",e=>{ const b=e.target.closest("[data-color]"); if(b){ newColorSel=b.dataset.color; drawColor('newColor',newColorSel); drawIconPick(); updatePreview(); }});
+$("#gName").addEventListener("input",updatePreview);
+$("#goalColor").addEventListener("click",async e=>{ const b=e.target.closest("[data-color]"); if(!b) return; const g=active(); if(!g) return; g.color=b.dataset.color; await db.setColor(g.id,g.color); render(); drawColor('goalColor',g.color); });
 $("#addGoal").onclick=async()=>{
   const name=$("#gName").value.trim(), price=Number($("#gPrice").value)||0;
   if(!name||price<=0){ toast("이름과 가격을 정해 주세요.", true); return; }
   let image=null, aspect=1;
   if(pendingPhoto){ toast("사진 올리는 중…", false); image=await db.upload(pendingPhoto.canvas); aspect=pendingPhoto.aspect; }
-  const g={ name, color:COLORS[S.goals.length%COLORS.length], price, sort:S.goals.length, emoji:pendingPhoto?null:pickEmoji, image, aspect };
+  const g={ name, color:newColorSel, price, sort:S.goals.length, image, aspect, icon:pendingPhoto?null:(pickIcon||null), emoji:(pendingPhoto||pickIcon)?null:pickEmoji };
   await db.addGoal(S.childId, g);
-  $("#gName").value=""; $("#gPrice").value=""; clearPhoto();
+  $("#gName").value=""; $("#gPrice").value=""; clearPhoto(); pickIcon=null; pickEmoji=null;
   await loadChild(S.childId);
   const mine=S.goals.filter(x=>x.name===name); if(mine.length){ S.activeId=mine[mine.length-1].id; await db.setActive(S.childId,S.activeId); render(); }
-  openSettings(); toast("새 목표 '"+name+"'을(를) 추가했어요.", false);
+  closeSettings(); setTimeout(celebrate,320); toast("새 목표 '"+name+"'을(를) 추가했어요.", false);
 };
 
 /* 시작 + 서비스워커 */
