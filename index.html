@@ -330,8 +330,15 @@
   :root[data-theme="light"] .needStat{background:rgba(28,18,38,.4); border-color:rgba(255,255,255,.12)}
   .axis{display:none}
   body.sheet .bigStat, body.sheet .pctStat, body.sheet .needStat{display:none}
-  body:has(#recordScrim.show) .stage, body:has(#setScrim.show) .stage, body:has(#histScrim.show) .stage, body:has(#confirmScrim.show) .stage{visibility:hidden}
+  body:has(#recordScrim.show) .stage, body:has(#setScrim.show) .stage, body:has(#histScrim.show) .stage, body:has(#confirmScrim.show) .stage, body:has(#iconScrim.show) .stage{visibility:hidden}
   body.modalview .stage{visibility:hidden}
+  #iconScrim{align-items:center}
+  .iconModal{max-width:360px !important; text-align:center; transform:translateY(18px) scale(.96)}
+  #iconScrim.show .iconModal{transform:none}
+  .iconPrev{width:168px; height:168px; margin:2px auto 14px; border-radius:38px; overflow:hidden; box-shadow:0 18px 44px -16px rgba(242,92,154,.7)}
+  .iconPrev svg{width:100%; height:100%; display:block}
+  .iconActions{display:flex; flex-direction:column; gap:10px; margin-top:18px}
+  .iconActions .mbtn{width:100%}
   .dash{display:none !important}
   @media (prefers-reduced-motion:reduce){ .art.pop{animation:none} .art.hop{animation:none} .burst{display:none} .mcheer{display:none} .stage,.art{transition:none} }
   .mActions{display:flex; gap:10px; margin-top:18px}
@@ -524,6 +531,19 @@
     <p class="hint">사용자(아이)를 새로 만들거나 이름을 바꿀 수 있어요.</p>
     <div class="setJump"><button class="mbtn ghost" id="toRecord">📒 저축 기록 보기</button></div>
     <div class="mActions"><button class="mbtn ghost" id="setClose">닫기</button></div>
+  </div>
+</div>
+
+<div class="scrim" id="iconScrim">
+  <div class="modal iconModal" role="dialog" aria-modal="true" aria-label="앱 아이콘">
+    <div class="iconPrev" id="iconPrev"></div>
+    <h2 class="jua">꿀꿀이 앱 아이콘</h2>
+    <p class="sub">홈 화면에 추가하면 이 아이콘으로 설치돼요.</p>
+    <div class="mActions iconActions">
+      <button class="mbtn primary" id="iconDl">⬇️ 아이콘 저장 (PNG)</button>
+      <button class="mbtn ghost" id="iconToGoal">🎯 목표 설정 열기</button>
+      <button class="mbtn ghost" id="iconClose">닫기</button>
+    </div>
   </div>
 </div>
 
@@ -1178,6 +1198,29 @@ function uiConfirm(o){ o=o||{};
   $("#confirmScrim").classList.add("show");
   return new Promise(res=>{ _confResolve=res; }); }
 function closeConf(v){ $("#confirmScrim").classList.remove("show"); const r=_confResolve; _confResolve=null; if(r) r(v); }
+/* 앱 아이콘(꿀꿀이 캐릭터) — 미리보기/다운로드 공용 */
+const APP_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">'
+ +'<defs><linearGradient id="oiBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34234C"/><stop offset="1" stop-color="#160E20"/></linearGradient>'
+ +'<radialGradient id="oiGlow" cx="50%" cy="45%" r="56%"><stop offset="0" stop-color="#F25C9A" stop-opacity=".55"/><stop offset="1" stop-color="#F25C9A" stop-opacity="0"/></radialGradient></defs>'
+ +'<rect width="512" height="512" rx="116" fill="url(#oiBg)"/><rect width="512" height="512" rx="116" fill="url(#oiGlow)"/>'
+ +'<g transform="translate(256,268)">'
+ +'<path d="M-95,-70 L-135,-150 L-50,-100 Z" fill="#F25C9A"/><path d="M95,-70 L135,-150 L50,-100 Z" fill="#F25C9A"/>'
+ +'<path d="M-84,-80 L-110,-136 L-58,-104 Z" fill="#FF9EC0"/><path d="M84,-80 L110,-136 L58,-104 Z" fill="#FF9EC0"/>'
+ +'<circle cx="0" cy="0" r="170" fill="#F25C9A"/><circle cx="-92" cy="34" r="32" fill="#FF9EC0"/><circle cx="92" cy="34" r="32" fill="#FF9EC0"/>'
+ +'<ellipse cx="0" cy="44" rx="90" ry="66" fill="#D6347B"/><ellipse cx="-30" cy="44" rx="15" ry="23" fill="#7d1c47"/><ellipse cx="30" cy="44" rx="15" ry="23" fill="#7d1c47"/>'
+ +'<circle cx="-58" cy="-44" r="24" fill="#241B36"/><circle cx="58" cy="-44" r="24" fill="#241B36"/><circle cx="-64" cy="-50" r="7" fill="#fff"/><circle cx="52" cy="-50" r="7" fill="#fff"/>'
+ +'<path d="M-46,118 q46,38 92,0" stroke="#9B2360" stroke-width="12" fill="none" stroke-linecap="round"/></g></svg>';
+function openIcon(){ const p=$("#iconPrev"); if(p) p.innerHTML=APP_ICON_SVG; document.body.classList.add('modalview'); $("#iconScrim").classList.add("show"); }
+function closeIcon(){ $("#iconScrim").classList.remove("show"); if(!$("#recordScrim").classList.contains('show') && !$("#setScrim").classList.contains('show')) document.body.classList.remove('modalview'); }
+function downloadIcon(){
+  try{
+    const blob=new Blob([APP_ICON_SVG],{type:'image/svg+xml;charset=utf-8'}); const url=URL.createObjectURL(blob); const img=new Image();
+    img.onload=()=>{ const c=document.createElement('canvas'); c.width=512; c.height=512; const x=c.getContext('2d'); x.drawImage(img,0,0,512,512); URL.revokeObjectURL(url);
+      c.toBlob(b=>{ if(!b){ toast('아이콘을 만들지 못했어요.',true); return; } const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='oinky-icon.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1500); toast('아이콘을 저장했어요. 🐷',false); },'image/png'); };
+    img.onerror=()=>{ URL.revokeObjectURL(url); toast('아이콘을 만들지 못했어요.',true); };
+    img.src=url;
+  }catch(e){ toast('아이콘을 만들지 못했어요.',true); }
+}
 /* 사용자(아이) 관리 — 전환·순서·삭제·색/아바타 */
 const KIDPAL=['#F25C9A','#3F86C9','#2BB673','#F4B740','#A855F7','#E0564B','#1FA98A','#FF7A45'];
 function _mix(hex,wth,amt){ const a=hex.replace('#',''), w=wth.replace('#','');
@@ -1307,7 +1350,11 @@ $("#histFullFilters").addEventListener("click",e=>{ const b=e.target.closest("[d
 $("#histFilters").addEventListener("click",e=>{ const b=e.target.closest("[data-t],[data-g]"); if(!b) return;
   if(b.dataset.t!==undefined && b.dataset.t!=='') histType=b.dataset.t; if(b.dataset.g!==undefined && b.dataset.g!=='') histGoal=b.dataset.g; drawHistory(); });
 setTimeout(()=>document.body.classList.remove('enter'),1700);
-$("#brandBtn").onclick=openSettings; $("#closeSettings").onclick=closeSettings;
+$("#brandBtn").onclick=openIcon; $("#closeSettings").onclick=closeSettings;
+$("#iconDl").onclick=downloadIcon;
+$("#iconToGoal").onclick=()=>{ closeIcon(); openSettings(); };
+$("#iconClose").onclick=closeIcon;
+$("#iconScrim").addEventListener("click",e=>{ if(e.target===$("#iconScrim")) closeIcon(); });
 $("#recordBtn").onclick=openRecord; $("#setBtn").onclick=openSet;
 $("#recordClose").onclick=closeRecord; $("#setClose").onclick=closeSet;
 $("#toRecord").onclick=()=>{ closeSet(); openRecord(); };
