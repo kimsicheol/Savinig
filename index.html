@@ -343,8 +343,13 @@
   :root[data-theme="light"] .needStat{background:rgba(28,18,38,.4); border-color:rgba(255,255,255,.12)}
   .axis{display:none}
   body.sheet .bigStat, body.sheet .pctStat, body.sheet .needStat{display:none}
-  body:has(#recordScrim.show) .stage, body:has(#setScrim.show) .stage, body:has(#histScrim.show) .stage, body:has(#confirmScrim.show) .stage, body:has(#iconScrim.show) .stage, body:has(#goalActScrim.show) .stage{visibility:hidden}
+  body:has(#recordScrim.show) .stage, body:has(#setScrim.show) .stage, body:has(#histScrim.show) .stage, body:has(#confirmScrim.show) .stage, body:has(#iconScrim.show) .stage, body:has(#goalActScrim.show) .stage, body:has(#goalEditScrim.show) .stage, body:has(#authScrim.show) .stage{visibility:hidden}
   body.modalview .stage{visibility:hidden}
+  #goalEditScrim{align-items:center}
+  .goalEditModal{max-width:360px !important; transform:translateY(18px) scale(.96)}
+  #goalEditScrim.show .goalEditModal{transform:none}
+  .efLbl{display:block; font-size:13px; color:var(--muted); font-weight:700; margin-bottom:5px}
+  .efInput{width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--line-2); background:var(--card-2); color:var(--ink); font-family:inherit; font-size:15px}
   #goalActScrim{align-items:center}
   .goalActModal{max-width:340px !important; transform:translateY(18px) scale(.96)}
   #goalActScrim.show .goalActModal{transform:none}
@@ -417,7 +422,7 @@
       <div class="surface" id="surface"></div>
       <div class="bigStat" id="bigStat" aria-hidden="true"><em id="bigAmt">0원</em></div>
       <div class="pctStat" id="pctStat" aria-hidden="true"><b id="bigPct">0%</b></div>
-      <div class="needStat" id="needStat" aria-hidden="true">부족한 돈 <b id="needAmt">0원</b></div>
+      <div class="needStat" id="needStat" aria-hidden="true">더 모을 돈 <b id="needAmt">0원</b></div>
     </div>
     <div class="axis axis-r" id="axisR" aria-hidden="true"></div>
     <div class="previewTag" id="previewTag">✨ 이렇게 보여요</div>
@@ -568,6 +573,20 @@
   </div>
 </div>
 
+<div class="scrim" id="goalEditScrim">
+  <div class="modal goalEditModal" role="dialog" aria-modal="true" aria-label="목표 수정">
+    <h2 class="jua" style="text-align:center; margin-bottom:12px">목표 수정</h2>
+    <label class="efLbl">이름</label>
+    <input id="geName" type="text" class="efInput" placeholder="목표 이름 (예: 닌텐도)" />
+    <label class="efLbl" style="margin-top:10px">목표 금액 (원)</label>
+    <input id="gePrice" type="number" inputmode="numeric" class="efInput" placeholder="예: 450000" />
+    <div class="mActions" style="margin-top:16px; display:flex; gap:10px">
+      <button class="mbtn ghost" id="geCancel" style="flex:1">취소</button>
+      <button class="mbtn primary" id="geSave" style="flex:1">저장</button>
+    </div>
+  </div>
+</div>
+
 <div class="scrim" id="goalActScrim">
   <div class="modal goalActModal" role="dialog" aria-modal="true" aria-label="목표 관리">
     <h2 class="jua" id="gaName" style="text-align:center; margin-bottom:4px">목표</h2>
@@ -576,6 +595,7 @@
       <button class="mbtn ghost" id="gaLeft">◀ 왼쪽으로</button>
       <button class="mbtn ghost" id="gaRight">오른쪽으로 ▶</button>
     </div>
+    <button class="mbtn ghost" id="gaEdit" style="width:100%; margin-top:10px">✏️ 이름·금액 수정</button>
     <button class="mbtn danger" id="gaDelete" style="width:100%; margin-top:10px">🗑 이 목표 삭제</button>
     <button class="mbtn ghost" id="gaClose" style="width:100%; margin-top:10px">닫기</button>
   </div>
@@ -810,6 +830,8 @@ const db = {
     await sb.from('goals').insert({child_id:cid,...g}); },
   async delGoal(gid){ if(!LIVE){ demoDB.goals=demoDB.goals.filter(g=>g.id!==gid); demoDB.deposits=demoDB.deposits.filter(d=>d.goal_id!==gid); return; }
     await sb.from('goals').delete().eq('id',gid); },
+  async editGoal(gid,fields){ if(!LIVE){ const g=demoDB.goals.find(x=>x.id===gid); if(g) Object.assign(g,fields); return; }
+    await sb.from('goals').update(fields).eq('id',gid); },
   async addKid(name,color,sort){ if(!LIVE){ const id='c'+Date.now(); demoDB.children.push({id,name,active_goal:null,color:color||'#F25C9A',sort:sort||demoDB.children.length}); return id; }
     const {data}=await sb.from('children').insert({name,color:color||'#F25C9A',sort:sort||0}).select('id').single(); return data&&data.id; },
   async renameKid(cid,name){ if(!LIVE){ const c=demoDB.children.find(x=>x.id===cid); if(c) c.name=name; return; }
@@ -949,9 +971,8 @@ function render(){
   { const bp=$("#bigPct"), ba=$("#bigAmt"), bs=$("#bigStat"), ps=$("#pctStat"); const fin=pct>=100;
     if(bp) bp.textContent=pct+"%";
     if(ba) ba.textContent=fin?(g.name+" 완성! 🎉"):wonKo(saved);
-    const yb=Math.max(10,Math.min(80,pct))+'%';
-    if(bs){ bs.classList.toggle('done',fin); bs.style.bottom=yb; }
-    if(ps){ ps.style.bottom=yb; ps.style.display=fin?'none':''; } }
+    if(bs){ bs.classList.toggle('done',fin); bs.style.bottom='50%'; }
+    if(ps){ ps.style.bottom=Math.max(8,Math.min(86,pct))+'%'; ps.style.display=fin?'none':''; } }
   { const ns=$("#needStat"), na=$("#needAmt"); if(ns){ if(left>0){ ns.style.display=''; if(na) na.textContent=wonKo(left); } else ns.style.display='none'; } }
   setPct(pct, g.color, (shown.goalId===g.id && pct>shown.pct));
   shown.goalId=g.id;
@@ -1007,10 +1028,12 @@ function openAuth(setup){ authSetup=setup; pinBuf=""; pinFirst=""; pinStage=setu
       else { setPinMode(true); $("#authMsg").textContent="4자리 비밀번호를 만들어 주세요."; $("#authSwitch").textContent=""; } }
     else { if(AUTH.mode()==='pin'){ setPinMode(true); $("#authMsg").textContent="비밀번호 4자리를 입력해요."; $("#authSwitch").textContent=""; }
       else { setPinMode(false); $("#authMsg").textContent="저축하려면 보호자 인증이 필요해요."; $("#bioBtn").textContent="👆 지문·얼굴로 인증"; $("#authSwitch").textContent=lsGet('authPin')?"비밀번호로 인증하기":""; } }
-    $("#authScrim").classList.add("show");
+    document.body.classList.add('modalview'); $("#authScrim").classList.add("show");
     return await new Promise(r=>authRes=r);
   })(); }
-function closeAuth(ok){ $("#authScrim").classList.remove("show"); const r=authRes; authRes=null; if(r) r(ok); }
+function closeAuth(ok){ $("#authScrim").classList.remove("show");
+  if(!['#recordScrim','#setScrim','#goalActScrim','#goalEditScrim','#iconScrim'].some(id=>$(id) && $(id).classList.contains('show'))) document.body.classList.remove('modalview');
+  const r=authRes; authRes=null; if(r) r(ok); }
 async function onBio(){ try{ if(authSetup){ await AUTH.regBio(); } else { await AUTH.verBio(); } AUTH.unlock(); closeAuth(true); }
   catch(e){ if(authSetup){ toast("지문 등록이 어려워요. 비밀번호로 설정해요.", true); setPinMode(true); pinStage="set1"; $("#authMsg").textContent="4자리 비밀번호를 만들어 주세요."; $("#authSwitch").textContent=""; }
     else { toast("인증에 실패했어요. 다시 시도해요.", true); } } }
@@ -1355,7 +1378,7 @@ function drawGoals(){
     const ns=savedFor(g.id), pct=Math.min(100,Math.round((ns/g.price)*100)), on=g.id===S.activeId, gi=S.goals.findIndex(x=>x.id===g.id);
     return `<div class="gitem ${on?'on':''}" data-go="${g.id}"><img class="em" src="${artFor(g).src}" alt="">
       <span class="gtext"><span class="nm">${g.name}</span><br><span class="pr">${won(ns)} / ${won(g.price)}원 · ${pct}%</span></span>
-      <span class="gctl"><button class="ordbtn" data-up="${g.id}" ${gi<=0?'disabled':''} aria-label="위로">▲</button><button class="ordbtn" data-down="${g.id}" ${gi>=S.goals.length-1?'disabled':''} aria-label="아래로">▼</button>${on?'<span class="now">지금</span>':(S.goals.length>1?`<button class="del" data-del="${g.id}">삭제</button>`:'')}</span></div>`;
+      <span class="gctl"><button class="ordbtn" data-edit="${g.id}" aria-label="수정">✏️</button><button class="ordbtn" data-up="${g.id}" ${gi<=0?'disabled':''} aria-label="위로">▲</button><button class="ordbtn" data-down="${g.id}" ${gi>=S.goals.length-1?'disabled':''} aria-label="아래로">▼</button>${on?'<span class="now">지금</span>':(S.goals.length>1?`<button class="del" data-del="${g.id}">삭제</button>`:'')}</span></div>`;
   }).join("") || '<div class="pr" style="color:var(--muted)">진행 중인 목표가 없어요. 아래에서 새 목표를 만들어요.</div>';
   $("#doneTitle").hidden = done.length===0;
   $("#doneList").innerHTML = done.map(g=>`<div class="done ${g.id===S.activeId?'on':''}" data-go="${g.id}"><img src="${artFor(g).src}" alt=""><span class="dn">${g.name}</span><span class="ck">완료 ✅</span></div>`).join("");
@@ -1397,6 +1420,21 @@ function closeGoalAct(){ _jiggleTab(null); $("#goalActScrim").classList.remove("
 $("#gaLeft").onclick=async()=>{ if(_gaId){ const id=_gaId; await reorderGoal(id,-1); openGoalAct(id); } };
 $("#gaRight").onclick=async()=>{ if(_gaId){ const id=_gaId; await reorderGoal(id,1); openGoalAct(id); } };
 $("#gaDelete").onclick=()=>{ const id=_gaId; closeGoalAct(); if(id) askDeleteGoal(id); };
+let _geId=null;
+function openGoalEdit(gid){ const g=S.goals.find(x=>x.id===gid); if(!g) return; _geId=gid;
+  const n=$("#geName"), p=$("#gePrice"); if(n) n.value=g.name||''; if(p) p.value=g.price||'';
+  document.body.classList.add('modalview'); $("#goalEditScrim").classList.add("show"); }
+function closeGoalEdit(){ $("#goalEditScrim").classList.remove("show"); document.body.classList.remove('modalview'); }
+$("#gaEdit").onclick=()=>{ const id=_gaId; closeGoalAct(); if(id) openGoalEdit(id); };
+$("#geCancel").onclick=closeGoalEdit;
+$("#goalEditScrim").addEventListener("click",e=>{ if(e.target===$("#goalEditScrim")) closeGoalEdit(); });
+$("#geSave").onclick=async()=>{ if(!_geId) return;
+  const name=($("#geName").value||'').trim(); const price=Math.round(Number($("#gePrice").value)||0);
+  if(!name){ toast("이름을 입력해 주세요.", true); return; }
+  if(!(price>0)){ toast("목표 금액을 올바르게 입력해 주세요.", true); return; }
+  await db.editGoal(_geId,{name,price}); await loadChild(S.childId); render();
+  if($("#scrim").classList.contains('show')) drawGoals();
+  closeGoalEdit(); toast("목표를 수정했어요. ✏️", false); };
 $("#gaClose").onclick=closeGoalAct;
 $("#goalActScrim").addEventListener("click",e=>{ if(e.target===$("#goalActScrim")) closeGoalAct(); });
 $("#goalTabs").addEventListener("pointerdown",e=>{ const b=e.target.closest("[data-go]"); if(!b) return; _tabHeld=false; _tabX=e.clientX; _tabY=e.clientY; _clearHold(); _tabHold=setTimeout(()=>{ _tabHeld=true; if(navigator.vibrate) try{navigator.vibrate(25);}catch(_){} openGoalAct(b.dataset.go); }, 500); });
@@ -1469,7 +1507,8 @@ $("#volRange").addEventListener("input", e=> setVol(+e.target.value, false));
 $("#volRange").addEventListener("change", e=> setVol(+e.target.value, true));
 $("#volMute").onclick=()=>{ sndMode = (sndMode==='sound')?'silent':'sound'; applySound(); drawVol(); if(sndMode==='sound') blip(1000); };
 $("#goalList").addEventListener("click",async e=>{
-  const up=e.target.closest("[data-up]"), dn=e.target.closest("[data-down]"), del=e.target.closest("[data-del]");
+  const ed=e.target.closest("[data-edit]"), up=e.target.closest("[data-up]"), dn=e.target.closest("[data-down]"), del=e.target.closest("[data-del]");
+  if(ed){ e.stopPropagation(); openGoalEdit(ed.dataset.edit); return; }
   if(up){ e.stopPropagation(); await reorderGoal(up.dataset.up,-1); drawGoals(); return; }
   if(dn){ e.stopPropagation(); await reorderGoal(dn.dataset.down,1); drawGoals(); return; }
   if(del){ e.stopPropagation(); await askDeleteGoal(del.dataset.del); drawGoals(); return; }
