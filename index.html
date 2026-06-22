@@ -344,8 +344,8 @@
   :root[data-theme="light"] .needStat{background:rgba(28,18,38,.4); border-color:rgba(255,255,255,.12)}
   .axis{display:none}
   body.sheet .bigStat, body.sheet .pctStat, body.sheet .needStat{display:none}
-  body:has(#recordScrim.show) .stage, body:has(#setScrim.show) .stage, body:has(#histScrim.show) .stage, body:has(#confirmScrim.show) .stage, body:has(#iconScrim.show) .stage, body:has(#goalActScrim.show) .stage, body:has(#goalEditScrim.show) .stage, body:has(#authScrim.show) .stage{visibility:hidden}
-  body.modalview .stage{visibility:hidden}
+  body:has(#recordScrim.show) .stage, body:has(#setScrim.show) .stage, body:has(#histScrim.show) .stage, body:has(#confirmScrim.show) .stage, body:has(#iconScrim.show) .stage, body:has(#goalActScrim.show) .stage, body:has(#goalEditScrim.show) .stage, body:has(#authScrim.show) .stage, body:has(#scrim.show) .stage{visibility:hidden}
+  body.modalview .stage, body.sheet .stage{visibility:hidden}
   #goalEditScrim{align-items:center}
   #obScrim{align-items:center; background:var(--bg,#1A1326); -webkit-backdrop-filter:none; backdrop-filter:none; z-index:120}
   .obCard{max-width:380px !important; text-align:left}
@@ -1375,7 +1375,7 @@ function setMainArt(a){ const base=$("#artGray"), col=$("#artColor"), wrap=$("#a
   base.src=a.src; col.src=a.src; base.dataset.src=col.dataset.src=a.src;
   setArtSize(a.aspect);
   col.style.opacity='1'; col.style.setProperty('--lvl','112%'); $("#surface").style.opacity='0'; }
-function updatePreview(){ const a=previewSrc(); $("#formPrevImg").src=a.src; $("#art").style.setProperty('--prevcol', newColorSel); document.documentElement.style.setProperty('--goalcol', newColorSel); if(document.body.classList.contains('sheet')) setMainArt(a); }
+function updatePreview(){ const a=previewSrc(); $("#formPrevImg").src=a.src; $("#art").style.setProperty('--prevcol', newColorSel); document.documentElement.style.setProperty('--goalcol', newColorSel); }
 const closeSettings=()=>{ document.body.classList.remove('sheet'); $("#scrim").classList.remove("show"); render(); };
 function celebrate(big){ const art=$("#art"); if(!art) return;
   art.classList.remove('pop','big'); void art.offsetWidth; art.classList.add('pop'); if(big) art.classList.add('big');
