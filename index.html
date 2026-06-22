@@ -291,7 +291,21 @@
   .burst{position:absolute; inset:0; pointer-events:none; z-index:3}
   .burst span{position:absolute; left:50%; top:46%; font-size:24px; animation:spark .9s ease-out forwards}
   @keyframes spark{0%{opacity:0; transform:translate(-50%,-50%) scale(.4)}20%{opacity:1}100%{opacity:0; transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.1)}}
-  @media (prefers-reduced-motion:reduce){ .art.pop{animation:none} .burst{display:none} .stage,.art{transition:none} }
+  @keyframes hop{0%{translate:0 0}30%{translate:0 -16px}55%{translate:0 0}74%{translate:0 -6px}100%{translate:0 0}}
+  .art.hop{animation:hop .6s cubic-bezier(.3,1.3,.5,1)}
+  .cheer{position:absolute; left:50%; top:5%; z-index:6; pointer-events:none; display:inline-flex; align-items:center; gap:8px; font-weight:800; font-size:18px; color:#fff; padding:6px 14px 6px 7px; border-radius:18px; background:var(--grad); box-shadow:0 12px 26px -10px var(--glow); white-space:nowrap; animation:cheerPop 1s ease-out forwards}
+  .cheer .cheerFace{width:27px; height:27px; border-radius:50%; background:#fff; overflow:hidden; flex:none; display:grid; place-items:center}
+  .cheer .cheerFace svg{width:100%; height:100%; display:block}
+  .cheer.sad{background:linear-gradient(135deg,#8A93B0 0%,#6E748C 100%); box-shadow:0 12px 26px -10px rgba(110,116,140,.6)}
+  .cheer::after{content:""; position:absolute; left:50%; bottom:-6px; margin-left:-7px; border:7px solid transparent; border-top-color:var(--ind)}
+  .cheer.sad::after{border-top-color:#6E748C}
+  @keyframes cheerPop{0%{opacity:0; transform:translate(-50%,10px) scale(.6)}18%{opacity:1; transform:translate(-50%,0) scale(1.06)}34%{transform:translate(-50%,0) scale(1)}80%{opacity:1; transform:translate(-50%,-6px)}100%{opacity:0; transform:translate(-50%,-18px) scale(.95)}}
+  .volRow{display:flex; align-items:center; gap:10px; margin-top:4px}
+  .volRow input[type=range]{flex:1; accent-color:var(--ind); height:26px}
+  .volIco{font-size:16px} .volPct{min-width:44px; text-align:right; font-weight:700; color:var(--muted); font-size:13px}
+  .volMute{font-size:18px; background:none; border:none; color:var(--ink); cursor:pointer; padding:2px 4px; line-height:1; border-radius:8px; transition:transform .12s}
+  .volMute:active{transform:scale(.88)}
+  @media (prefers-reduced-motion:reduce){ .art.pop{animation:none} .art.hop{animation:none} .burst{display:none} .cheer{display:none} .stage,.art{transition:none} }
   .mActions{display:flex; gap:10px; margin-top:18px}
   .mbtn{flex:1; padding:15px; border-radius:13px; border:none; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit}
   .mbtn.primary{background:var(--grad); color:#fff; box-shadow:0 12px 30px -12px var(--glow)} .mbtn.ghost{background:var(--card-2); color:var(--ink); border:1px solid var(--line-2)}
@@ -389,6 +403,8 @@
     <div id="goalList"></div>
     <div class="orline" style="margin-top:10px">지금 목표 색 바꾸기</div>
     <div class="colorPick" id="goalColor"></div>
+    <div class="orline" style="margin-top:14px">🔊 소리 크기</div>
+    <div class="volRow"><button class="volMute" id="volMute" type="button" aria-label="소리 끄기/켜기">🔊</button><input type="range" id="volRange" min="0" max="100" step="1" aria-label="소리 크기" /><span class="volPct" id="volPct">65%</span></div>
     <div class="orline" id="doneTitle" hidden style="margin-top:14px">🏆 내가 이룬 목표</div>
     <div id="doneList" class="shelf"></div>
     <div class="histHead" style="margin-top:14px"><span class="orline" style="margin:0">📒 <span id="histName"></span> 저축 내역</span><button class="linkBtn" id="histMore" type="button">자세히 보기 ▸</button></div>
@@ -791,12 +807,12 @@ async function commit(amount, serial, type){
   const res=await db.insertDeposit(rec);
   if(!res.ok){ S.deposits=S.deposits.filter(d=>!String(d.id).startsWith('tmp')); render();
     toast(res.dup?"이미 저축한 지폐예요!":"저장에 실패했어요. 다시 시도해 주세요.", true); return; }
-  if(amount<0){ toast(josaIga(S.childName)+" "+won(-amount)+"원 뺐어요.", false); if(document.body.classList.contains('sheet')) drawHistory(); return; }
+  if(amount<0){ mascotCheer(pick(CHEER_MINUS),'sad'); toast(josaIga(S.childName)+" "+won(-amount)+"원 뺐어요.", false); if(document.body.classList.contains('sheet')) drawHistory(); return; }
   const bPct=Math.min(100,Math.round((before/g.price)*100)), aPct=Math.min(100,Math.round(((before+amount)/g.price)*100));
-  if(before<g.price && before+amount>=g.price){ party(); celebrate(true); toast(g.name+" 다 모았어요! 🎉", false); }
+  if(before<g.price && before+amount>=g.price){ mascotCheer(pick(CHEER_DONE),'sparkle'); party(); celebrate(true); fxGoal(); toast(g.name+" 다 모았어요! 🎉", false); }
   else { let ms=0; for(const th of [25,50,75]) if(bPct<th && aPct>=th) ms=th;
-    if(ms && ms>msSeen(g)){ await setMsSeen(g,ms); celebrate(false); toast(({25:"좋아요! 벌써 25%나 모았어요 👏",50:"절반이나 모았어요! 🙌",75:"거의 다 왔어요! 75% 돌파 🔥"})[ms], false); }
-    else toast(josaIga(S.childName)+" "+won(amount)+"원 저축했어요!", false); }
+    if(ms && ms>msSeen(g)){ await setMsSeen(g,ms); mascotCheer(pick(CHEER_MS[ms]),'ms'); celebrate(false); fxMilestone(); toast(({25:"좋아요! 벌써 25%나 모았어요 👏",50:"절반이나 모았어요! 🙌",75:"거의 다 왔어요! 75% 돌파 🔥"})[ms], false); }
+    else { mascotCheer(pick(CHEER_SAVE),'happy'); toast(josaIga(S.childName)+" "+won(amount)+"원 저축했어요!", false); } }
   if(document.body.classList.contains('sheet')) drawHistory();
 }
 
@@ -846,20 +862,89 @@ function handlePin(){
 async function requestAuth(){ return await openAuth(!AUTH.isSet()); }
 let pend=0, _lastGoal=null;
 let sndMode='sound'; try{ const v=lsGet('sound'); sndMode = v==='off'?'silent':(v==='vibe'||v==='silent'?v:'sound'); }catch(e){}
+let volVal=65; try{ const v=lsGet('vol'); if(v!=null){ const map={low:35,mid:65,high:100}; volVal = (v in map)?map[v]:Math.max(0,Math.min(100,parseInt(v,10)||65)); } }catch(e){}
+function _volMul(){ return (volVal/100)*1.6; }
 function vibe(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
-/* 효과음 (가벼운 블립) */
-let _actx=null;
-function blip(amt){ if(sndMode!=='sound') return; try{ _actx=_actx||new (window.AudioContext||window.webkitAudioContext)(); const c=_actx; if(c.state==='suspended') c.resume();
-  const o=c.createOscillator(), g=c.createGain(), up=amt>0, f=up?620:300;
-  o.type='triangle'; o.frequency.setValueAtTime(f,c.currentTime); o.frequency.exponentialRampToValueAtTime(up?f*1.5:f*0.7, c.currentTime+0.09);
-  g.gain.setValueAtTime(0.0001,c.currentTime); g.gain.exponentialRampToValueAtTime(0.05,c.currentTime+0.01); g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+0.13);
-  o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+0.14); }catch(e){} }
-function chime(){ if(sndMode!=='sound') return; try{ _actx=_actx||new (window.AudioContext||window.webkitAudioContext)(); const c=_actx; if(c.state==='suspended') c.resume();
-  [660,880,1175].forEach((f,i)=>{ const o=c.createOscillator(), g=c.createGain(); o.type='triangle'; o.frequency.value=f;
-    const t=c.currentTime+i*0.09; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.05,t+0.01); g.gain.exponentialRampToValueAtTime(0.0001,t+0.18);
-    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+0.2); }); }catch(e){} }
+/* 효과음 엔진 (Web Audio) */
+let _actx=null, _master=null;
+function _AC(){ _actx=_actx||new (window.AudioContext||window.webkitAudioContext)(); if(_actx.state==='suspended'){ try{ _actx.resume(); }catch(e){} }
+  if(!_master){ _master=_actx.createGain(); _master.gain.value=_volMul(); _master.connect(_actx.destination); } return _actx; }
+function _tone(c,o){ const f=o.f, f2=o.f2, t0=c.currentTime+(o.t||0), dur=o.dur||0.15, peak=o.peak||0.05;
+  const osc=c.createOscillator(), g=c.createGain(); osc.type=o.type||'triangle';
+  osc.frequency.setValueAtTime(f,t0); if(f2) osc.frequency.exponentialRampToValueAtTime(Math.max(1,f2), t0+dur);
+  g.gain.setValueAtTime(0.0001,t0); g.gain.exponentialRampToValueAtTime(peak,t0+0.012); g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  if(o.filter){ const lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=o.filter; osc.connect(lp); lp.connect(g); }
+  else osc.connect(g);
+  g.connect(_master||c.destination); osc.start(t0); osc.stop(t0+dur+0.03); }
+/* 담기: 금액 클수록 낮고 묵직하게 */
+function blip(amt){ if(sndMode!=='sound') return; try{ const c=_AC(), up=amt>0, a=Math.abs(amt);
+  const f = up ? (a>=10000?392 : a>=5000?494 : a>=1000?622 : 784) : 300;
+  _tone(c,{f:f, f2:up?f*1.4:f*0.7, dur:0.13, type:'triangle', peak:0.05});
+  _tone(c,{f:f*2, dur:0.05, type:'sine', peak:0.016});
+  if(up && a>=5000) _tone(c,{f:f*0.5, dur:0.18, type:'sine', peak:0.045}); }catch(e){} }
+/* 저축: 밝은 아르페지오 */
+function chime(){ if(sndMode!=='sound') return; try{ const c=_AC();
+  [523,659,784,1046].forEach((f,i)=>{ _tone(c,{f:f, t:i*0.085, dur:0.22, type:'triangle', peak:0.05});
+    _tone(c,{f:f*2, t:i*0.085, dur:0.12, type:'sine', peak:0.012}); }); }catch(e){} }
+/* 마일스톤: 반짝 */
+function sparkle(){ if(sndMode!=='sound') return; try{ const c=_AC();
+  [1568,2093,2637].forEach((f,i)=> _tone(c,{f:f, t:i*0.06, dur:0.16, type:'sine', peak:0.04})); }catch(e){} }
+/* 꿀꿀이 "꿀!" — 로우패스 통과 톱니로 콧소리 흉내 */
+function oink(){ if(sndMode!=='sound') return; try{ const c=_AC();
+  [0,0.16].forEach(t0=> _tone(c,{f:300, f2:170, t:t0, dur:0.13, type:'sawtooth', peak:0.06, filter:900})); }catch(e){} }
+/* 100% 완성: 매번 다른 레벨업 멜로디 + 종소리 */
+const FANFARES=[
+  [523,587,659,784,880,1046,1318],
+  [659,784,988,1318,1568],
+  [523,659,784,1046,784,1046,1318],
+  [440,554,659,880,1108,1318],
+  [587,740,880,1046,1318,1568]
+];
+function fanfare(){ if(sndMode!=='sound') return; try{ const c=_AC();
+  const run=FANFARES[Math.floor(Math.random()*FANFARES.length)];
+  run.forEach((f,i)=> _tone(c,{f:f, t:i*0.07, dur:0.2, type:'triangle', peak:0.055}));
+  const tail=run[run.length-1];
+  [tail*0.5,tail,tail*1.5].forEach(f=> _tone(c,{f:f, t:0.55, dur:0.7, type:'triangle', peak:0.038}));
+  [1046.5,1568,2093,2637].forEach(f=> _tone(c,{f:f, t:0.6, dur:1.15, type:'sine', peak:0.026})); }catch(e){} }
 function fxTap(amt){ if(sndMode==='sound') blip(amt); else if(sndMode==='vibe') vibe(12); }
 function fxSave(){ if(sndMode==='sound') chime(); else if(sndMode==='vibe') vibe([22,40,22]); }
+function fxMilestone(){ if(sndMode==='sound') sparkle(); else if(sndMode==='vibe') vibe([16,30,16]); }
+function fxGoal(){ if(sndMode==='sound'){ fanfare(); setTimeout(oink,760); } else if(sndMode==='vibe') vibe([28,40,28,40,70]); }
+/* 볼륨(0~100%) */
+function setVol(v, preview){ volVal=Math.max(0,Math.min(100,Math.round(v))); try{ lsSet('vol',String(volVal)); }catch(e){}
+  if(_master) _master.gain.value=_volMul(); const p=$("#volPct"); if(p) p.textContent=volVal+'%';
+  if(preview){ if(sndMode==='sound') blip(1000); else if(sndMode==='vibe') vibe(14); } }
+function drawVol(){ const r=$("#volRange"), p=$("#volPct"), mb=$("#volMute"); if(r) r.value=volVal; if(p) p.textContent=volVal+'%';
+  if(mb) mb.textContent = sndMode==='sound'?'🔊':(sndMode==='vibe'?'📳':'🔇'); }
+/* 저축 시 꿀꿀이 점프 + 말풍선 (상황별 랜덤 문구 + 표정) */
+const CHEER_SAVE=["꿀!","냠냠 ","좋아 👍","최고야 ✨","쑥쑥 📈","차곡차곡 ","우와 😆"];
+const CHEER_DONE=["🎉 꿀!","다 모았다 🎉","해냈어 🏆","우와 완성 ✨","최고야 🥳"];
+const CHEER_MS={25:["좋은 출발 👏","25% 꿀!","가보자 🚀"],50:["벌써 절반 🙌","반이나 모았어 ","멋져 💪"],75:["거의 다 왔어 🔥","75% 돌파 ","조금만 더 ✨"]};
+const CHEER_MINUS=["아쉽다 😢","조금 뺐어 ","다시 모으자 ","에구 "];
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function _star(x,y,r){ return `<path d="M${x},${y-r} L${x+r*0.3},${y-r*0.3} L${x+r},${y} L${x+r*0.3},${y+r*0.3} L${x},${y+r} L${x-r*0.3},${y+r*0.3} L${x-r},${y} L${x-r*0.3},${y-r*0.3} Z"/>`; }
+function pigFace(mood){
+  let eyes, mouth;
+  if(mood==='sparkle') eyes='<g fill="#FBBF24">'+_star(94,114,10)+_star(146,114,10)+'</g>';
+  else if(mood==='happy'||mood==='ms') eyes='<g fill="none" stroke="#241B36" stroke-width="7" stroke-linecap="round"><path d="M83,120 q11,-14 22,0"/><path d="M135,120 q11,-14 22,0"/></g>';
+  else if(mood==='sad') eyes='<g fill="none" stroke="#241B36" stroke-width="7" stroke-linecap="round"><path d="M83,114 q11,12 22,0"/><path d="M135,114 q11,12 22,0"/></g>';
+  else eyes='<circle cx="94" cy="116" r="9.5" fill="#241B36"/><circle cx="146" cy="116" r="9.5" fill="#241B36"/>';
+  mouth = mood==='sad'
+    ? '<path d="M104,210 q16,-13 32,0" stroke="#9B2360" stroke-width="5" fill="none" stroke-linecap="round"/>'
+    : '<path d="M100,202 q20,16 40,0" stroke="#9B2360" stroke-width="5" fill="none" stroke-linecap="round"/>';
+  const spark = mood==='sparkle' ? '<g fill="#FBBF24">'+_star(200,58,7)+_star(50,66,6)+'</g>' : '';
+  return '<svg viewBox="28 26 184 198" xmlns="http://www.w3.org/2000/svg">'
+    +'<path d="M72,74 L58,30 L102,60 Z" fill="#F25C9A"/><path d="M168,74 L182,30 L138,60 Z" fill="#F25C9A"/>'
+    +'<circle cx="120" cy="132" r="88" fill="#F25C9A"/>'
+    +'<circle cx="74" cy="156" r="17" fill="#FF9EC0"/><circle cx="166" cy="156" r="17" fill="#FF9EC0"/>'
+    +'<ellipse cx="120" cy="162" rx="46" ry="33" fill="#D6347B"/>'
+    +'<ellipse cx="104" cy="162" rx="7" ry="11" fill="#9B2360"/><ellipse cx="136" cy="162" rx="7" ry="11" fill="#9B2360"/>'
+    +eyes+mouth+spark+'</svg>';
+}
+function mascotCheer(text, mood){ if(matchMedia("(prefers-reduced-motion:reduce)").matches) return;
+  const art=$("#art"); if(art && mood!=='sad'){ art.classList.remove('hop'); void art.offsetWidth; art.classList.add('hop'); setTimeout(()=>art.classList.remove('hop'),650); }
+  const stage=document.querySelector('.stage'); if(stage){ const b=document.createElement('div'); b.className='cheer'+(mood==='sad'?' sad':'');
+    b.innerHTML='<span class="cheerFace">'+pigFace(mood)+'</span><span>'+(text||'꿀!')+'</span>'; stage.appendChild(b); setTimeout(()=>b.remove(),1050); } }
 function popVal(){ const v=$("#pendVal"); if(!v) return; v.classList.remove('pop'); void v.offsetWidth; v.classList.add('pop'); }
 /* 예고 물결선: 저장 전 "여기까지 차오를 예정"(Q1) */
 function updatePreviewFill(){ const g=active(), pv=$("#artPrev"), pl=$("#prevline");
@@ -968,7 +1053,7 @@ function party(){ if(matchMedia("(prefers-reduced-motion:reduce)").matches) retu
 
 /* 설정 모달 */
 let pickEmoji=null, pendingPhoto=null, newColorSel=PAL[0], pickIcon=null;
-function openSettings(){ document.body.classList.add('sheet'); drawKids(); drawGoals(); drawHistory(); drawIconTabs(); drawIconPick(); drawEmoji(); drawColor('newColor',newColorSel); drawColor('goalColor',(active()&&active().color)||PAL[0]); updatePreview(); $("#scrim").classList.add("show"); }
+function openSettings(){ document.body.classList.add('sheet'); drawKids(); drawGoals(); drawHistory(); drawIconTabs(); drawIconPick(); drawEmoji(); drawColor('newColor',newColorSel); drawColor('goalColor',(active()&&active().color)||PAL[0]); drawVol(); updatePreview(); $("#scrim").classList.add("show"); }
 function drawColor(id,sel){ document.getElementById(id).innerHTML=PAL.map(c=>`<button data-color="${c}" class="${c===sel?'sel':''}" style="background:${c}"></button>`).join(""); }
 const CATS=[['탈것','🛴',['bike','kickboard','drone']],['동물','🦖',['dino','teddy']],['장난감','🎮',['game','robot','guitar','ball']],['선물','🎁',['gift']]];
 let catSel=0;
@@ -1047,9 +1132,9 @@ function applyTheme(t){ document.documentElement.setAttribute('data-theme',t); c
 let curTheme='dark'; try{ const sv=localStorage.getItem('theme'); if(THEMES.includes(sv)) curTheme=sv; }catch(e){}
 applyTheme(curTheme);
 $("#themeBtn").onclick=()=>{ curTheme=THEMES[(THEMES.indexOf(curTheme)+1)%THEMES.length]; applyTheme(curTheme); };
-function applySound(){ const b=$("#soundBtn"); if(b){ b.textContent = sndMode==='sound'?'🔊':(sndMode==='vibe'?'📳':'🔇'); b.setAttribute('aria-label', sndMode==='sound'?'소리 켜짐':(sndMode==='vibe'?'진동 모드':'무음')); } try{ lsSet('sound',sndMode); }catch(e){} }
+function applySound(){ const b=$("#soundBtn"); if(b){ b.textContent = sndMode==='sound'?'🔊':(sndMode==='vibe'?'📳':'🔇'); b.setAttribute('aria-label', sndMode==='sound'?'소리 켜짐':(sndMode==='vibe'?'진동 모드':'무음')); } const mb=$("#volMute"); if(mb) mb.textContent = sndMode==='sound'?'🔊':(sndMode==='vibe'?'📳':'🔇'); try{ lsSet('sound',sndMode); }catch(e){} }
 applySound();
-$("#soundBtn").onclick=()=>{ sndMode = sndMode==='sound'?'vibe':(sndMode==='vibe'?'silent':'sound'); applySound(); if(sndMode==='sound') blip(100); else if(sndMode==='vibe') vibe(18); };
+$("#soundBtn").onclick=()=>{ sndMode = sndMode==='sound'?'vibe':(sndMode==='vibe'?'silent':'sound'); applySound(); if(sndMode==='sound') oink(); else if(sndMode==='vibe') vibe(18); };
 $("#histPeriods").addEventListener("click",e=>{ const b=e.target.closest("[data-p]"); if(b){ histPeriod=b.dataset.p; drawHistory(); } });
 $("#histList").addEventListener("click",e=>{ const h=e.target.closest("[data-mon]"); if(h){ const k=h.dataset.mon; if(collapsedMonths.has(k)) collapsedMonths.delete(k); else collapsedMonths.add(k); drawHistory(); } });
 $("#histMore").onclick=openHistFull;
@@ -1064,6 +1149,9 @@ setTimeout(()=>document.body.classList.remove('enter'),1700);
 $("#brandBtn").onclick=openSettings; $("#closeSettings").onclick=closeSettings;
 $("#scrim").addEventListener("click",e=>{ if(e.target===$("#scrim")) closeSettings(); });
 $("#kidPills").addEventListener("click",e=>{ const b=e.target.closest("[data-kid]"); if(b) loadChild(b.dataset.kid).then(openSettings); });
+$("#volRange").addEventListener("input", e=> setVol(+e.target.value, false));
+$("#volRange").addEventListener("change", e=> setVol(+e.target.value, true));
+$("#volMute").onclick=()=>{ sndMode = (sndMode==='sound')?'silent':'sound'; applySound(); drawVol(); if(sndMode==='sound') blip(1000); };
 $("#goalList").addEventListener("click",async e=>{
   const del=e.target.closest("[data-del]");
   if(del){ e.stopPropagation(); await db.delGoal(del.dataset.del); await loadChild(S.childId); openSettings(); return; }
