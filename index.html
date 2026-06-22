@@ -3,50 +3,51 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#0A0C14" />
+<meta name="theme-color" content="#1A1326" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <link rel="manifest" href="./manifest.webmanifest" />
 <link rel="apple-touch-icon" href="./icon.svg" />
-<title>우리집 저금통</title>
+<title>꿀꿀이 · Oinky</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 <style>
   @property --lvl{ syntax:'<percentage>'; inherits:false; initial-value:0%; }
   :root{
-    --bg:#0A0C14; --bgimg:radial-gradient(1100px 640px at 50% -10%, #1C2240 0%, rgba(28,34,64,0) 60%), #0A0C14;
-    --card:rgba(255,255,255,.045); --card-2:rgba(255,255,255,.075);
-    --line:rgba(255,255,255,.10); --line-2:rgba(255,255,255,.17);
-    --ink:#EDEFF7; --muted:#9AA0B6; --faint:#6E748C; --field:rgba(255,255,255,.05);
-    --ind:#6366F1; --vio:#8B5CF6; --grad:linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%); --glow:rgba(123,99,241,.7);
-    --go:#6366F1; --go-soft:rgba(99,102,241,.15);
-    --emerald:#34D399; --gold:#FBBF24; --warn:#F87171;
-    --shadow:0 24px 60px rgba(0,0,0,.5); --r:18px; --goalcol:#6366F1;
+    --bg:#1A1326; --bgimg:radial-gradient(1100px 640px at 50% -10%, #3A2348 0%, rgba(58,35,72,0) 60%), #1A1326;
+    --card:rgba(255,255,255,.05); --card-2:rgba(255,255,255,.08);
+    --line:rgba(255,255,255,.10); --line-2:rgba(255,255,255,.18);
+    --ink:#F6EEF4; --muted:#C2AABB; --faint:#8A7384; --field:rgba(255,255,255,.05);
+    --ind:#F25C9A; --vio:#FF8FB5; --grad:linear-gradient(135deg,#FF7DB0 0%,#F25C9A 55%,#E0508D 100%); --glow:rgba(242,92,154,.7);
+    --go:#F25C9A; --go-soft:rgba(242,92,154,.16);
+    --emerald:#2BC4A0; --gold:#FBBF24; --warn:#F87171;
+    --shadow:0 24px 60px rgba(0,0,0,.5); --r:18px; --goalcol:#F25C9A;
     --ghost:grayscale(1) brightness(1.18) contrast(.88) opacity(.40);
     --surf-bg:rgba(255,255,255,.9); --surf-sh:0 0 18px 3px rgba(255,255,255,.5);
-    --modalbg:linear-gradient(180deg,#171B2A 0%,#10131F 100%);
+    --modalbg:linear-gradient(180deg,#241830 0%,#180F22 100%);
   }
   :root[data-theme="warm"]{
-    --bg:#15111B; --bgimg:radial-gradient(1100px 640px at 50% -10%, #3A2640 0%, rgba(58,38,64,0) 60%), #15111B;
-    --card:rgba(255,255,255,.05); --card-2:rgba(255,255,255,.08);
-    --line:rgba(255,255,255,.11); --line-2:rgba(255,255,255,.18);
-    --ink:#F3EEF6; --muted:#B2A6BC; --faint:#7C7088; --field:rgba(255,255,255,.055);
-    --ind:#A855F7; --vio:#EC4899; --grad:linear-gradient(135deg,#A855F7 0%,#EC4899 100%); --glow:rgba(192,38,211,.6);
-    --go:#A855F7; --go-soft:rgba(168,85,247,.16);
+    --bg:#211325; --bgimg:radial-gradient(1100px 640px at 50% -10%, #4A2540 0%, rgba(74,37,64,0) 60%), #211325;
+    --card:rgba(255,255,255,.055); --card-2:rgba(255,255,255,.085);
+    --line:rgba(255,255,255,.12); --line-2:rgba(255,255,255,.20);
+    --ink:#F8EFE9; --muted:#D2ABA8; --faint:#917271; --field:rgba(255,255,255,.06);
+    --ind:#FF6F91; --vio:#FBBF24; --grad:linear-gradient(135deg,#FF9F5A 0%,#F25C9A 100%); --glow:rgba(242,92,154,.6);
+    --go:#FF6F91; --go-soft:rgba(255,111,145,.16);
+    --emerald:#2BC4A0;
     --ghost:grayscale(1) brightness(1.16) contrast(.9) opacity(.44);
-    --surf-bg:rgba(255,255,255,.9); --surf-sh:0 0 18px 3px rgba(255,236,250,.5);
-    --modalbg:linear-gradient(180deg,#231A2C 0%,#160F1E 100%);
+    --surf-bg:rgba(255,255,255,.9); --surf-sh:0 0 18px 3px rgba(255,236,240,.5);
+    --modalbg:linear-gradient(180deg,#2A1A2C 0%,#1A1020 100%);
   }
   :root[data-theme="light"]{
-    --bg:#F5F4FB; --bgimg:radial-gradient(1100px 640px at 50% -12%, #E6E5FC 0%, rgba(230,229,252,0) 60%), #F5F4FB;
-    --card:rgba(28,30,60,.035); --card-2:rgba(28,30,60,.06);
-    --line:rgba(28,30,60,.10); --line-2:rgba(28,30,60,.15);
-    --ink:#1B1F30; --muted:#5C6276; --faint:#9AA0B2; --field:rgba(28,30,60,.04);
-    --ind:#6366F1; --vio:#8B5CF6; --grad:linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%); --glow:rgba(99,102,241,.42);
-    --go:#6366F1; --go-soft:rgba(99,102,241,.12);
-    --emerald:#0E9F6E; --warn:#DC2626;
-    --shadow:0 22px 54px rgba(50,50,95,.14);
+    --bg:#FFF6FB; --bgimg:radial-gradient(1100px 640px at 50% -12%, #FFE3EF 0%, rgba(255,227,239,0) 60%), #FFF6FB;
+    --card:rgba(36,27,54,.035); --card-2:rgba(36,27,54,.06);
+    --line:rgba(36,27,54,.10); --line-2:rgba(36,27,54,.15);
+    --ink:#241B36; --muted:#6A6076; --faint:#A99FB0; --field:rgba(36,27,54,.04);
+    --ind:#EC4E93; --vio:#F25C9A; --grad:linear-gradient(135deg,#FF7DB0 0%,#EC4E93 100%); --glow:rgba(236,78,147,.40);
+    --go:#EC4E93; --go-soft:rgba(236,78,147,.12);
+    --emerald:#1FA98A; --warn:#DC2626;
+    --shadow:0 22px 54px rgba(90,40,75,.14);
     --ghost:grayscale(1) brightness(.98) contrast(.95) opacity(.40);
-    --surf-bg:rgba(40,48,70,.6); --surf-sh:0 0 12px 2px rgba(40,48,70,.22);
+    --surf-bg:rgba(60,40,70,.6); --surf-sh:0 0 12px 2px rgba(60,40,70,.22);
     --modalbg:#FFFFFF;
   }
   *{box-sizing:border-box}
@@ -61,7 +62,8 @@
   .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:-.01em; font-size:16px; background:var(--card-2); border:1px solid var(--line-2); color:var(--ink); padding:6px 14px 6px 6px; border-radius:999px; cursor:pointer; font-family:inherit; transition:transform .12s}
   .brand:active{transform:scale(.97)}
   .brand .gear{font-size:14px; opacity:.85; margin-left:2px}
-  .brand .logo{width:34px; height:34px; border-radius:11px; display:grid; place-items:center; font-size:18px; background:var(--grad); box-shadow:0 8px 22px -6px rgba(99,102,241,.75)}
+  .brand .logo{width:34px; height:34px; border-radius:11px; display:grid; place-items:center; background:#fff; overflow:hidden; padding:3px; box-shadow:0 8px 22px -6px rgba(242,92,154,.7)}
+  .brand .logo svg{width:100%; height:100%; display:block}
   .kidtag{font-size:13px; font-weight:700; color:var(--ink); background:var(--card-2); border:1px solid var(--line); padding:7px 14px; border-radius:999px; max-width:48vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .kidtag:empty{display:none}
   .tb-right{display:flex; align-items:center; gap:8px}
@@ -231,14 +233,14 @@
   .modal label{display:block; font-size:13px; color:var(--muted); font-weight:600; margin:16px 0 8px}
   .modal input[type=text],.modal input[type=number]{width:100%; padding:13px 15px; border:1px solid var(--line-2); border-radius:12px; font-size:16px; font-family:inherit; background:var(--field); color:var(--ink)}
   .modal input::placeholder{color:var(--faint)}
-  .modal input:focus{outline:none; border-color:var(--ind); box-shadow:0 0 0 3px rgba(99,102,241,.28)}
+  .modal input:focus{outline:none; border-color:var(--ind); box-shadow:0 0 0 3px rgba(242,92,154,.28)}
 
   .pills{display:flex; gap:8px; flex-wrap:wrap}
   .pill{border:1px solid var(--line-2); background:var(--card); color:var(--ink); font-family:inherit; font-weight:700; padding:10px 16px; border-radius:999px; cursor:pointer}
   .pill.on{border-color:transparent; background:var(--grad); color:#fff}
 
   .gitem{display:flex; align-items:center; gap:12px; padding:12px; border:1px solid var(--line); border-radius:14px; margin-top:8px; cursor:pointer; background:var(--card)}
-  .gitem.on{border-color:rgba(99,102,241,.55); background:var(--go-soft)}
+  .gitem.on{border-color:rgba(242,92,154,.55); background:var(--go-soft)}
   .gitem .em{font-size:26px; width:34px; text-align:center}
   .gitem img.em{width:34px; height:34px; object-fit:contain; font-size:0}
   .gitem .nm{font-weight:700} .gitem .pr{font-size:13px; color:var(--muted)}
@@ -247,7 +249,7 @@
 
   .shelf{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px}
   .done{width:98px; padding:10px 8px; border:1px solid var(--line); border-radius:14px; background:var(--card); text-align:center; cursor:pointer; position:relative}
-  .done.on{border-color:rgba(99,102,241,.55); background:var(--go-soft)}
+  .done.on{border-color:rgba(242,92,154,.55); background:var(--go-soft)}
   .done img{width:62px; height:62px; object-fit:contain; display:block; margin:0 auto 4px}
   .done .dn{display:block; font-size:12px; font-weight:700; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
   .done .ck{display:block; font-size:11px; color:var(--emerald); font-weight:700; margin-top:2px}
@@ -280,7 +282,7 @@
   #scrim.show .modal{transform:translateY(0)}
   .previewTag{display:none}
   body.sheet .previewTag{display:block; text-align:center; color:var(--muted); font-weight:700; font-size:13px; margin-top:10px}
-  body.sheet .art{outline:2px dashed var(--prevcol, #6366F1); outline-offset:12px; border-radius:14px}
+  body.sheet .art{outline:2px dashed var(--prevcol, #F25C9A); outline-offset:12px; border-radius:14px}
 
   @keyframes pop{0%{transform:scale(1)}38%{transform:scale(1.09)}68%{transform:scale(.975)}100%{transform:scale(1)}}
   @keyframes popbig{0%{transform:scale(1)}35%{transform:scale(1.16)}65%{transform:scale(.95)}100%{transform:scale(1)}}
@@ -301,7 +303,7 @@
 <body class="enter">
 <div class="app">
   <header class="topbar">
-    <button class="brand" id="brandBtn" type="button" aria-label="목표 설정"><span class="logo">🐷</span>저금통<span class="gear">⚙️</span></button>
+    <button class="brand" id="brandBtn" type="button" aria-label="목표 설정"><span class="logo"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15,15 L11,6 L20,12 Z" fill="#F25C9A"/><path d="M33,15 L37,6 L28,12 Z" fill="#F25C9A"/><circle cx="24" cy="27" r="17" fill="#F25C9A"/><circle cx="15" cy="30" r="3.4" fill="#FF9EC0"/><circle cx="33" cy="30" r="3.4" fill="#FF9EC0"/><ellipse cx="24" cy="31" rx="9" ry="6.6" fill="#D6347B"/><ellipse cx="21" cy="31" rx="1.7" ry="2.5" fill="#7d1c47"/><ellipse cx="27" cy="31" rx="1.7" ry="2.5" fill="#7d1c47"/><circle cx="18.5" cy="22.5" r="2.5" fill="#241B36"/><circle cx="29.5" cy="22.5" r="2.5" fill="#241B36"/></svg></span>꿀꿀이<span class="gear">⚙️</span></button>
     <div class="tb-right">
       <button class="themeBtn" id="soundBtn" type="button" aria-label="소리 켜기/끄기">🔊</button>
       <button class="themeBtn" id="themeBtn" type="button" aria-label="화면 테마 바꾸기">🌙</button>
@@ -582,9 +584,25 @@ function iconFromName(name){ const n=(name||'').toLowerCase(); let best=null, sc
     if(p>=0){ const sc=(WEAK.has(w)?0:1000)+p; if(sc>score){ score=sc; best=k; } } } }
   return best; }
 
+/* 꿀꿀이 마스코트 — 채움용 이미지(흑백→컬러로 차오름). 그림 경계에 꽉 차도록 viewBox 타이트하게 */
+const _OINKY_INNER =
+  '<path d="M72,74 L58,30 L102,60 Z" fill="#F25C9A"/><path d="M168,74 L182,30 L138,60 Z" fill="#F25C9A"/>'
+ +'<path d="M80,70 L70,44 L98,62 Z" fill="#FFB3CF"/><path d="M160,70 L170,44 L142,62 Z" fill="#FFB3CF"/>'
+ +'<circle cx="120" cy="132" r="88" fill="#F25C9A"/>'
+ +'<circle cx="74" cy="156" r="17" fill="#FF9EC0"/><circle cx="166" cy="156" r="17" fill="#FF9EC0"/>'
+ +'<ellipse cx="120" cy="162" rx="46" ry="33" fill="#D6347B"/>'
+ +'<ellipse cx="104" cy="162" rx="7" ry="11" fill="#9B2360"/><ellipse cx="136" cy="162" rx="7" ry="11" fill="#9B2360"/>'
+ +'<circle cx="94" cy="116" r="12" fill="#ffffff"/><circle cx="146" cy="116" r="12" fill="#ffffff"/>'
+ +'<circle cx="96" cy="118" r="6.5" fill="#241B36"/><circle cx="148" cy="118" r="6.5" fill="#241B36"/>'
+ +'<circle cx="93.5" cy="115.5" r="2.3" fill="#ffffff"/><circle cx="145.5" cy="115.5" r="2.3" fill="#ffffff"/>'
+ +'<path d="M100,202 q20,16 40,0" stroke="#9B2360" stroke-width="5" fill="none" stroke-linecap="round"/>';
+const OINKY_IMG = "data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 26 184 198">'+_OINKY_INNER+'</svg>');
+const OINKY_ASPECT = 184/198;
+
 const demoDB = {
-  children:[ {id:'c1',name:'민준',active_goal:'g1'}, {id:'c2',name:'서준',active_goal:'g4'} ],
+  children:[ {id:'c1',name:'민준',active_goal:'g0'}, {id:'c2',name:'서준',active_goal:'g4'} ],
   goals:[
+    {id:'g0',child_id:'c1',name:'꿀꿀이 채우기',emoji:null,color:'#F25C9A',image:OINKY_IMG,aspect:OINKY_ASPECT,price:50000},
     {id:'g1',child_id:'c1',name:'빨간 자전거',emoji:'🚲',color:'#E0564B',image:null,aspect:1,price:100000},
     {id:'g2',child_id:'c1',name:'게임기',    emoji:'🎮',color:'#3F86C9',image:null,aspect:1,price:320000},
     {id:'g3',child_id:'c1',name:'공룡 인형',  emoji:'🦖',color:'#2DB67D',image:null,aspect:1,price:18000},
@@ -790,7 +808,7 @@ const AUTH={ until:0,
   mode(){ return lsGet('authMode'); }, isSet(){ return !!this.mode(); },
   unlocked(){ return Date.now()<this.until; }, unlock(){ this.until=Date.now()+120000; },
   async bioOK(){ try{ return !!window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); }catch(e){ return false; } },
-  async regBio(){ const c=await navigator.credentials.create({publicKey:{ challenge:rand(32), rp:{name:"우리집 저금통"}, user:{id:rand(16),name:"parent",displayName:"보호자"}, pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}], authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"}, timeout:60000 }}); if(!c) throw new Error('no cred'); lsSet('authCredId',b64(c.rawId)); lsSet('authMode','bio'); },
+  async regBio(){ const c=await navigator.credentials.create({publicKey:{ challenge:rand(32), rp:{name:"꿀꿀이"}, user:{id:rand(16),name:"parent",displayName:"보호자"}, pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}], authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"}, timeout:60000 }}); if(!c) throw new Error('no cred'); lsSet('authCredId',b64(c.rawId)); lsSet('authMode','bio'); },
   async verBio(){ const id=lsGet('authCredId'); const pk={ challenge:rand(32), userVerification:"required", timeout:60000 }; if(id) pk.allowCredentials=[{type:"public-key",id:unb64(id)}]; await navigator.credentials.get({publicKey:pk}); return true; },
   setPin(p){ lsSet('authPin',p); lsSet('authMode','pin'); }, pinOK(p){ return lsGet('authPin')===p; } };
 
@@ -1022,7 +1040,7 @@ $("#nextGoalBtn").onclick=openSettings;
 window.addEventListener("resize",()=>{ const g=active(); if(g) setArtSize(artFor(g).aspect); });
 
 /* 낮·밤·따뜻한 테마 전환, 첫 등장 시퀀스 */
-const THEMES=['dark','warm','light'], TICON={dark:'🌙',warm:'🌆',light:'☀️'}, TMETA={dark:'#0A0C14',warm:'#15111B',light:'#F5F4FB'};
+const THEMES=['dark','warm','light'], TICON={dark:'🌙',warm:'🌆',light:'☀️'}, TMETA={dark:'#1A1326',warm:'#211325',light:'#FFF6FB'};
 function applyTheme(t){ document.documentElement.setAttribute('data-theme',t); const b=$("#themeBtn"); if(b) b.textContent=TICON[t]; const mt=document.querySelector('meta[name=theme-color]'); if(mt) mt.content=TMETA[t]; try{ localStorage.setItem('theme',t); }catch(e){} }
 let curTheme='dark'; try{ const sv=localStorage.getItem('theme'); if(THEMES.includes(sv)) curTheme=sv; }catch(e){}
 applyTheme(curTheme);
