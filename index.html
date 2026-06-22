@@ -58,7 +58,9 @@
   .app{min-height:100dvh; max-width:760px; margin:0 auto; display:flex; flex-direction:column; padding:14px 16px calc(14px + env(safe-area-inset-bottom))}
 
   .topbar{display:flex; align-items:center; justify-content:space-between; padding:2px 2px 6px}
-  .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:-.01em; font-size:16px}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:-.01em; font-size:16px; background:var(--card-2); border:1px solid var(--line-2); color:var(--ink); padding:6px 14px 6px 6px; border-radius:999px; cursor:pointer; font-family:inherit; transition:transform .12s}
+  .brand:active{transform:scale(.97)}
+  .brand .gear{font-size:14px; opacity:.85; margin-left:2px}
   .brand .logo{width:34px; height:34px; border-radius:11px; display:grid; place-items:center; font-size:18px; background:var(--grad); box-shadow:0 8px 22px -6px rgba(99,102,241,.75)}
   .kidtag{font-size:13px; font-weight:700; color:var(--ink); background:var(--card-2); border:1px solid var(--line); padding:7px 14px; border-radius:999px; max-width:48vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
   .kidtag:empty{display:none}
@@ -70,14 +72,27 @@
   body.enter .head{animation:fadeUp .55s .14s both}
   body.enter .stage{animation:fadeUp .68s .30s both}
   body.enter .dash{animation:fadeUp .55s .46s both}
-  body.enter .nextBtn,body.enter .btns{animation:fadeUp .55s .54s both}
-  @media (prefers-reduced-motion:reduce){ body.enter .topbar,body.enter .head,body.enter .stage,body.enter .dash,body.enter .btns{animation:none} }
+  body.enter .nextBtn,body.enter .bank{animation:fadeUp .55s .54s both}
+  body.enter .goaltabs{animation:fadeUp .5s .12s both}
+  @media (prefers-reduced-motion:reduce){ body.enter .topbar,body.enter .head,body.enter .stage,body.enter .dash,body.enter .bank{animation:none} }
 
   .head{text-align:center; padding-top:4px}
   .goalName{font-size:30px; margin:0; font-weight:800; letter-spacing:-.025em}
   .cheer{font-size:14px; color:var(--muted); margin-top:6px; min-height:1.1em; font-weight:500}
 
   .stage{flex:1; position:relative; display:flex; align-items:center; justify-content:center; min-height:200px; padding:10px 0; transition:max-height .34s cubic-bezier(.22,1,.36,1)}
+  .axis{position:absolute; top:50%; transform:translateY(-50%); width:64px; pointer-events:none; z-index:2}
+  .axis-l{left:0} .axis-r{right:0}
+  .axis::before{content:''; position:absolute; top:0; bottom:0; width:1px; background:var(--line)}
+  .axis-l::before{left:0} .axis-r::before{right:0}
+  .axis .t,.axis .cur{position:absolute; font-size:10.5px; line-height:1; padding:2px 6px; border-radius:7px; transform:translateY(50%); white-space:nowrap}
+  .axis-l .t,.axis-l .cur{left:3px} .axis-r .t,.axis-r .cur{right:3px}
+  .axis .t{color:var(--muted); opacity:.65}
+  .axis .cur{font-weight:800; font-size:11.5px; background:var(--card-2); border:1px solid var(--line-2); box-shadow:var(--shadow)}
+  .axis .cur::after{content:''; position:absolute; top:50%; transform:translateY(-50%); border:5px solid transparent}
+  .axis-l .cur::after{right:-9px; border-left-color:currentColor}
+  .axis-r .cur::after{left:-9px; border-right-color:currentColor}
+  body.sheet .axis, body.noaxis .axis{display:none}
   .stage::before{content:''; position:absolute; left:50%; top:50%; width:76vmin; height:76vmin; transform:translate(-50%,-50%); border-radius:50%; pointer-events:none;
     background:radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--goalcol) 36%, transparent), transparent 66%); filter:blur(16px); opacity:.6; transition:background .55s ease, opacity .55s ease}
   .art{position:relative; z-index:1; width:min(92vw,64vh); max-height:68vh; transition:width .34s cubic-bezier(.22,1,.36,1), height .34s cubic-bezier(.22,1,.36,1)}
@@ -102,12 +117,46 @@
   .meter i{display:block; height:100%; border-radius:999px; transition:width .6s cubic-bezier(.22,1,.36,1)}
   .meter .tick{position:absolute; top:50%; transform:translateY(-50%); width:3px; height:3px; margin-left:-1.5px; border-radius:50%; background:rgba(255,255,255,.32)}
 
-  .btns{display:flex; gap:12px}
-  .btn{flex:1; border:none; cursor:pointer; font-family:inherit; font-weight:700; font-size:18px; padding:19px; border-radius:var(--r); transition:transform .12s, box-shadow .2s}
-  .btn:active{transform:scale(.985)}
-  .btn.save{background:var(--grad); color:#fff; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 14px 34px -12px var(--glow); border:1px solid rgba(255,255,255,.14)}
-  .btn.set{background:var(--card-2); color:var(--ink); border:1px solid var(--line-2)}
-  .btn.next{background:linear-gradient(135deg,#FBBF24,#F59E0B); color:#241700; width:100%; margin-bottom:12px; box-shadow:0 14px 34px -12px rgba(245,158,11,.6); animation:risein .42s ease}
+  /* 상단 목표 탭 */
+  .goaltabs{display:flex; gap:8px; overflow-x:auto; padding:4px 2px 10px; -webkit-overflow-scrolling:touch; scrollbar-width:none}
+  .goaltabs::-webkit-scrollbar{display:none}
+  .goaltabs:empty{display:none}
+  .gtab{flex:0 0 auto; display:flex; align-items:center; gap:7px; padding:9px 15px; border-radius:999px; border:1px solid var(--line-2); background:var(--card-2); color:var(--muted); font-family:inherit; font-weight:700; font-size:14px; cursor:pointer; transition:transform .12s, border-color .2s; white-space:nowrap; max-width:46vw; overflow:hidden; text-overflow:ellipsis}
+  .gtab .dot{width:10px; height:10px; border-radius:50%; flex:0 0 auto}
+  .gtab.on{color:#fff; background:var(--grad); border-color:transparent; box-shadow:0 10px 26px -12px var(--glow)}
+  .gtab.on .dot{box-shadow:0 0 0 2px rgba(255,255,255,.6)}
+  .gtab.done{color:var(--emerald)}
+  .gtab.plus{color:var(--ink); font-weight:800}
+  .gtab:active{transform:scale(.96)}
+  /* 빠른 저축 패널 */
+  .bank{background:var(--card); border:1px solid var(--line-2); border-radius:var(--r); padding:14px; box-shadow:var(--shadow)}
+  .bankLbl{font-weight:800; font-size:15px; margin:0 2px 12px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
+  .bankSub{font-size:12px; font-weight:600; color:var(--muted)}
+  .amtRow{display:grid; grid-template-columns:repeat(4,1fr); gap:9px}
+  .amtRow.sub{margin-top:9px}
+  .amt{border:none; cursor:pointer; font-family:inherit; font-weight:800; border-radius:14px; transition:transform .1s, box-shadow .2s; letter-spacing:-.01em}
+  .amt:active{transform:scale(.94)}
+  .amt.up{padding:18px 6px; font-size:18px; background:var(--grad); color:#fff; box-shadow:0 12px 28px -14px var(--glow); border:1px solid rgba(255,255,255,.14)}
+  .amt.down{padding:11px 6px; font-size:14px; background:var(--card-2); color:var(--muted); border:1px solid var(--line-2)}
+  .amt:disabled{opacity:.4; pointer-events:none}
+  /* 인증 모달 */
+  .authModal{max-width:360px; text-align:center}
+  .authModal h2{margin-top:6px}
+  .authModal p.sub{margin-left:auto;margin-right:auto}
+  .authIcon{width:64px; height:64px; margin:2px auto 10px; border-radius:20px; display:grid; place-items:center; font-size:30px; background:var(--grad); box-shadow:0 14px 30px -12px var(--glow)}
+  .bioBox{margin:6px 0 2px}
+  .bioBox .mbtn{width:100%; padding:17px; font-size:17px}
+  .pinDots{display:flex; gap:14px; justify-content:center; margin:8px 0 18px}
+  .pinDots i{width:15px; height:15px; border-radius:50%; background:var(--field); border:1.5px solid var(--line-2)}
+  .pinDots i.on{background:var(--ind); border-color:var(--ind)}
+  .pinDots.bad i{border-color:var(--warn)}
+  .keypad{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+  .keypad button{padding:16px 0; font-size:22px; font-weight:800; font-family:inherit; border-radius:14px; border:1px solid var(--line-2); background:var(--card-2); color:var(--ink); cursor:pointer}
+  .keypad button:active{transform:scale(.95)}
+  .keypad button.blank{visibility:hidden}
+  .authAlt{margin:14px 0 2px}
+  .linkBtn{background:none; border:none; color:var(--muted); font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; text-decoration:underline; text-underline-offset:3px}
+  .linkBtn:empty{display:none}
   @keyframes risein{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
 
   .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:rgba(18,21,33,.94); color:#fff; border:1px solid var(--line-2); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); padding:14px 22px; border-radius:14px; font-size:15px; font-weight:600; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:90; max-width:90vw; text-align:center}
@@ -185,8 +234,6 @@
   .mActions{display:flex; gap:10px; margin-top:18px}
   .mbtn{flex:1; padding:15px; border-radius:13px; border:none; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit}
   .mbtn.primary{background:var(--grad); color:#fff; box-shadow:0 12px 30px -12px var(--glow)} .mbtn.ghost{background:var(--card-2); color:var(--ink); border:1px solid var(--line-2)}
-  .camModal video{width:100%; border-radius:14px; background:#000; aspect-ratio:4/3; object-fit:cover}
-  .camHint{font-size:13px; color:var(--muted); margin:10px 0 0; text-align:center}
   .pop{position:fixed; width:12px; height:12px; z-index:95; pointer-events:none; border-radius:3px}
   @media(prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important} }
 </style>
@@ -195,22 +242,25 @@
 <body class="enter">
 <div class="app">
   <header class="topbar">
-    <div class="brand"><span class="logo">🐷</span>저금통</div>
+    <button class="brand" id="brandBtn" type="button" aria-label="목표 설정"><span class="logo">🐷</span>저금통<span class="gear">⚙️</span></button>
     <div class="tb-right">
       <button class="themeBtn" id="themeBtn" type="button" aria-label="화면 테마 바꾸기">🌙</button>
       <span class="kidtag" id="kidTag"></span>
     </div>
   </header>
+  <nav class="goaltabs" id="goalTabs" aria-label="목표 탭"></nav>
   <div class="head">
     <h1 class="goalName jua" id="goalName">—</h1>
     <div class="cheer" id="cheer"></div>
   </div>
   <div class="stage">
+    <div class="axis axis-l" id="axisL" aria-hidden="true"></div>
     <div class="art" id="art">
       <img class="layer gray"  id="artGray"  alt="" />
       <img class="layer color" id="artColor" alt="" />
       <div class="surface" id="surface"></div>
     </div>
+    <div class="axis axis-r" id="axisR" aria-hidden="true"></div>
     <div class="previewTag" id="previewTag">✨ 이렇게 보여요</div>
   </div>
   <div class="dash">
@@ -222,24 +272,39 @@
     <div class="meter"><i id="meter"></i><span class="tick" style="left:25%"></span><span class="tick" style="left:50%"></span><span class="tick" style="left:75%"></span></div>
   </div>
   <button class="btn next" id="nextGoalBtn" hidden>🎯 다음 목표 정하기</button>
-  <div class="btns">
-    <button class="btn set" id="openSettings">목표 설정</button>
-    <button class="btn save" id="saveBtn"><span>📷</span> 저축하기</button>
+  <div class="bank" id="bank">
+    <div class="bankLbl">💰 저축하기 <span class="bankSub" id="bankSub">버튼을 누르면 보호자 인증 후 바로 저축돼요</span></div>
+    <div class="amtRow add">
+      <button class="amt up" data-amt="100">+100</button>
+      <button class="amt up" data-amt="1000">+1,000</button>
+      <button class="amt up" data-amt="5000">+5,000</button>
+      <button class="amt up" data-amt="10000">+10,000</button>
+    </div>
+    <div class="amtRow sub">
+      <button class="amt down" data-amt="-100">−100</button>
+      <button class="amt down" data-amt="-1000">−1,000</button>
+      <button class="amt down" data-amt="-5000">−5,000</button>
+      <button class="amt down" data-amt="-10000">−10,000</button>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<div class="scrim" id="camScrim">
-  <div class="modal camModal" role="dialog" aria-modal="true" aria-label="지폐 촬영">
-    <h2 class="jua">지폐를 비춰 주세요</h2>
-    <p class="sub">일련번호가 잘 보이게 화면 안에 또렷이 담아 주세요.</p>
-    <video id="cam" playsinline autoplay muted></video>
-    <p class="camHint" id="camHint">초점이 맞으면 ‘이 지폐 저축하기’를 눌러요.</p>
-    <div class="mActions">
-      <button class="mbtn primary" id="shoot">이 지폐 저축하기</button>
-      <button class="mbtn ghost" id="camClose">닫기</button>
+<div class="scrim" id="authScrim">
+  <div class="modal authModal" role="dialog" aria-modal="true" aria-label="보호자 인증">
+    <div class="authIcon" id="authIcon">🔒</div>
+    <h2 class="jua" id="authTitle">보호자 인증</h2>
+    <p class="sub" id="authMsg">저축하려면 보호자 인증이 필요해요.</p>
+    <div class="bioBox" id="bioBox">
+      <button class="mbtn primary" id="bioBtn">👆 지문 · 얼굴로 인증</button>
     </div>
+    <div class="pinBox" id="pinBox" hidden>
+      <div class="pinDots" id="pinDots"></div>
+      <div class="keypad" id="keypad"></div>
+    </div>
+    <div class="authAlt"><button class="linkBtn" id="authSwitch" type="button"></button></div>
+    <div class="mActions"><button class="mbtn ghost" id="authCancel">닫기</button></div>
   </div>
 </div>
 
@@ -290,8 +355,23 @@ const PAL=['#E0564B','#E08A2B','#F4B740','#2DB67D','#3F86C9','#9B6FD4','#D24B86'
 function darken(hex,f){ const n=parseInt(hex.slice(1),16); let r=(n>>16)&255,g=(n>>8)&255,b=n&255;
   r=Math.round(r*(1-f)); g=Math.round(g*(1-f)); b=Math.round(b*(1-f)); return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1); }
 const IDLE_CSS='<style>.idle{transform-box:fill-box;transform-origin:center;animation:breathe 3.6s ease-in-out infinite}.ey{transform-box:fill-box;transform-origin:center;animation:blink 4.2s ease-in-out infinite}@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}@keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}@media(prefers-reduced-motion:reduce){.idle,.ey{animation:none}}</style>';
-function wrap(vb,inner){ const p=vb.split(' ');
-  return { src:"data:image/svg+xml,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}">${IDLE_CSS}<g class="idle">${inner}</g></svg>`), aspect:Number(p[2])/Number(p[3]) }; }
+const _vbCache={}; let _meas=null;
+function _measureVB(inner){ try{
+    if(!_meas){ _meas=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      _meas.setAttribute('viewBox','0 0 700 700');
+      _meas.setAttribute('style','position:absolute;left:-9999px;top:-9999px;width:300px;height:300px;visibility:hidden;pointer-events:none');
+      (document.body||document.documentElement).appendChild(_meas); }
+    _meas.innerHTML='<g>'+inner+'</g>';
+    const b=_meas.firstChild.getBBox();
+    return (b && b.width>0 && b.height>0) ? b : null;
+  }catch(e){ return null; } }
+function wrap(vb,inner){
+  let tv=vb; const key=inner.replace(/#[0-9A-Fa-f]{3,8}/g,'');
+  if(_vbCache[key]) tv=_vbCache[key];
+  else { const b=_measureVB(inner); if(b){ const pad=Math.max(b.width,b.height)*0.05+9;
+      tv=`${(b.x-pad).toFixed(1)} ${(b.y-pad).toFixed(1)} ${(b.width+2*pad).toFixed(1)} ${(b.height+2*pad).toFixed(1)}`; _vbCache[key]=tv; } }
+  const p=tv.split(' ');
+  return { src:"data:image/svg+xml,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${tv}">${IDLE_CSS}<g class="idle">${inner}</g></svg>`), aspect:Number(p[2])/Number(p[3]) }; }
 const ART={
   bike(color){
     const r=96, R={x:113,y:267}, F={x:447,y:267};
@@ -483,6 +563,11 @@ function wonKo(n){
   if(rest){ const ch=Math.floor(rest/1000), r=rest%1000; if(ch) s+=" "+ch+"천"; if(r) s+=" "+won(r); }
   return s+" 원";                                   /* 예: 35만 원, 32만 9천 원 */
 }
+function wonShort(n){ if(n>=10000){ const m=Math.round(n/1000)/10; return (m%1===0?m:m)+"만"; } if(n>=1000){ return Math.round(n/1000)+"천"; } return String(n); }
+function niceMoneyTicks(price){ if(!price||price<=0) return [0];
+  const mag=Math.pow(10,Math.floor(Math.log10(price/5))); const cands=[1,2,5,10].map(x=>x*mag);
+  let step=cands.find(c=>price/c<=6)||cands[cands.length-1];
+  const ticks=[0]; for(let v=step; v<price-step*0.25; v+=step) ticks.push(Math.round(v)); ticks.push(price); return ticks; }
 let shown={ goalId:null, pct:0 }, pctRAF=null;
 function setPct(to, color, animate){
   const dp=$("#dPct"); dp.style.color=color;
@@ -553,13 +638,17 @@ async function loadChild(id){
 
 function render(){
   const g=active();
-  if(!g){ $("#goalName").textContent="목표를 추가해 주세요"; $("#cheer").textContent=""; $("#meter").style.width="0%"; $("#dSaved").textContent=$("#dTarget").textContent="0원"; $("#dPct").textContent="0%"; $("#artGray").src=$("#artColor").src=""; $("#artGray").dataset.src=$("#artColor").dataset.src=""; $("#surface").style.opacity="0"; $("#nextGoalBtn").hidden=true; return; }
+  drawGoalTabs();
+  if(!g){ $("#goalName").textContent="목표를 추가해 주세요"; $("#cheer").textContent=""; $("#meter").style.width="0%"; $("#dSaved").textContent=$("#dTarget").textContent="0원"; $("#dPct").textContent="0%"; $("#artGray").src=$("#artColor").src=""; $("#artGray").dataset.src=$("#artColor").dataset.src=""; $("#surface").style.opacity="0"; $("#nextGoalBtn").hidden=true; $("#axisL").innerHTML=$("#axisR").innerHTML=""; return; }
   const saved=savedFor(g.id), pct=Math.min(100,Math.round((saved/g.price)*100)), left=Math.max(0,g.price-saved);
 
   $("#goalName").textContent=g.name;
   $("#cheer").textContent = left<=0 ? "다 모았어요! 🎉" : (wonKo(left)+"만 더 모으면 돼요!");
   document.documentElement.style.setProperty('--goalcol', g.color);
   $("#kidTag").textContent = S.childName || '';
+  const moneyTicks=niceMoneyTicks(g.price), pctTicks=[0,25,50,75,100];
+  $("#axisL").innerHTML = moneyTicks.map(v=>`<span class="t" style="bottom:${g.price>0?Math.min(100,v/g.price*100):0}%">${wonShort(v)}</span>`).join("") + `<span class="cur" style="bottom:${Math.min(100,pct)}%; color:${g.color}">${wonShort(saved)}</span>`;
+  $("#axisR").innerHTML = pctTicks.map(p=>`<span class="t" style="bottom:${p}%">${p}%</span>`).join("") + `<span class="cur" style="bottom:${Math.min(100,pct)}%; color:${g.color}">${pct}%</span>`;
 
   const a=artFor(g), base=$("#artGray"), col=$("#artColor"), wrap=$("#art");
   const changed = base.dataset.src!==a.src;
@@ -584,14 +673,16 @@ function render(){
 /* 저축 */
 function msSeen(g){ return (g&&g.ms_seen)||0; }
 async function setMsSeen(g,th){ g.ms_seen=th; await db.setMs(g.id,th); }
-async function commit(amount, serial){
-  const g=active(), before=savedFor(g.id);
+async function commit(amount, serial, type){
+  const g=active(); if(!g) return; const before=savedFor(g.id);
+  if(amount<0 && before+amount<0){ toast("뺄 수 있는 금액보다 많아요.", true); return; }
   if(serial && await db.isDuplicate(S.childId,serial,amount)){ toast("이미 저축한 지폐예요! 같은 돈은 한 번만 셀 수 있어요.", true); return; }
-  const rec={ child_id:S.childId, goal_id:g.id, amount, type:'bill', serial:serial||null };
+  const rec={ child_id:S.childId, goal_id:g.id, amount, type:type||'manual', serial:serial||null };
   S.deposits.unshift({ id:'tmp'+Date.now(), t:Date.now(), ...rec }); render();
   const res=await db.insertDeposit(rec);
   if(!res.ok){ S.deposits=S.deposits.filter(d=>!String(d.id).startsWith('tmp')); render();
     toast(res.dup?"이미 저축한 지폐예요!":"저장에 실패했어요. 다시 시도해 주세요.", true); return; }
+  if(amount<0){ toast(won(-amount)+"원 뺐어요.", false); return; }
   const bPct=Math.min(100,Math.round((before/g.price)*100)), aPct=Math.min(100,Math.round(((before+amount)/g.price)*100));
   if(before<g.price && before+amount>=g.price){ party(); celebrate(true); toast(g.name+" 다 모았어요! 🎉", false); }
   else { let ms=0; for(const th of [25,50,75]) if(bPct<th && aPct>=th) ms=th;
@@ -599,25 +690,52 @@ async function commit(amount, serial){
     else toast("+"+won(amount)+"원 저축했어요!", false); }
 }
 
-/* 카메라 + Cloud Vision (없으면 예시) */
-let stream=null;
-async function onSave(){ if(!CONFIG.RECOGNIZE_ENDPOINT) return simulate();
-  try{ stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); $("#cam").srcObject=stream; $("#camScrim").classList.add("show"); }
-  catch(e){ toast("카메라를 열 수 없어 예시 모드로 진행해요.", true); simulate(); } }
-function closeCam(){ $("#camScrim").classList.remove("show"); if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; } }
-async function shoot(){
-  const v=$("#cam"); if(!v.videoWidth){ toast("잠시 후 다시 눌러 주세요.", true); return; }
-  const cv=document.createElement('canvas'); cv.width=v.videoWidth; cv.height=v.videoHeight; cv.getContext('2d').drawImage(v,0,0);
-  const b64=cv.toDataURL('image/jpeg',0.85).split(',')[1]; $("#camHint").textContent="지폐를 읽는 중…";
-  try{ const r=await fetch(CONFIG.RECOGNIZE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:b64})});
-    const out=await r.json(); $("#camHint").textContent="초점이 맞으면 ‘이 지폐 저축하기’를 눌러요.";
-    if(!out.serial||!out.amount){ toast("일련번호가 안 보여요. 더 또렷하게 다시 찍어 주세요.", true); return; }
-    closeCam(); await commit(out.amount, out.serial);
-  }catch(e){ $("#camHint").textContent="초점이 맞으면 ‘이 지폐 저축하기’를 눌러요."; toast("인식 서버에 연결하지 못했어요.", true); }
-}
-function simulate(){ const btn=$("#saveBtn"); btn.disabled=true; const html=btn.innerHTML; btn.innerHTML="<span>🔎</span> 읽는 중…";
-  setTimeout(async()=>{ btn.disabled=false; btn.innerHTML=html; const d=[1000,5000,5000,10000]; await commit(d[Math.floor(Math.random()*d.length)], genSerial()); },800); }
-function genSerial(){ const L="ABCDEFGHJKLMNPRSTUVWXYZ",r=a=>a[Math.floor(Math.random()*a.length)]; let n=""; for(let i=0;i<8;i++)n+=Math.floor(Math.random()*10); return r(L)+r(L)+n+r(L); }
+/* 보호자 인증 (지문·얼굴=WebAuthn, 미지원 시 4자리 PIN) */
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+const b64=b=>btoa(String.fromCharCode.apply(null,new Uint8Array(b)));
+const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const rand=n=>{ const a=new Uint8Array(n); crypto.getRandomValues(a); return a; };
+const AUTH={ until:0,
+  mode(){ return lsGet('authMode'); }, isSet(){ return !!this.mode(); },
+  unlocked(){ return Date.now()<this.until; }, unlock(){ this.until=Date.now()+120000; },
+  async bioOK(){ try{ return !!window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); }catch(e){ return false; } },
+  async regBio(){ const c=await navigator.credentials.create({publicKey:{ challenge:rand(32), rp:{name:"우리집 저금통"}, user:{id:rand(16),name:"parent",displayName:"보호자"}, pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}], authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"}, timeout:60000 }}); if(!c) throw new Error('no cred'); lsSet('authCredId',b64(c.rawId)); lsSet('authMode','bio'); },
+  async verBio(){ const id=lsGet('authCredId'); const pk={ challenge:rand(32), userVerification:"required", timeout:60000 }; if(id) pk.allowCredentials=[{type:"public-key",id:unb64(id)}]; await navigator.credentials.get({publicKey:pk}); return true; },
+  setPin(p){ lsSet('authPin',p); lsSet('authMode','pin'); }, pinOK(p){ return lsGet('authPin')===p; } };
+
+let authRes=null, authSetup=false, usePin=false, pinBuf="", pinStage="enter", pinFirst="";
+function showKeypad(){ $("#keypad").innerHTML=['1','2','3','4','5','6','7','8','9','blank','0','back'].map(k=> k==='blank'?'<button class="blank"></button>':(k==='back'?'<button data-k="back">⌫</button>':`<button data-k="${k}">${k}</button>`)).join(""); }
+function drawDots(bad){ $("#pinDots").className="pinDots"+(bad?" bad":""); $("#pinDots").innerHTML=[0,1,2,3].map(i=>`<i class="${i<pinBuf.length?'on':''}"></i>`).join(""); }
+function setPinMode(on){ usePin=on; $("#bioBox").hidden=on; $("#pinBox").hidden=!on; if(on){ pinBuf=""; showKeypad(); drawDots(false); } }
+function openAuth(setup){ authSetup=setup; pinBuf=""; pinFirst=""; pinStage=setup?"set1":"enter";
+  $("#authIcon").textContent="🔒";
+  $("#authTitle").textContent=setup?"보호자 인증 설정":"보호자 인증";
+  return (async()=>{
+    if(setup){ const can=await AUTH.bioOK();
+      if(can){ setPinMode(false); $("#authMsg").textContent="처음 한 번만요. 지문·얼굴로 보호자를 등록해요."; $("#bioBtn").textContent="👆 지문·얼굴 등록하기"; $("#authSwitch").textContent="비밀번호(PIN)로 설정하기"; }
+      else { setPinMode(true); $("#authMsg").textContent="4자리 비밀번호를 만들어 주세요."; $("#authSwitch").textContent=""; } }
+    else { if(AUTH.mode()==='pin'){ setPinMode(true); $("#authMsg").textContent="비밀번호 4자리를 입력해요."; $("#authSwitch").textContent=""; }
+      else { setPinMode(false); $("#authMsg").textContent="저축하려면 보호자 인증이 필요해요."; $("#bioBtn").textContent="👆 지문·얼굴로 인증"; $("#authSwitch").textContent=lsGet('authPin')?"비밀번호로 인증하기":""; } }
+    $("#authScrim").classList.add("show");
+    return await new Promise(r=>authRes=r);
+  })(); }
+function closeAuth(ok){ $("#authScrim").classList.remove("show"); const r=authRes; authRes=null; if(r) r(ok); }
+async function onBio(){ try{ if(authSetup){ await AUTH.regBio(); } else { await AUTH.verBio(); } AUTH.unlock(); closeAuth(true); }
+  catch(e){ if(authSetup){ toast("지문 등록이 어려워요. 비밀번호로 설정해요.", true); setPinMode(true); pinStage="set1"; $("#authMsg").textContent="4자리 비밀번호를 만들어 주세요."; $("#authSwitch").textContent=""; }
+    else { toast("인증에 실패했어요. 다시 시도해요.", true); } } }
+function onKey(k){ if(k==='back'){ pinBuf=pinBuf.slice(0,-1); drawDots(false); return; }
+  if(pinBuf.length>=4) return; pinBuf+=k; drawDots(false);
+  if(pinBuf.length===4) setTimeout(handlePin,140); }
+function handlePin(){
+  if(authSetup){
+    if(pinStage==='set1'){ pinFirst=pinBuf; pinBuf=""; pinStage='set2'; $("#authMsg").textContent="확인을 위해 한 번 더 입력해요."; drawDots(false); }
+    else { if(pinBuf===pinFirst){ AUTH.setPin(pinBuf); AUTH.unlock(); closeAuth(true); }
+      else { drawDots(true); pinBuf=""; pinStage='set1'; pinFirst=""; $("#authMsg").textContent="비밀번호가 달라요. 다시 만들어요."; setTimeout(()=>drawDots(false),500); } }
+  } else { if(AUTH.pinOK(pinBuf)){ AUTH.unlock(); closeAuth(true); } else { drawDots(true); pinBuf=""; toast("비밀번호가 달라요.", true); setTimeout(()=>drawDots(false),500); } } }
+async function requestAuth(){ if(AUTH.unlocked()) return true; return await openAuth(!AUTH.isSet()); }
+async function deposit(amount){ const g=active(); if(!g){ toast("먼저 목표를 정해요.", true); openSettings(); return; }
+  const ok=await requestAuth(); if(!ok) return; await commit(amount, null, 'manual'); }
 
 /* 알림·축하 */
 let toastT;
@@ -646,7 +764,14 @@ function setArtSize(asp){ const el=$("#art"); if(!el||!asp) return;
   const vw=window.innerWidth, vh=window.innerHeight, sheet=document.body.classList.contains('sheet');
   let w=Math.min((sheet?0.62:0.92)*vw, (sheet?0.30:0.64)*vh*asp);
   let h=w/asp; const maxH=(sheet?0.34:0.68)*vh; if(h>maxH){ h=maxH; w=h*asp; }
-  el.style.aspectRatio='auto'; el.style.width=Math.round(w)+'px'; el.style.height=Math.round(h)+'px'; }
+  if(!sheet){
+    const stageW=(el.parentElement && el.parentElement.clientWidth) || vw, NEED=58;
+    let room=(stageW-w)/2;
+    if(room<NEED){ const want=stageW-NEED*2; if(want>=150 && want<w){ w=want; h=w/asp; if(h>maxH){ h=maxH; w=h*asp; } room=(stageW-w)/2; } }
+    document.body.classList.toggle('noaxis', room<38);
+  }
+  el.style.aspectRatio='auto'; el.style.width=Math.round(w)+'px'; el.style.height=Math.round(h)+'px';
+  const ax=Math.round(h)+'px', aL=$("#axisL"), aR=$("#axisR"); if(aL) aL.style.height=ax; if(aR) aR.style.height=ax; }
 function setMainArt(a){ const base=$("#artGray"), col=$("#artColor"), wrap=$("#art");
   base.src=a.src; col.src=a.src; base.dataset.src=col.dataset.src=a.src;
   setArtSize(a.aspect);
@@ -664,6 +789,12 @@ function celebrate(big){ const art=$("#art"); if(!art) return;
     s.style.animationDelay=(i*30)+'ms'; burst.appendChild(s); });
   art.appendChild(burst); setTimeout(()=>burst.remove(), big?1500:1100); }
 function drawKids(){ $("#kidPills").innerHTML=children.map(c=>`<button class="pill ${c.id===S.childId?'on':''}" data-kid="${c.id}">${c.name}</button>`).join(""); }
+function drawGoalTabs(){ const el=$("#goalTabs"); if(!el) return;
+  if(!S.goals||!S.goals.length){ el.innerHTML='<button class="gtab plus" data-add="1">＋ 목표 만들기</button>'; return; }
+  const tabs=S.goals.map(g=>{ const done=savedFor(g.id)>=g.price, on=g.id===S.activeId;
+    return `<button class="gtab ${on?'on':''} ${done?'done':''}" data-go="${g.id}"><span class="dot" style="background:${g.color}"></span>${g.name}${done?' ✅':''}</button>`; }).join("");
+  el.innerHTML=tabs+'<button class="gtab plus" data-add="1">＋</button>';
+  const onEl=el.querySelector('.gtab.on'); if(onEl){ try{ onEl.scrollIntoView({inline:'center',block:'nearest'}); }catch(e){} } }
 function drawGoals(){
   const act=S.goals.filter(g=>savedFor(g.id)<g.price), done=S.goals.filter(g=>savedFor(g.id)>=g.price);
   $("#goalList").innerHTML=act.map(g=>{
@@ -679,7 +810,14 @@ function drawEmoji(){ $("#emojiPick").innerHTML=EMOJIS.map(e=>`<button data-e="$
 function clearPhoto(){ pendingPhoto=null; $("#photoPrev").hidden=true; $("#photoPrev").src=""; $("#photoBtn").textContent="📷 사진 찍기 / 올리기"; }
 
 /* 이벤트 */
-$("#saveBtn").onclick=onSave; $("#shoot").onclick=shoot; $("#camClose").onclick=closeCam;
+$("#bank").addEventListener("click",e=>{ const b=e.target.closest("[data-amt]"); if(b) deposit(+b.dataset.amt); });
+$("#bioBtn").onclick=onBio;
+$("#keypad").addEventListener("click",e=>{ const b=e.target.closest("[data-k]"); if(b) onKey(b.dataset.k); });
+$("#authSwitch").onclick=()=>{ if(authSetup){ const goPin=!usePin; setPinMode(goPin); pinStage='set1'; pinFirst=''; $("#authMsg").textContent=goPin?"4자리 비밀번호를 만들어 주세요.":"처음 한 번만요. 지문·얼굴로 보호자를 등록해요."; $("#authSwitch").textContent=goPin?"지문·얼굴로 설정하기":"비밀번호(PIN)로 설정하기"; } else { setPinMode(true); $("#authMsg").textContent="비밀번호 4자리를 입력해요."; $("#authSwitch").textContent=""; } };
+$("#authCancel").onclick=()=>closeAuth(false);
+$("#authScrim").addEventListener("click",e=>{ if(e.target===$("#authScrim")) closeAuth(false); });
+$("#goalTabs").addEventListener("click",async e=>{ if(e.target.closest("[data-add]")){ openSettings(); return; }
+  const b=e.target.closest("[data-go]"); if(b){ S.activeId=b.dataset.go; await db.setActive(S.childId,S.activeId); render(); } });
 $("#nextGoalBtn").onclick=openSettings;
 window.addEventListener("resize",()=>{ const g=active(); if(g) setArtSize(artFor(g).aspect); });
 
@@ -690,8 +828,7 @@ let curTheme='dark'; try{ const sv=localStorage.getItem('theme'); if(THEMES.incl
 applyTheme(curTheme);
 $("#themeBtn").onclick=()=>{ curTheme=THEMES[(THEMES.indexOf(curTheme)+1)%THEMES.length]; applyTheme(curTheme); };
 setTimeout(()=>document.body.classList.remove('enter'),1700);
-$("#camScrim").addEventListener("click",e=>{ if(e.target===$("#camScrim")) closeCam(); });
-$("#openSettings").onclick=openSettings; $("#closeSettings").onclick=closeSettings;
+$("#brandBtn").onclick=openSettings; $("#closeSettings").onclick=closeSettings;
 $("#scrim").addEventListener("click",e=>{ if(e.target===$("#scrim")) closeSettings(); });
 $("#kidPills").addEventListener("click",e=>{ const b=e.target.closest("[data-kid]"); if(b) loadChild(b.dataset.kid).then(openSettings); });
 $("#goalList").addEventListener("click",async e=>{
@@ -735,6 +872,7 @@ async function init(){
   if(LIVE){ const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2'); sb=createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY); }
   children=await db.children();
   if(children.length) await loadChild(children[0].id);
+  if(!AUTH.isSet()){ setTimeout(()=>openAuth(true),700); }
   if('serviceWorker' in navigator){ try{ await navigator.serviceWorker.register('./sw.js'); }catch(e){} }
 }
 init();
