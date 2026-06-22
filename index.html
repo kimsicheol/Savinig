@@ -69,7 +69,8 @@
   .brand .gear{font-size:14px; opacity:.85; margin-left:2px}
   .brand .logo{width:34px; height:34px; border-radius:11px; display:grid; place-items:center; background:#fff; overflow:hidden; padding:3px; box-shadow:0 8px 22px -6px rgba(242,92,154,.7)}
   .brand .logo svg{width:100%; height:100%; display:block}
-  .kidtag{font-size:13px; font-weight:700; color:var(--ink); background:var(--card-2); border:1px solid var(--line); padding:7px 14px; border-radius:999px; max-width:48vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .kidtag{font-size:13px; font-weight:700; color:var(--ink); background:var(--card-2); border:1px solid var(--line); padding:7px 14px; border-radius:999px; max-width:48vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer; transition:transform .12s, border-color .2s}
+  .kidtag:hover{border-color:var(--ind)} .kidtag:active{transform:scale(.96)}
   .kidtag:empty{display:none}
   .tb-right{display:flex; align-items:center; gap:8px}
   .themeBtn{width:38px; height:38px; border-radius:11px; border:1px solid var(--line-2); background:var(--card-2); color:var(--ink); font-size:17px; cursor:pointer; display:grid; place-items:center; transition:transform .12s}
@@ -409,8 +410,7 @@
     <button class="brand" id="brandBtn" type="button" aria-label="목표 설정"><span class="logo"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15,15 L11,6 L20,12 Z" fill="#F25C9A"/><path d="M33,15 L37,6 L28,12 Z" fill="#F25C9A"/><circle cx="24" cy="27" r="17" fill="#F25C9A"/><circle cx="15" cy="30" r="3.4" fill="#FF9EC0"/><circle cx="33" cy="30" r="3.4" fill="#FF9EC0"/><ellipse cx="24" cy="31" rx="9" ry="6.6" fill="#D6347B"/><ellipse cx="21" cy="31" rx="1.7" ry="2.5" fill="#7d1c47"/><ellipse cx="27" cy="31" rx="1.7" ry="2.5" fill="#7d1c47"/><circle cx="18.5" cy="22.5" r="2.5" fill="#241B36"/><circle cx="29.5" cy="22.5" r="2.5" fill="#241B36"/></svg></span>꿀꿀이<span class="gear">🎯</span></button>
     <div class="tb-right">
       <button class="themeBtn" id="recordBtn" type="button" aria-label="저축 기록">📒</button>
-      <button class="themeBtn" id="setBtn" type="button" aria-label="설정">⚙️</button>
-      <span class="kidtag" id="kidTag"></span>
+      <span class="kidtag" id="kidTag" role="button" tabindex="0" aria-label="설정"></span>
     </div>
   </header>
   <nav class="goaltabs" id="goalTabs" aria-label="목표 탭"></nav>
@@ -584,12 +584,14 @@
   <div class="modal obCard" role="dialog" aria-modal="true" aria-label="시작하기">
     <div class="obIcon" id="obIcon"></div>
     <h2 class="jua" style="text-align:center">우리집 저금통 시작하기</h2>
-    <p class="sub" style="text-align:center">아이 이름을 정하면 바로 시작할 수 있어요.</p>
-    <button class="mbtn ghost" id="obGoogle" style="width:100%; margin-top:6px">☁️ 구글로 로그인 (선택)</button>
-    <p class="obHint" id="obLoginState">로그인하면 다른 기기에서도 같은 기록을 볼 수 있어요.</p>
-    <label class="efLbl" style="margin-top:10px">아이 이름</label>
-    <input id="obName" class="efInput" type="text" placeholder="예: 민준" />
-    <button class="mbtn primary" id="obStart" style="width:100%; margin-top:14px">시작하기 🐷</button>
+    <p class="sub" id="obSub" style="text-align:center">구글로 로그인하면 시작할 수 있어요.</p>
+    <button class="mbtn primary" id="obGoogle" style="width:100%; margin-top:6px">☁️ 구글로 로그인</button>
+    <p class="obHint" id="obLoginState">내 가족 저금통은 내 구글 계정에만 저장돼요.</p>
+    <div id="obStep2" hidden>
+      <label class="efLbl" style="margin-top:10px">아이 이름</label>
+      <input id="obName" class="efInput" type="text" placeholder="예: 민준" />
+      <button class="mbtn primary" id="obStart" style="width:100%; margin-top:14px">시작하기 🐷</button>
+    </div>
   </div>
 </div>
 
@@ -1494,7 +1496,8 @@ window.addEventListener('beforeinstallprompt',(e)=>{ e.preventDefault(); _deferr
 window.addEventListener('appinstalled',()=>{ _deferredPrompt=null; updateInstallUI(); toast('앱이 설치됐어요! 🎉',false); });
 $("#iconClose").onclick=closeIcon;
 $("#iconScrim").addEventListener("click",e=>{ if(e.target===$("#iconScrim")) closeIcon(); });
-$("#recordBtn").onclick=openRecord; $("#setBtn").onclick=openSet;
+$("#recordBtn").onclick=openRecord; $("#kidTag").onclick=openSet;
+$("#kidTag").addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openSet(); } });
 $("#recordClose").onclick=closeRecord; $("#setClose").onclick=closeSet;
 $("#toRecord").onclick=()=>{ closeSet(); openRecord(); };
 $("#recordScrim").addEventListener("click",e=>{ if(e.target===$("#recordScrim")) closeRecord(); });
@@ -1570,18 +1573,24 @@ $("#addGoal").onclick=async()=>{
 let _session=null;
 async function refreshSession(){ if(!(LIVE&&sb)) return null; try{ const {data}=await sb.auth.getSession(); _session=data&&data.session||null; }catch(e){ _session=null; } updateLoginState(); return _session; }
 function _email(){ return (_session&&_session.user&&(_session.user.email||''))||''; }
-function updateLoginState(){ const el=$("#obLoginState"); if(el){ if(_session){ el.textContent='로그인됨 ✓ '+_email(); el.classList.add('ok'); } else { el.textContent='로그인하면 다른 기기에서도 같은 기록을 볼 수 있어요.'; el.classList.remove('ok'); } }
-  const g=$("#obGoogle"); if(g) g.style.display=_session?'none':'';
+function updateLoginState(){ const el=$("#obLoginState"), sub=$("#obSub"), g=$("#obGoogle"), st=$("#obStep2");
+  if(el){ if(_session){ el.textContent='로그인됨 ✓ '+_email(); el.classList.add('ok'); } else { el.textContent='내 가족 저금통은 내 구글 계정에만 저장돼요.'; el.classList.remove('ok'); } }
+  if(sub) sub.textContent=_session?'아이 이름을 정해 주세요.':'구글로 로그인하면 시작할 수 있어요.';
+  if(g) g.style.display=_session?'none':'';
+  if(st) st.hidden=!_session;
   const lb=$("#authLogin"); if(lb) lb.textContent=_session?('☁️ 로그아웃 ('+(_email()||'구글')+')'):'☁️ 구글로 로그인'; }
 async function loginGoogle(){ if(!(LIVE&&sb)){ toast('먼저 저장(서버) 연결이 필요해요.', true); return; }
   try{ const { error }=await sb.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: location.origin+location.pathname } }); if(error) throw error; }
-  catch(e){ toast('구글 로그인이 아직 설정 전이거나 실패했어요. 로그인 없이도 시작할 수 있어요.', true); } }
-async function logoutGoogle(){ if(!(LIVE&&sb)) return; try{ await sb.auth.signOut(); }catch(e){} _session=null; updateLoginState(); toast('로그아웃했어요.', false); }
+  catch(e){ toast('구글 로그인에 실패했어요. 잠시 후 다시 시도해 주세요.', true); } }
+async function logoutGoogle(){ if(!(LIVE&&sb)) return; try{ await sb.auth.signOut(); }catch(e){} _session=null;
+  closeSet&&closeSet(); children=await db.children(); showOnboarding(); toast('로그아웃했어요.', false); }
 function showOnboarding(){ const ic=$("#obIcon"); if(ic) ic.innerHTML=APP_ICON_SVG; updateLoginState(); $("#obScrim").classList.add('show'); const n=$("#obName"); if(n) setTimeout(()=>n.focus(),200); }
 $("#obGoogle").onclick=loginGoogle;
 $("#authLogin").onclick=()=>{ if(_session) logoutGoogle(); else loginGoogle(); };
 $("#obStart").onclick=async()=>{ const v=($("#obName").value||'').trim(); if(!v){ toast('아이 이름을 입력해 주세요.', true); return; }
-  const id=await db.addKid(v, KIDPAL[0], 0); children=await db.children(); if(id) await loadChild(id); drawKids();
+  const id=await db.addKid(v, KIDPAL[0], 0);
+  try{ await db.addGoal(id, { name:'꿀꿀이 채우기', color:'#F25C9A', price:50000, sort:0, image:OINKY_IMG, aspect:OINKY_ASPECT, icon:null, emoji:null }); }catch(e){}
+  children=await db.children(); if(id) await loadChild(id); drawKids();
   $("#obScrim").classList.remove('show');
   if(!AUTH.isSet()){ setTimeout(()=>openAuth(true), 350); }
   toast('환영해요! 🐷', false); };
