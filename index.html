@@ -5,8 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#1A1326" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="꿀꿀이" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <link rel="manifest" href="./manifest.webmanifest" />
-<link rel="apple-touch-icon" href="./icon.svg" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+<link rel="apple-touch-icon" href="./icon-192.png" />
+<link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png" />
 <title>꿀꿀이 · Oinky</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
@@ -1256,17 +1261,24 @@ function downloadIcon(){
 let _deferredPrompt=null;
 function isStandalone(){ return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone===true; }
 function isIOS(){ return /iphone|ipad|ipod/i.test(navigator.userAgent||'') || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1); }
+function isAndroid(){ return /android/i.test(navigator.userAgent||''); }
 function updateInstallUI(){ const b=$("#installBtn"), g=$("#iosGuide"); if(!b) return;
   if(isStandalone()){ b.textContent='설치됨 ✓'; b.disabled=true; b.classList.add('isdone'); if(g) g.hidden=true; return; }
   b.disabled=false; b.classList.remove('isdone');
-  if(_deferredPrompt){ b.textContent='📲 홈 화면에 추가 (앱 설치)'; if(g) g.hidden=true; }
-  else if(isIOS()){ b.textContent='📲 홈 화면에 추가'; if(g) g.hidden=false; }
-  else { b.textContent='📲 홈 화면에 추가'; if(g) g.hidden=true; } }
+  if(_deferredPrompt){ b.textContent='📲 홈 화면에 추가 (앱 설치)'; if(g) g.hidden=true; return; }
+  b.textContent='📲 홈 화면에 추가';
+  if(g){
+    if(isIOS()){ g.innerHTML='아이폰은 사파리 아래 <b>공유</b> 버튼 → <b>‘홈 화면에 추가’</b>를 누르면 설치돼요.'; g.hidden=false; }
+    else if(isAndroid()){ g.innerHTML='크롬 오른쪽 위 <b>⋮ 메뉴</b> → <b>‘앱 설치’</b> 또는 <b>‘홈 화면에 추가’</b>를 눌러 주세요. (이미 설치돼 있으면 다시 뜨지 않아요)'; g.hidden=false; }
+    else { g.innerHTML='브라우저 메뉴에서 <b>‘앱 설치’</b>를 눌러 설치할 수 있어요.'; g.hidden=false; }
+  } }
 async function installApp(){
   if(isStandalone()){ toast('이미 설치되어 있어요. 🐷',false); return; }
   if(_deferredPrompt){ _deferredPrompt.prompt(); let oc='dismissed'; try{ oc=(await _deferredPrompt.userChoice).outcome; }catch(e){} _deferredPrompt=null; if(oc==='accepted') toast('설치를 시작했어요! 🎉',false); updateInstallUI(); return; }
-  if(isIOS()){ const g=$("#iosGuide"); if(g) g.hidden=false; toast('사파리 공유 → 홈 화면에 추가를 눌러 주세요.',false); return; }
-  toast('브라우저 메뉴의 “홈 화면에 추가 / 앱 설치”로 설치할 수 있어요.',false); }
+  const g=$("#iosGuide"); if(g) g.hidden=false;
+  if(isIOS()) toast('사파리 공유 → 홈 화면에 추가를 눌러 주세요.',false);
+  else if(isAndroid()) toast('크롬 ⋮ 메뉴 → 앱 설치를 눌러 주세요.',false);
+  else toast('브라우저 메뉴의 “앱 설치”로 설치할 수 있어요.',false); }
 /* 사용자(아이) 관리 — 전환·순서·삭제·색/아바타 */
 const KIDPAL=['#F25C9A','#3F86C9','#2BB673','#F4B740','#A855F7','#E0564B','#1FA98A','#FF7A45'];
 function _mix(hex,wth,amt){ const a=hex.replace('#',''), w=wth.replace('#','');
