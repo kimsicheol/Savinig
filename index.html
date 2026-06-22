@@ -346,6 +346,12 @@
   body:has(#recordScrim.show) .stage, body:has(#setScrim.show) .stage, body:has(#histScrim.show) .stage, body:has(#confirmScrim.show) .stage, body:has(#iconScrim.show) .stage, body:has(#goalActScrim.show) .stage, body:has(#goalEditScrim.show) .stage, body:has(#authScrim.show) .stage{visibility:hidden}
   body.modalview .stage{visibility:hidden}
   #goalEditScrim{align-items:center}
+  #obScrim{align-items:center; background:var(--bg,#1A1326); -webkit-backdrop-filter:none; backdrop-filter:none; z-index:120}
+  .obCard{max-width:380px !important; text-align:left}
+  .obIcon{width:96px; height:96px; margin:2px auto 12px; border-radius:26px; overflow:hidden; box-shadow:0 18px 44px -16px rgba(242,92,154,.7)}
+  .obIcon svg{width:100%; height:100%; display:block}
+  .obHint{font-size:12.5px; color:var(--muted); margin:8px 2px 0; line-height:1.5}
+  #obLoginState.ok{color:var(--emerald); font-weight:700}
   .goalEditModal{max-width:360px !important; transform:translateY(18px) scale(.96)}
   #goalEditScrim.show .goalEditModal{transform:none}
   .efLbl{display:block; font-size:13px; color:var(--muted); font-weight:700; margin-bottom:5px}
@@ -556,6 +562,7 @@
     <div class="userRow"><input id="newKid" type="text" placeholder="새 사용자 이름" /><button class="mbtn small" id="kidAdd">＋ 추가</button></div>
     <p class="hint">사용자(아이)를 새로 만들거나 이름을 바꿀 수 있어요.</p>
     <div class="setJump"><button class="mbtn ghost" id="toRecord">📒 저축 기록 보기</button></div>
+    <div class="setJump" style="margin-top:8px"><button class="mbtn ghost" id="authLogin" style="width:100%">☁️ 구글로 로그인</button></div>
     <div class="mActions"><button class="mbtn ghost" id="setClose">닫기</button></div>
   </div>
 </div>
@@ -570,6 +577,19 @@
       <button class="mbtn primary" id="installBtn">📲 홈 화면에 추가</button>
       <button class="mbtn ghost" id="iconClose">닫기</button>
     </div>
+  </div>
+</div>
+
+<div class="scrim ob" id="obScrim">
+  <div class="modal obCard" role="dialog" aria-modal="true" aria-label="시작하기">
+    <div class="obIcon" id="obIcon"></div>
+    <h2 class="jua" style="text-align:center">우리집 저금통 시작하기</h2>
+    <p class="sub" style="text-align:center">아이 이름을 정하면 바로 시작할 수 있어요.</p>
+    <button class="mbtn ghost" id="obGoogle" style="width:100%; margin-top:6px">☁️ 구글로 로그인 (선택)</button>
+    <p class="obHint" id="obLoginState">로그인하면 다른 기기에서도 같은 기록을 볼 수 있어요.</p>
+    <label class="efLbl" style="margin-top:10px">아이 이름</label>
+    <input id="obName" class="efInput" type="text" placeholder="예: 민준" />
+    <button class="mbtn primary" id="obStart" style="width:100%; margin-top:14px">시작하기 🐷</button>
   </div>
 </div>
 
@@ -1243,7 +1263,7 @@ let pickEmoji=null, pendingPhoto=null, newColorSel=PAL[0], pickIcon=null;
 function openSettings(){ document.body.classList.add('sheet'); drawKids(); drawGoals(); drawIconTabs(); drawIconPick(); drawEmoji(); drawColor('newColor',newColorSel); drawColor('goalColor',(active()&&active().color)||PAL[0]); updatePreview(); $("#scrim").classList.add("show"); }
 function openRecord(){ const nm=$("#recName"); if(nm) nm.textContent=(S.childName||'')+"의"; drawGoals(); drawHistory(); document.body.classList.add('modalview'); $("#recordScrim").classList.add("show"); }
 const closeRecord=()=>{ $("#recordScrim").classList.remove("show"); if(!$("#setScrim").classList.contains('show')) document.body.classList.remove('modalview'); };
-function openSet(){ const ni=$("#kidName"); if(ni) ni.value=S.childName||''; const nk=$("#newKid"); if(nk) nk.value=''; drawVol(); applySound(); drawThemePills(); drawKidManage(); document.body.classList.add('modalview'); $("#setScrim").classList.add("show"); }
+function openSet(){ const ni=$("#kidName"); if(ni) ni.value=S.childName||''; const nk=$("#newKid"); if(nk) nk.value=''; drawVol(); applySound(); drawThemePills(); drawKidManage(); updateLoginState(); document.body.classList.add('modalview'); $("#setScrim").classList.add("show"); }
 const closeSet=()=>{ $("#setScrim").classList.remove("show"); if(!$("#recordScrim").classList.contains('show')) document.body.classList.remove('modalview'); };
 function drawThemePills(){ const el=$("#themePills"); if(!el) return; const LB={dark:'밤',warm:'노을',light:'낮'};
   el.innerHTML=THEMES.map(t=>`<button class="pill ${t===curTheme?'on':''}" data-theme="${t}">${TICON[t]} ${LB[t]}</button>`).join(""); }
@@ -1546,11 +1566,32 @@ $("#addGoal").onclick=async()=>{
 };
 
 /* 시작 + 서비스워커 */
+/* 구글 로그인 + 첫 실행 온보딩 */
+let _session=null;
+async function refreshSession(){ if(!(LIVE&&sb)) return null; try{ const {data}=await sb.auth.getSession(); _session=data&&data.session||null; }catch(e){ _session=null; } updateLoginState(); return _session; }
+function _email(){ return (_session&&_session.user&&(_session.user.email||''))||''; }
+function updateLoginState(){ const el=$("#obLoginState"); if(el){ if(_session){ el.textContent='로그인됨 ✓ '+_email(); el.classList.add('ok'); } else { el.textContent='로그인하면 다른 기기에서도 같은 기록을 볼 수 있어요.'; el.classList.remove('ok'); } }
+  const g=$("#obGoogle"); if(g) g.style.display=_session?'none':'';
+  const lb=$("#authLogin"); if(lb) lb.textContent=_session?('☁️ 로그아웃 ('+(_email()||'구글')+')'):'☁️ 구글로 로그인'; }
+async function loginGoogle(){ if(!(LIVE&&sb)){ toast('먼저 저장(서버) 연결이 필요해요.', true); return; }
+  try{ const { error }=await sb.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: location.origin+location.pathname } }); if(error) throw error; }
+  catch(e){ toast('구글 로그인이 아직 설정 전이거나 실패했어요. 로그인 없이도 시작할 수 있어요.', true); } }
+async function logoutGoogle(){ if(!(LIVE&&sb)) return; try{ await sb.auth.signOut(); }catch(e){} _session=null; updateLoginState(); toast('로그아웃했어요.', false); }
+function showOnboarding(){ const ic=$("#obIcon"); if(ic) ic.innerHTML=APP_ICON_SVG; updateLoginState(); $("#obScrim").classList.add('show'); const n=$("#obName"); if(n) setTimeout(()=>n.focus(),200); }
+$("#obGoogle").onclick=loginGoogle;
+$("#authLogin").onclick=()=>{ if(_session) logoutGoogle(); else loginGoogle(); };
+$("#obStart").onclick=async()=>{ const v=($("#obName").value||'').trim(); if(!v){ toast('아이 이름을 입력해 주세요.', true); return; }
+  const id=await db.addKid(v, KIDPAL[0], 0); children=await db.children(); if(id) await loadChild(id); drawKids();
+  $("#obScrim").classList.remove('show');
+  if(!AUTH.isSet()){ setTimeout(()=>openAuth(true), 350); }
+  toast('환영해요! 🐷', false); };
+$("#obName").addEventListener('keydown',e=>{ if(e.key==='Enter') $("#obStart").click(); });
+
 async function init(){
-  if(LIVE){ const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2'); sb=createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY); }
+  if(LIVE){ const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2'); sb=createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY); await refreshSession(); }
   children=await db.children();
-  if(children.length) await loadChild(children[0].id);
-  if(!AUTH.isSet()){ setTimeout(()=>openAuth(true),700); }
+  if(LIVE && children.length===0){ showOnboarding(); }
+  else { if(children.length) await loadChild(children[0].id); if(!AUTH.isSet()){ setTimeout(()=>openAuth(true),700); } }
   if('serviceWorker' in navigator){ try{ await navigator.serviceWorker.register('./sw.js'); }catch(e){} }
 }
 init();
