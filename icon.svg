@@ -1,7 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#F4B740"/>
-  <circle cx="256" cy="262" r="150" fill="#FFFFFF"/>
-  <text x="256" y="270" text-anchor="middle" dominant-baseline="central"
-        font-family="'Jua','Noto Sans KR',sans-serif" font-weight="700"
-        font-size="190" fill="#B27A12">₩</text>
+<defs>
+<linearGradient id="oiBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34234C"/><stop offset="1" stop-color="#160E20"/></linearGradient>
+<radialGradient id="oiGlow" cx="50%" cy="45%" r="56%"><stop offset="0" stop-color="#F25C9A" stop-opacity=".55"/><stop offset="1" stop-color="#F25C9A" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="512" height="512" rx="116" fill="url(#oiBg)"/>
+<rect width="512" height="512" rx="116" fill="url(#oiGlow)"/>
+<g transform="translate(256,268)">
+<path d="M-95,-70 L-135,-150 L-50,-100 Z" fill="#F25C9A"/>
+<path d="M95,-70 L135,-150 L50,-100 Z" fill="#F25C9A"/>
+<path d="M-84,-80 L-110,-136 L-58,-104 Z" fill="#FF9EC0"/>
+<path d="M84,-80 L110,-136 L58,-104 Z" fill="#FF9EC0"/>
+<circle cx="0" cy="0" r="170" fill="#F25C9A"/>
+<circle cx="-92" cy="34" r="32" fill="#FF9EC0"/>
+<circle cx="92" cy="34" r="32" fill="#FF9EC0"/>
+<ellipse cx="0" cy="44" rx="90" ry="66" fill="#D6347B"/>
+<ellipse cx="-30" cy="44" rx="15" ry="23" fill="#7d1c47"/>
+<ellipse cx="30" cy="44" rx="15" ry="23" fill="#7d1c47"/>
+<circle cx="-58" cy="-44" r="24" fill="#241B36"/>
+<circle cx="58" cy="-44" r="24" fill="#241B36"/>
+<circle cx="-64" cy="-50" r="7" fill="#fff"/>
+<circle cx="52" cy="-50" r="7" fill="#fff"/>
+<path d="M-46,118 q46,38 92,0" stroke="#9B2360" stroke-width="12" fill="none" stroke-linecap="round"/>
+</g>
 </svg>
