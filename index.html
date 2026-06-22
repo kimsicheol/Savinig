@@ -138,6 +138,9 @@
   .gtab .dot{width:10px; height:10px; border-radius:50%; flex:0 0 auto}
   .gtab.on{color:#fff; background:var(--grad); border-color:transparent; box-shadow:0 10px 26px -12px var(--glow)}
   .gtab.on .dot{box-shadow:0 0 0 2px rgba(255,255,255,.6)}
+  @keyframes jiggle{0%,100%{transform:rotate(-2.6deg)}50%{transform:rotate(2.6deg)}}
+  .gtab.jiggle{animation:jiggle .26s ease-in-out infinite; position:relative; z-index:85; pointer-events:none; box-shadow:0 14px 32px -10px var(--glow)}
+  @media (prefers-reduced-motion:reduce){ .gtab.jiggle{animation:none} }
   .gtab.done{color:var(--emerald)}
   .gtab.plus{color:var(--ink); font-weight:800}
   .gtab:active{transform:scale(.96)}
@@ -247,6 +250,11 @@
   .gitem .nm{font-weight:700} .gitem .pr{font-size:13px; color:var(--muted)}
   .gitem .now{margin-left:auto; font-size:12px; color:var(--emerald); font-weight:700}
   .gitem .del{margin-left:auto; background:none; border:none; color:var(--warn); cursor:pointer; font-size:14px}
+  .gitem .gtext{flex:1; min-width:0}
+  .gitem .gctl{margin-left:auto; display:flex; align-items:center; gap:6px; flex:none}
+  .gitem .gctl .now, .gitem .gctl .del{margin-left:0}
+  .ordbtn{border:1px solid var(--line-2); background:var(--card-2); color:var(--ink); border-radius:8px; padding:5px 9px; font-size:13px; line-height:1; cursor:pointer; font-family:inherit}
+  .ordbtn:disabled{opacity:.3; cursor:default}
 
   .shelf{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px}
   .done{width:98px; padding:10px 8px; border:1px solid var(--line); border-radius:14px; background:var(--card); text-align:center; cursor:pointer; position:relative}
@@ -330,8 +338,13 @@
   :root[data-theme="light"] .needStat{background:rgba(28,18,38,.4); border-color:rgba(255,255,255,.12)}
   .axis{display:none}
   body.sheet .bigStat, body.sheet .pctStat, body.sheet .needStat{display:none}
-  body:has(#recordScrim.show) .stage, body:has(#setScrim.show) .stage, body:has(#histScrim.show) .stage, body:has(#confirmScrim.show) .stage, body:has(#iconScrim.show) .stage{visibility:hidden}
+  body:has(#recordScrim.show) .stage, body:has(#setScrim.show) .stage, body:has(#histScrim.show) .stage, body:has(#confirmScrim.show) .stage, body:has(#iconScrim.show) .stage, body:has(#goalActScrim.show) .stage{visibility:hidden}
   body.modalview .stage{visibility:hidden}
+  #goalActScrim{align-items:center}
+  .goalActModal{max-width:340px !important; transform:translateY(18px) scale(.96)}
+  #goalActScrim.show .goalActModal{transform:none}
+  .goalActModal .gaRow{display:flex; gap:10px; margin-top:8px}
+  .goalActModal .gaRow .mbtn{flex:1}
   #iconScrim{align-items:center}
   .iconModal{max-width:360px !important; text-align:center; transform:translateY(18px) scale(.96)}
   #iconScrim.show .iconModal{transform:none}
@@ -339,6 +352,9 @@
   .iconPrev svg{width:100%; height:100%; display:block}
   .iconActions{display:flex; flex-direction:column; gap:10px; margin-top:18px}
   .iconActions .mbtn{width:100%}
+  .iosGuide{margin:0 0 14px; padding:11px 14px; border-radius:12px; background:rgba(242,92,154,.12); border:1px solid rgba(242,92,154,.28); color:var(--ink); font-size:13.5px; line-height:1.55; text-align:left}
+  .iosGuide b{color:var(--ind)}
+  .iconActions .mbtn.isdone{background:var(--card-2); color:var(--muted); box-shadow:none}
   .dash{display:none !important}
   @media (prefers-reduced-motion:reduce){ .art.pop{animation:none} .art.hop{animation:none} .burst{display:none} .mcheer{display:none} .stage,.art{transition:none} }
   .mActions{display:flex; gap:10px; margin-top:18px}
@@ -535,15 +551,28 @@
 </div>
 
 <div class="scrim" id="iconScrim">
-  <div class="modal iconModal" role="dialog" aria-modal="true" aria-label="앱 아이콘">
+  <div class="modal iconModal" role="dialog" aria-modal="true" aria-label="앱 설치">
     <div class="iconPrev" id="iconPrev"></div>
-    <h2 class="jua">꿀꿀이 앱 아이콘</h2>
-    <p class="sub">홈 화면에 추가하면 이 아이콘으로 설치돼요.</p>
+    <h2 class="jua">꿀꿀이 앱 설치</h2>
+    <p class="sub">홈 화면에 추가하면 전체화면 앱처럼 쓸 수 있어요.</p>
+    <div id="iosGuide" class="iosGuide" hidden>아이폰은 사파리 아래 <b>공유</b> 버튼 → <b>‘홈 화면에 추가’</b>를 누르면 설치돼요.</div>
     <div class="mActions iconActions">
-      <button class="mbtn primary" id="iconDl">⬇️ 아이콘 저장 (PNG)</button>
-      <button class="mbtn ghost" id="iconToGoal">🎯 목표 설정 열기</button>
+      <button class="mbtn primary" id="installBtn">📲 홈 화면에 추가</button>
       <button class="mbtn ghost" id="iconClose">닫기</button>
     </div>
+  </div>
+</div>
+
+<div class="scrim" id="goalActScrim">
+  <div class="modal goalActModal" role="dialog" aria-modal="true" aria-label="목표 관리">
+    <h2 class="jua" id="gaName" style="text-align:center; margin-bottom:4px">목표</h2>
+    <p class="sub" style="text-align:center">탭 순서를 바꾸거나 삭제할 수 있어요.</p>
+    <div class="gaRow">
+      <button class="mbtn ghost" id="gaLeft">◀ 왼쪽으로</button>
+      <button class="mbtn ghost" id="gaRight">오른쪽으로 ▶</button>
+    </div>
+    <button class="mbtn danger" id="gaDelete" style="width:100%; margin-top:10px">🗑 이 목표 삭제</button>
+    <button class="mbtn ghost" id="gaClose" style="width:100%; margin-top:10px">닫기</button>
   </div>
 </div>
 
@@ -755,6 +784,8 @@ const db = {
     const {data}=await sb.from('children').select('*').eq('id',id).single(); return data; },
   async goals(cid){ if(!LIVE) return demoDB.goals.filter(g=>g.child_id===cid).map(g=>({...g}));
     const {data}=await sb.from('goals').select('*').eq('child_id',cid).order('sort'); return data||[]; },
+  async setGoalSort(gid,sort){ if(!LIVE){ const g=demoDB.goals.find(x=>x.id===gid); if(g) g.sort=sort; return; }
+    await sb.from('goals').update({sort}).eq('id',gid); },
   async deposits(cid){ if(!LIVE) return demoDB.deposits.filter(d=>d.child_id===cid).map(d=>({...d}));
     const {data}=await sb.from('deposits').select('*').eq('child_id',cid).order('created_at',{ascending:false});
     return (data||[]).map(d=>({...d,t:Date.parse(d.created_at)})); },
@@ -1210,7 +1241,7 @@ const APP_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 5
  +'<ellipse cx="0" cy="44" rx="90" ry="66" fill="#D6347B"/><ellipse cx="-30" cy="44" rx="15" ry="23" fill="#7d1c47"/><ellipse cx="30" cy="44" rx="15" ry="23" fill="#7d1c47"/>'
  +'<circle cx="-58" cy="-44" r="24" fill="#241B36"/><circle cx="58" cy="-44" r="24" fill="#241B36"/><circle cx="-64" cy="-50" r="7" fill="#fff"/><circle cx="52" cy="-50" r="7" fill="#fff"/>'
  +'<path d="M-46,118 q46,38 92,0" stroke="#9B2360" stroke-width="12" fill="none" stroke-linecap="round"/></g></svg>';
-function openIcon(){ const p=$("#iconPrev"); if(p) p.innerHTML=APP_ICON_SVG; document.body.classList.add('modalview'); $("#iconScrim").classList.add("show"); }
+function openIcon(){ const p=$("#iconPrev"); if(p) p.innerHTML=APP_ICON_SVG; updateInstallUI(); document.body.classList.add('modalview'); $("#iconScrim").classList.add("show"); }
 function closeIcon(){ $("#iconScrim").classList.remove("show"); if(!$("#recordScrim").classList.contains('show') && !$("#setScrim").classList.contains('show')) document.body.classList.remove('modalview'); }
 function downloadIcon(){
   try{
@@ -1221,6 +1252,21 @@ function downloadIcon(){
     img.src=url;
   }catch(e){ toast('아이콘을 만들지 못했어요.',true); }
 }
+/* PWA 설치(홈 화면에 추가) */
+let _deferredPrompt=null;
+function isStandalone(){ return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone===true; }
+function isIOS(){ return /iphone|ipad|ipod/i.test(navigator.userAgent||'') || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1); }
+function updateInstallUI(){ const b=$("#installBtn"), g=$("#iosGuide"); if(!b) return;
+  if(isStandalone()){ b.textContent='설치됨 ✓'; b.disabled=true; b.classList.add('isdone'); if(g) g.hidden=true; return; }
+  b.disabled=false; b.classList.remove('isdone');
+  if(_deferredPrompt){ b.textContent='📲 홈 화면에 추가 (앱 설치)'; if(g) g.hidden=true; }
+  else if(isIOS()){ b.textContent='📲 홈 화면에 추가'; if(g) g.hidden=false; }
+  else { b.textContent='📲 홈 화면에 추가'; if(g) g.hidden=true; } }
+async function installApp(){
+  if(isStandalone()){ toast('이미 설치되어 있어요. 🐷',false); return; }
+  if(_deferredPrompt){ _deferredPrompt.prompt(); let oc='dismissed'; try{ oc=(await _deferredPrompt.userChoice).outcome; }catch(e){} _deferredPrompt=null; if(oc==='accepted') toast('설치를 시작했어요! 🎉',false); updateInstallUI(); return; }
+  if(isIOS()){ const g=$("#iosGuide"); if(g) g.hidden=false; toast('사파리 공유 → 홈 화면에 추가를 눌러 주세요.',false); return; }
+  toast('브라우저 메뉴의 “홈 화면에 추가 / 앱 설치”로 설치할 수 있어요.',false); }
 /* 사용자(아이) 관리 — 전환·순서·삭제·색/아바타 */
 const KIDPAL=['#F25C9A','#3F86C9','#2BB673','#F4B740','#A855F7','#E0564B','#1FA98A','#FF7A45'];
 function _mix(hex,wth,amt){ const a=hex.replace('#',''), w=wth.replace('#','');
@@ -1294,10 +1340,10 @@ function drawGoalTabs(){ const el=$("#goalTabs"); if(!el) return;
 function drawGoals(){
   const act=S.goals.filter(g=>savedFor(g.id)<g.price), done=S.goals.filter(g=>savedFor(g.id)>=g.price);
   $("#goalList").innerHTML=act.map(g=>{
-    const ns=savedFor(g.id), pct=Math.min(100,Math.round((ns/g.price)*100)), on=g.id===S.activeId;
+    const ns=savedFor(g.id), pct=Math.min(100,Math.round((ns/g.price)*100)), on=g.id===S.activeId, gi=S.goals.findIndex(x=>x.id===g.id);
     return `<div class="gitem ${on?'on':''}" data-go="${g.id}"><img class="em" src="${artFor(g).src}" alt="">
-      <span><span class="nm">${g.name}</span><br><span class="pr">${won(ns)} / ${won(g.price)}원 · ${pct}%</span></span>
-      ${on?'<span class="now">지금 모으는 중</span>':(S.goals.length>1?`<button class="del" data-del="${g.id}">삭제</button>`:'')}</div>`;
+      <span class="gtext"><span class="nm">${g.name}</span><br><span class="pr">${won(ns)} / ${won(g.price)}원 · ${pct}%</span></span>
+      <span class="gctl"><button class="ordbtn" data-up="${g.id}" ${gi<=0?'disabled':''} aria-label="위로">▲</button><button class="ordbtn" data-down="${g.id}" ${gi>=S.goals.length-1?'disabled':''} aria-label="아래로">▼</button>${on?'<span class="now">지금</span>':(S.goals.length>1?`<button class="del" data-del="${g.id}">삭제</button>`:'')}</span></div>`;
   }).join("") || '<div class="pr" style="color:var(--muted)">진행 중인 목표가 없어요. 아래에서 새 목표를 만들어요.</div>';
   $("#doneTitle").hidden = done.length===0;
   $("#doneList").innerHTML = done.map(g=>`<div class="done ${g.id===S.activeId?'on':''}" data-go="${g.id}"><img src="${artFor(g).src}" alt=""><span class="dn">${g.name}</span><span class="ck">완료 ✅</span></div>`).join("");
@@ -1313,17 +1359,39 @@ $("#keypad").addEventListener("click",e=>{ const b=e.target.closest("[data-k]");
 $("#authSwitch").onclick=()=>{ if(authSetup){ const goPin=!usePin; setPinMode(goPin); pinStage='set1'; pinFirst=''; $("#authMsg").textContent=goPin?"4자리 비밀번호를 만들어 주세요.":"처음 한 번만요. 지문·얼굴로 보호자를 등록해요."; $("#authSwitch").textContent=goPin?"지문·얼굴로 설정하기":"비밀번호(PIN)로 설정하기"; } else { setPinMode(true); $("#authMsg").textContent="비밀번호 4자리를 입력해요."; $("#authSwitch").textContent=""; } };
 $("#authCancel").onclick=()=>closeAuth(false);
 $("#authScrim").addEventListener("click",e=>{ if(e.target===$("#authScrim")) closeAuth(false); });
-let _tabHold=null, _tabHeld=false;
+let _tabHold=null, _tabHeld=false, _tabX=0, _tabY=0, _gaId=null;
 function _clearHold(){ if(_tabHold){ clearTimeout(_tabHold); _tabHold=null; } }
 async function askDeleteGoal(gid){ const g=S.goals.find(x=>x.id===gid); if(!g) return;
   if(S.goals.length<=1){ toast("마지막 목표는 지울 수 없어요.", true); return; }
   if(!(await uiConfirm({title:"목표를 삭제할까요?", msg:"‘"+g.name+"’을(를) 지우면 모은 기록도 함께 사라져요.", ok:"삭제"}))) return;
+  const ok=await requestAuth(); if(!ok){ toast("보호자 인증이 필요해요.", true); return; }
   await db.delGoal(gid); await loadChild(S.childId); render(); toast("‘"+g.name+"’ 목표를 삭제했어요.", false); }
-$("#goalTabs").addEventListener("pointerdown",e=>{ const b=e.target.closest("[data-go]"); if(!b) return; _tabHeld=false; _clearHold(); _tabHold=setTimeout(()=>{ _tabHeld=true; if(navigator.vibrate) try{navigator.vibrate(25);}catch(_){} askDeleteGoal(b.dataset.go); }, 650); });
+async function reorderGoal(gid,dir){
+  const gs=S.goals.slice(); const i=gs.findIndex(g=>g.id===gid), j=i+dir;
+  if(i<0||j<0||j>=gs.length){ toast(dir<0?"이미 맨 앞이에요.":"이미 맨 뒤예요.", true); return; }
+  const t=gs[i]; gs[i]=gs[j]; gs[j]=t;
+  if(!LIVE){ const others=demoDB.goals.filter(g=>g.child_id!==S.childId); const mine=gs.map(g=>demoDB.goals.find(x=>x.id===g.id)).filter(Boolean); mine.forEach((g,k)=>g.sort=k); demoDB.goals=others.concat(mine); }
+  else { for(let k=0;k<gs.length;k++){ try{ await db.setGoalSort(gs[k].id,k); }catch(e){} } }
+  await loadChild(S.childId); render();
+}
+function _jiggleTab(gid){ const tabs=$("#goalTabs"); if(!tabs) return; tabs.querySelectorAll('.gtab.jiggle').forEach(t=>t.classList.remove('jiggle')); if(gid){ const t=tabs.querySelector('[data-go="'+gid+'"]'); if(t) t.classList.add('jiggle'); } }
+function openGoalAct(gid){ const g=S.goals.find(x=>x.id===gid); if(!g) return; _gaId=gid;
+  const nm=$("#gaName"); if(nm) nm.textContent=g.name;
+  const i=S.goals.findIndex(x=>x.id===gid);
+  const L=$("#gaLeft"), R=$("#gaRight"), D=$("#gaDelete");
+  if(L) L.disabled = i<=0; if(R) R.disabled = i>=S.goals.length-1; if(D) D.disabled = S.goals.length<=1;
+  _jiggleTab(gid); document.body.classList.add('modalview'); $("#goalActScrim").classList.add("show"); }
+function closeGoalAct(){ _jiggleTab(null); $("#goalActScrim").classList.remove("show"); if(!$("#recordScrim").classList.contains('show') && !$("#setScrim").classList.contains('show')) document.body.classList.remove('modalview'); }
+$("#gaLeft").onclick=async()=>{ if(_gaId){ const id=_gaId; await reorderGoal(id,-1); openGoalAct(id); } };
+$("#gaRight").onclick=async()=>{ if(_gaId){ const id=_gaId; await reorderGoal(id,1); openGoalAct(id); } };
+$("#gaDelete").onclick=()=>{ const id=_gaId; closeGoalAct(); if(id) askDeleteGoal(id); };
+$("#gaClose").onclick=closeGoalAct;
+$("#goalActScrim").addEventListener("click",e=>{ if(e.target===$("#goalActScrim")) closeGoalAct(); });
+$("#goalTabs").addEventListener("pointerdown",e=>{ const b=e.target.closest("[data-go]"); if(!b) return; _tabHeld=false; _tabX=e.clientX; _tabY=e.clientY; _clearHold(); _tabHold=setTimeout(()=>{ _tabHeld=true; if(navigator.vibrate) try{navigator.vibrate(25);}catch(_){} openGoalAct(b.dataset.go); }, 500); });
 $("#goalTabs").addEventListener("pointerup",_clearHold);
 $("#goalTabs").addEventListener("pointerleave",_clearHold);
 $("#goalTabs").addEventListener("pointercancel",_clearHold);
-$("#goalTabs").addEventListener("pointermove",_clearHold);
+$("#goalTabs").addEventListener("pointermove",e=>{ if(_tabHold && Math.hypot(e.clientX-_tabX, e.clientY-_tabY) > 12) _clearHold(); });
 $("#goalTabs").addEventListener("click",async e=>{ if(_tabHeld){ _tabHeld=false; e.preventDefault(); return; }
   if(e.target.closest("[data-add]")){ openSettings(); return; }
   const b=e.target.closest("[data-go]"); if(b){ S.activeId=b.dataset.go; await db.setActive(S.childId,S.activeId); render(); } });
@@ -1351,8 +1419,9 @@ $("#histFilters").addEventListener("click",e=>{ const b=e.target.closest("[data-
   if(b.dataset.t!==undefined && b.dataset.t!=='') histType=b.dataset.t; if(b.dataset.g!==undefined && b.dataset.g!=='') histGoal=b.dataset.g; drawHistory(); });
 setTimeout(()=>document.body.classList.remove('enter'),1700);
 $("#brandBtn").onclick=openIcon; $("#closeSettings").onclick=closeSettings;
-$("#iconDl").onclick=downloadIcon;
-$("#iconToGoal").onclick=()=>{ closeIcon(); openSettings(); };
+$("#installBtn").onclick=installApp;
+window.addEventListener('beforeinstallprompt',(e)=>{ e.preventDefault(); _deferredPrompt=e; updateInstallUI(); });
+window.addEventListener('appinstalled',()=>{ _deferredPrompt=null; updateInstallUI(); toast('앱이 설치됐어요! 🎉',false); });
 $("#iconClose").onclick=closeIcon;
 $("#iconScrim").addEventListener("click",e=>{ if(e.target===$("#iconScrim")) closeIcon(); });
 $("#recordBtn").onclick=openRecord; $("#setBtn").onclick=openSet;
@@ -1388,8 +1457,10 @@ $("#volRange").addEventListener("input", e=> setVol(+e.target.value, false));
 $("#volRange").addEventListener("change", e=> setVol(+e.target.value, true));
 $("#volMute").onclick=()=>{ sndMode = (sndMode==='sound')?'silent':'sound'; applySound(); drawVol(); if(sndMode==='sound') blip(1000); };
 $("#goalList").addEventListener("click",async e=>{
-  const del=e.target.closest("[data-del]");
-  if(del){ e.stopPropagation(); await db.delGoal(del.dataset.del); await loadChild(S.childId); openSettings(); return; }
+  const up=e.target.closest("[data-up]"), dn=e.target.closest("[data-down]"), del=e.target.closest("[data-del]");
+  if(up){ e.stopPropagation(); await reorderGoal(up.dataset.up,-1); drawGoals(); return; }
+  if(dn){ e.stopPropagation(); await reorderGoal(dn.dataset.down,1); drawGoals(); return; }
+  if(del){ e.stopPropagation(); await askDeleteGoal(del.dataset.del); drawGoals(); return; }
   const it=e.target.closest("[data-go]");
   if(it){ S.activeId=it.dataset.go; await db.setActive(S.childId,S.activeId); render(); drawGoals(); }
 });
