@@ -202,18 +202,42 @@
   .hmonth.closed .chev{transform:rotate(-90deg)}
   .hmonth .mnet{margin-left:auto; font-weight:800; color:var(--emerald)}
   .hmonth .mnet.neg{color:var(--warn)}
-  .hgroup{display:flex; flex-direction:column; gap:7px; margin-top:7px}
-  .hgroup.closed{display:none}
-  .histModal{max-width:560px}
+  .hgroup{display:grid; grid-template-rows:1fr; transition:grid-template-rows .32s ease, opacity .28s ease, margin-top .28s ease; margin-top:7px; opacity:1}
+  .hgroup.closed{grid-template-rows:0fr; opacity:0; margin-top:0}
+  .hgInner{overflow:hidden; min-height:0; display:flex; flex-direction:column; gap:7px}
+  @media (prefers-reduced-motion:reduce){ .hgroup{transition:none} .hgroup.closed{display:none} }
+  .modal.histModal{max-width:560px; display:flex; flex-direction:column; overflow:hidden}
+  .histModal > h2, .histModal > .sub, .histModal > .chartTop, .histModal > .chartWrap, .histModal > .histFullSummary, .histModal > .histFilters{flex:0 0 auto}
   .chartWrap{margin:6px 0 14px; overflow-x:auto}
-  .chart{display:flex; align-items:stretch; gap:10px; height:150px; min-width:280px; padding:6px 2px 0}
+  .chart{display:flex; align-items:stretch; gap:10px; height:clamp(118px,20vh,150px); min-width:280px; padding:6px 2px 0}
   .chart .col{flex:1; min-width:34px; display:flex; flex-direction:column; align-items:center; gap:5px}
   .chart .barwrap{flex:1; width:100%; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:4px}
   .chart .bar{width:100%; max-width:46px; background:var(--grad); border-radius:8px 8px 4px 4px; min-height:3px; transition:height .5s cubic-bezier(.22,1,.36,1)}
-  .chart .bv{font-size:10.5px; font-weight:800; color:var(--ink); white-space:nowrap}
+  .chart .bv{font-size:11px; font-weight:800; color:var(--ink); white-space:nowrap}
   .chart .bl{font-size:10.5px; color:var(--muted); white-space:nowrap}
   .chart .col.cur .bar{background:linear-gradient(135deg,#FBBF24,#F59E0B)}
-  .histList.big{max-height:48vh}
+  .chart .col.cur .bv{color:#F59E0B}
+  .chart .col.cur .bl{color:#F59E0B; font-weight:800}
+  .chart .curtag{font-size:9px; font-weight:800; color:#F59E0B; line-height:1; margin-top:1px}
+  .chart .col[data-ym]{cursor:pointer; border-radius:10px; transition:background .15s}
+  .chart .col[data-ym]:hover{background:rgba(255,255,255,.04)}
+  .chart .col.sel .bar{outline:2.5px solid #fff; outline-offset:2px}
+  .chart .col.sel .bl{color:#fff; font-weight:800}
+  .monClear{width:100%; margin:0 0 8px; padding:9px 12px; border:1px solid rgba(242,92,154,.4); background:rgba(242,92,154,.12); color:var(--ink); font-family:inherit; font-weight:800; font-size:13px; border-radius:11px; cursor:pointer; text-align:center}
+  .chartTop{display:flex; align-items:center; justify-content:space-between; gap:8px; margin:2px 0 6px}
+  .spanSeg{display:inline-flex; gap:3px; background:var(--card-2); border:1px solid var(--line-2); border-radius:10px; padding:3px}
+  .spanSeg button{border:none; background:transparent; color:var(--muted); font-family:inherit; font-weight:800; font-size:12px; padding:6px 11px; border-radius:8px; cursor:pointer}
+  .spanSeg button.on{background:var(--grad); color:#fff}
+  .histFullSummary{margin:2px 0 12px; padding:11px 13px; background:var(--card-2); border:1px solid var(--line-2); border-radius:12px}
+  .histFullSummary .hfTot{font-weight:800; font-size:14.5px}
+  .histFullSummary .hfTot .pos{color:var(--emerald)} .histFullSummary .hfTot .neg{color:var(--warn)}
+  .histFullSummary .hfCmp{font-size:12.5px; margin-top:3px}
+  .histFullSummary .hfCmp.muted{color:var(--muted)}
+  .histFullSummary .up{color:var(--emerald)} .histFullSummary .down{color:var(--warn)}
+  .loadMore{width:100%; margin-top:10px; padding:12px; border:1px dashed var(--line-2); background:var(--card-2); color:var(--ink); font-family:inherit; font-weight:800; font-size:13.5px; border-radius:12px; cursor:pointer}
+  .loadMore span{color:var(--muted); font-weight:700; font-size:12px}
+  .histModal .histList.big{flex:1 1 auto; min-height:110px; max-height:none}
+  .histModal .mActions{flex:0 0 auto; margin-top:10px; padding-top:12px; border-top:1px solid var(--line-2); position:sticky; bottom:0; background:var(--modalbg)}
   .histSummary .lab{color:var(--muted)}
   .histSummary b.pos{color:var(--emerald); font-weight:800}
   .histSummary b.neg{color:var(--warn); font-weight:800}
@@ -243,12 +267,15 @@
   .linkBtn:empty{display:none}
   @keyframes risein{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
 
-  .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:rgba(18,21,33,.94); color:#fff; border:1px solid var(--line-2); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); padding:14px 22px; border-radius:14px; font-size:15px; font-weight:600; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:90; max-width:90vw; text-align:center}
+  .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:rgba(18,21,33,.94); color:#fff; border:1px solid var(--line-2); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); padding:14px 22px; border-radius:14px; font-size:15px; font-weight:600; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:250; max-width:90vw; text-align:center}
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0)} .toast.warn{border-color:rgba(248,113,113,.55)}
 
-  .scrim{position:fixed; inset:0; background:rgba(4,6,12,.64); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; padding:18px; z-index:80; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .28s ease, visibility .28s ease}
+  .scrim{position:fixed; inset:0; background:rgba(4,6,12,.64); -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; padding:18px; z-index:80; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .4s ease, visibility .4s ease}
+  #histScrim, #iconScrim, #goalActScrim, #goalEditScrim{z-index:100}
+  #confirmScrim{z-index:130}
+  #authScrim{z-index:150}
   .scrim.show{opacity:1; visibility:visible; pointer-events:auto}
-  .modal{background:var(--modalbg); border:1px solid var(--line-2); border-radius:var(--r); padding:22px; width:100%; max-width:480px; max-height:90vh; overflow:auto; box-shadow:var(--shadow); transform:translateY(14px) scale(.98); transition:transform .32s cubic-bezier(.22,1,.36,1)}
+  .modal{background:var(--modalbg); border:1px solid var(--line-2); border-radius:var(--r); padding:22px; width:100%; max-width:480px; max-height:90vh; overflow:auto; box-shadow:var(--shadow); transform:translateY(14px) scale(.98); transition:transform .42s cubic-bezier(.32,.72,0,1)}
   .scrim.show .modal{transform:none}
   @media (prefers-reduced-motion:reduce){ .scrim,.modal{transition:none} }
   .modal h2{font-size:22px; margin:0 0 4px; font-weight:800; letter-spacing:-.02em}
@@ -336,10 +363,10 @@
 
   body.sheet .stage{max-height:34vh; align-items:flex-start; padding-top:2px}
   #scrim{align-items:flex-end}
-  #scrim .modal, #recordScrim .modal, #setScrim .modal{width:100%; max-width:640px; border-radius:24px 24px 0 0; transform:translateY(100%)}
-  #scrim .modal{max-height:66vh} #recordScrim .modal, #setScrim .modal{max-height:84vh}
-  #scrim.show .modal, #recordScrim.show .modal, #setScrim.show .modal{transform:translateY(0)}
-  #scrim, #recordScrim, #setScrim{align-items:flex-end}
+  #scrim .modal, #recordScrim .modal, #setScrim .modal, #histScrim .modal{width:100%; max-width:640px; border-radius:24px 24px 0 0; transform:translateY(100%)}
+  #scrim .modal{max-height:66vh} #recordScrim .modal, #setScrim .modal, #histScrim .modal{max-height:84vh}
+  #scrim.show .modal, #recordScrim.show .modal, #setScrim.show .modal, #histScrim.show .modal{transform:translateY(0)}
+  #scrim, #recordScrim, #setScrim, #histScrim{align-items:flex-end}
   .previewTag{display:none}
   body.sheet .previewTag{display:block; text-align:center; color:var(--muted); font-weight:700; font-size:13px; margin-top:10px}
   body.sheet .art{outline:2px dashed var(--prevcol, #F25C9A); outline-offset:12px; border-radius:14px}
@@ -623,7 +650,9 @@
   <div class="modal histModal" role="dialog" aria-modal="true" aria-label="저축 내역 자세히">
     <h2 class="jua">📒 <span id="histFullName"></span> 저축 내역</h2>
     <p class="sub">월별 모은 금액과 전체 기록을 한눈에 볼 수 있어요.</p>
+    <div class="chartTop"><span class="orline" style="margin:0">📊 월별 모은 금액</span><div class="spanSeg" id="histSpanSeg"><button class="on" data-span="6" type="button">6개월</button><button data-span="12" type="button">12개월</button></div></div>
     <div class="chartWrap"><div class="chart" id="histChart"></div></div>
+    <div class="histFullSummary" id="histFullSummary" hidden></div>
     <div class="histFilters" id="histFullFilters"></div>
     <div class="histList big" id="histListFull"></div>
     <div class="mActions"><button class="mbtn ghost" id="histClose">닫기</button></div>
@@ -1529,7 +1558,7 @@ function clearPending(){ pend=0; drawPending(); }
 async function saveDeposit(){ if(pend===0) return; const ok=await requestAuth(); if(!ok) return;
   const amt=pend; pend=0; drawPending(); if(amt>0) fxSave(); await commit(amt, null, 'manual'); }
 /* 저축 내역(Q3) + 필터(Q1) */
-let histGoal='all', histType='all', histPeriod='month';
+let histGoal='all', histType='all', histPeriod='month', histMonth=null;
 const PERIODS=[['month','이번 달'],['last','지난달'],['all','전체']];
 function inPeriod(t){ if(histPeriod==='all') return true; const d=new Date(t||0), now=new Date(); let y=now.getFullYear(), mo=now.getMonth();
   if(histPeriod==='last'){ mo-=1; if(mo<0){ mo=11; y-=1; } } return d.getFullYear()===y && d.getMonth()===mo; }
@@ -1569,6 +1598,7 @@ function filteredItems(usePeriod){ let items=(S.deposits||[]).slice();
   if(usePeriod) items=items.filter(d=>inPeriod(d.t));
   if(histType==='pos') items=items.filter(d=>(d.amount||0)>=0);
   else if(histType==='neg') items=items.filter(d=>(d.amount||0)<0);
+  if(!usePeriod && histMonth) items=items.filter(d=>{ const dt=new Date(d.t||0); return (dt.getFullYear()+'-'+(dt.getMonth()+1))===histMonth; });
   items.sort((a,b)=>(b.t||0)-(a.t||0)); return items; }
 let collapsedMonths=new Set();
 function monthGroups(items){ const map={}, order=[];
@@ -1578,24 +1608,46 @@ function monthGroups(items){ const map={}, order=[];
   return order.map(k=>map[k]); }
 function groupedHtml(items){ return monthGroups(items).map(g=>{ const closed=collapsedMonths.has(g.key);
     return `<div class="hmonth ${closed?'closed':''}" data-mon="${g.key}"><span class="chev">▾</span><span>${g.label}</span><span class="mnet ${g.net<0?'neg':''}">${g.net>=0?'+':'−'}${won(Math.abs(g.net))}원</span></div>`
-      +`<div class="hgroup ${closed?'closed':''}">${g.items.map(rowHtml).join("")}</div>`; }).join(""); }
+      +`<div class="hgroup ${closed?'closed':''}"><div class="hgInner">${g.items.map(rowHtml).join("")}</div></div>`; }).join(""); }
 function drawHistory(){ const el=$("#histList"); if(!el) return; const nm=$("#histName"); if(nm) nm.textContent=S.childName||"";
   drawHistPeriods(); drawHistSummary(); drawHistCompare(); drawHistFilters();
   let items=filteredItems(true);
   if(!items.length){ el.innerHTML='<div class="pr" style="color:var(--muted); padding:4px 2px">조건에 맞는 내역이 없어요.</div>'; return; }
   el.innerHTML = (histPeriod==='all') ? groupedHtml(items.slice(0,150)) : items.slice(0,60).map(rowHtml).join(""); }
 /* 자세히 보기 모달 (월별 막대그래프 + 전체 기록) — Q3 */
-function drawHistChart(){ const el=$("#histChart"); if(!el) return; const now=new Date(), cols=[]; const H=96;
-  for(let i=5;i>=0;i--){ let y=now.getFullYear(), mo=now.getMonth()-i; while(mo<0){ mo+=12; y-=1; } let pos=0;
+let histSpan=6;
+function drawHistChart(){ const el=$("#histChart"); if(!el) return; const now=new Date(), cols=[]; const H=96; const N=histSpan;
+  for(let i=N-1;i>=0;i--){ let y=now.getFullYear(), mo=now.getMonth()-i; while(mo<0){ mo+=12; y-=1; } let pos=0;
     (S.deposits||[]).forEach(d=>{ if(histGoal!=='all'&&d.goal_id!==histGoal) return; const dt=new Date(d.t||0); if(dt.getFullYear()===y&&dt.getMonth()===mo){ const a=d.amount||0; if(a>0) pos+=a; } });
-    cols.push({mo:mo+1, val:pos, cur:i===0}); }
+    cols.push({mo:mo+1, val:pos, cur:i===0, ym:y+'-'+(mo+1)}); }
   const max=Math.max(1,...cols.map(c=>c.val));
-  el.innerHTML=cols.map(c=>`<div class="col ${c.cur?'cur':''}"><div class="barwrap"><div class="bv">${c.val?wonShort(c.val):''}</div><div class="bar" style="height:${Math.round(c.val/max*H)+(c.val?2:0)}px"></div></div><div class="bl">${c.mo}월</div></div>`).join(""); }
-function renderHistFullList(){ const el=$("#histListFull"); if(!el) return; const items=filteredItems(false);
-  if(!items.length){ el.innerHTML='<div class="pr" style="color:var(--muted); padding:4px 2px">조건에 맞는 내역이 없어요.</div>'; return; }
-  el.innerHTML=groupedHtml(items); }
-function openHistFull(){ const nm=$("#histFullName"); if(nm) nm.textContent=S.childName||''; drawHistChart(); drawFilterChips('histFullFilters'); renderHistFullList(); document.body.classList.add('modalview'); $("#histScrim").classList.add("show"); }
-function refreshHistFull(){ drawHistChart(); drawFilterChips('histFullFilters'); renderHistFullList(); }
+  el.style.minWidth = Math.max(280, cols.length*46) + 'px';
+  el.innerHTML=cols.map(c=>`<div class="col ${c.cur?'cur':''} ${histMonth===c.ym?'sel':''}" data-ym="${c.ym}"><div class="barwrap"><div class="bv">${c.val?wonShort(c.val):''}</div><div class="bar" style="height:${Math.round(c.val/max*H)+(c.val?2:0)}px"></div></div><div class="bl">${c.mo}월</div>${c.cur?'<div class="curtag">이번 달</div>':''}</div>`).join(""); }
+let _histCollapseInit=false;
+function ensureMonthCollapse(){ if(_histCollapseInit) return; _histCollapseInit=true;
+  const keys=[...new Set(filteredItems(false).map(d=>{ const dt=new Date(d.t||0); return dt.getFullYear()+'-'+(dt.getMonth()+1); }))];
+  keys.slice(1).forEach(k=>collapsedMonths.add(k)); }
+function monthTotals(ym){ let pos=0,neg=0; (S.deposits||[]).forEach(d=>{ if(histGoal!=='all'&&d.goal_id!==histGoal) return; const dt=new Date(d.t||0); if((dt.getFullYear()+'-'+(dt.getMonth()+1))!==ym) return; const a=d.amount||0; if(a>=0) pos+=a; else neg+=-a; }); return {pos,neg,net:pos-neg}; }
+function prevYm(ym){ let [y,mo]=ym.split('-').map(Number); mo-=1; if(mo<1){ mo=12; y-=1; } return y+'-'+mo; }
+function drawHistFullSummary(){ const el=$("#histFullSummary"); if(!el) return;
+  if(histMonth){ const mm=histMonth.split('-')[1], t=monthTotals(histMonth), p=monthTotals(prevYm(histMonth)), diff=t.net-p.net;
+    const cmp = diff>0?`전달보다 <b class="up">+${won(diff)}원</b> 더 모았어요` : diff<0?`전달보다 <b class="down">${won(-diff)}원</b> 덜 모았어요` : `전달과 비슷하게 모았어요`;
+    el.innerHTML=`<div class="hfTot"><b>${mm}월</b> <span class="pos">+${won(t.pos)}원</span>${t.neg?` <span class="neg">−${won(t.neg)}원</span>`:''}</div><div class="hfCmp">${cmp}</div>`;
+  } else { const all=filteredItems(false); let pos=0,neg=0; all.forEach(d=>{ const a=d.amount||0; if(a>=0) pos+=a; else neg+=-a; });
+    el.innerHTML=`<div class="hfTot"><b>전체</b> <span class="pos">+${won(pos)}원</span>${neg?` <span class="neg">−${won(neg)}원</span>`:''}</div><div class="hfCmp muted">막대를 탭하면 그 달만 볼 수 있어요</div>`; }
+  el.hidden=false; }
+let _histShown=40;
+function renderHistFullList(){ const el=$("#histListFull"); if(!el) return; const all=filteredItems(false);
+  if(!all.length){ el.innerHTML='<div class="pr" style="color:var(--muted); padding:4px 2px">조건에 맞는 내역이 없어요.</div>'; return; }
+  const slice=all.slice(0,_histShown);
+  let html='';
+  if(histMonth){ const mm=histMonth.split('-')[1]; html+=`<button class="monClear" id="monClear" type="button">📅 ${mm}월만 보는 중 · 전체 보기 ✕</button>`; }
+  html+=groupedHtml(slice);
+  if(all.length>_histShown){ html+=`<button class="loadMore" id="histLoadMore" type="button">더 불러오기 <span>(${all.length-_histShown}개 남음)</span></button>`; }
+  el.innerHTML=html; }
+function loadMoreHist(){ const el=$("#histListFull"); const top=el?el.scrollTop:0; _histShown+=40; renderHistFullList(); if(el) el.scrollTop=top; }
+function openHistFull(){ const nm=$("#histFullName"); if(nm) nm.textContent=S.childName||''; _histShown=40; ensureMonthCollapse(); drawHistChart(); drawHistFullSummary(); drawFilterChips('histFullFilters'); renderHistFullList(); document.body.classList.add('modalview'); $("#histScrim").classList.add("show"); }
+function refreshHistFull(){ _histShown=40; drawHistChart(); drawHistFullSummary(); drawFilterChips('histFullFilters'); renderHistFullList(); }
 
 /* 알림·축하 */
 let toastT;
@@ -1947,6 +1999,12 @@ $("#histScrim").addEventListener("click",e=>{ if(e.target===$("#histScrim")){ $(
 $("#histListFull").addEventListener("click",e=>{ const h=e.target.closest("[data-mon]"); if(h){ const k=h.dataset.mon; if(collapsedMonths.has(k)) collapsedMonths.delete(k); else collapsedMonths.add(k); renderHistFullList(); } });
 $("#histFullFilters").addEventListener("click",e=>{ const b=e.target.closest("[data-t],[data-g]"); if(!b) return;
   if(b.dataset.t!==undefined && b.dataset.t!=='') histType=b.dataset.t; if(b.dataset.g!==undefined && b.dataset.g!=='') histGoal=b.dataset.g; refreshHistFull(); drawHistory(); });
+$("#histListFull").addEventListener("click",e=>{ if(e.target.closest("#histLoadMore")){ loadMoreHist(); return; } if(e.target.closest("#monClear")){ histMonth=null; _histShown=40; drawHistChart(); drawHistFullSummary(); renderHistFullList(); } });
+$("#histListFull").addEventListener("scroll",e=>{ const el=e.currentTarget; if(el.scrollTop+el.clientHeight>=el.scrollHeight-48){ const all=filteredItems(false); if(_histShown<all.length) loadMoreHist(); } });
+$("#histChart").addEventListener("click",e=>{ const col=e.target.closest("[data-ym]"); if(!col) return; const ym=col.dataset.ym;
+  histMonth = (histMonth===ym) ? null : ym; if(histMonth) collapsedMonths.delete(histMonth); _histShown=40; drawHistChart(); drawHistFullSummary(); renderHistFullList(); });
+$("#histSpanSeg").addEventListener("click",e=>{ const b=e.target.closest("[data-span]"); if(!b) return; histSpan=+b.dataset.span;
+  $("#histSpanSeg").querySelectorAll("[data-span]").forEach(x=>x.classList.toggle('on', x===b)); drawHistChart(); });
 $("#histFilters").addEventListener("click",e=>{ const b=e.target.closest("[data-t],[data-g]"); if(!b) return;
   if(b.dataset.t!==undefined && b.dataset.t!=='') histType=b.dataset.t; if(b.dataset.g!==undefined && b.dataset.g!=='') histGoal=b.dataset.g; drawHistory(); });
 setTimeout(()=>document.body.classList.remove('enter'),1700);
@@ -1985,6 +2043,25 @@ $("#kidAdd").onclick=async()=>{ const v=$("#newKid").value.trim(); if(!v){ toast
   const col=KIDPAL[children.length % KIDPAL.length]; const id=await db.addKid(v, col, children.length); children=await db.children(); $("#newKid").value=""; await loadChild(id); drawKids(); drawKidManage();
   const ni=$("#kidName"); if(ni) ni.value=S.childName; setKidTag(); toast("새 사용자 '"+v+"'을(를) 만들었어요.", false); };
 $("#scrim").addEventListener("click",e=>{ if(e.target===$("#scrim")) closeSettings(); });
+/* ESC·휴대폰 뒤로가기로 최상단 모달 닫기 (위에 있는 창부터) */
+const SCRIM_CLOSE=[
+  ['#authScrim', ()=>closeAuth(false)],
+  ['#confirmScrim', ()=>closeConf(false)],
+  ['#iconScrim', ()=>closeIcon()],
+  ['#goalEditScrim', ()=>closeGoalEdit()],
+  ['#goalActScrim', ()=>closeGoalAct()],
+  ['#histScrim', ()=>{ $("#histScrim").classList.remove("show"); if(!$("#recordScrim").classList.contains('show') && !$("#setScrim").classList.contains('show')) document.body.classList.remove('modalview'); }],
+  ['#setScrim', ()=>closeSet()],
+  ['#recordScrim', ()=>closeRecord()],
+  ['#scrim', ()=>closeSettings()],
+];
+function closeTopModal(){ for(const [sel,fn] of SCRIM_CLOSE){ const e=$(sel); if(e && e.classList.contains('show')){ try{ fn(); }catch(_){ e.classList.remove('show'); } return true; } } return false; }
+document.addEventListener("keydown", e=>{ if(e.key==='Escape' && closeTopModal()) e.preventDefault(); });
+(function(){ const scrims=SCRIM_CLOSE.map(([s])=>$(s)).filter(Boolean); let depth=0;
+  const cnt=()=>scrims.filter(s=>s.classList.contains('show')).length;
+  const sync=()=>{ const n=cnt(); if(n>depth){ for(let i=0;i<n-depth;i++){ try{ history.pushState({oinkyModal:1},''); }catch(_){} } } depth=n; };
+  try{ const mo=new MutationObserver(sync); scrims.forEach(s=>mo.observe(s,{attributes:true,attributeFilter:['class']})); }catch(_){}
+  window.addEventListener("popstate", ()=>{ if(cnt()>0){ closeTopModal(); depth=cnt(); } }); })();
 $("#kidPills").addEventListener("click",e=>{ const b=e.target.closest("[data-kid]"); if(b) loadChild(b.dataset.kid).then(openSettings); });
 $("#volRange").addEventListener("input", e=> setVol(+e.target.value, false));
 $("#volRange").addEventListener("change", e=> setVol(+e.target.value, true));
