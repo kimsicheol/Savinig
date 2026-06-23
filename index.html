@@ -13,6 +13,20 @@
 <link rel="apple-touch-icon" href="./icon-192.png" />
 <link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png" />
 <title>꿀꿀이 · Oinky</title>
+<meta name="description" content="모을수록 컬러로 차오르는 아이 저금통. 목표를 정하고 저축하면 흑백 그림이 컬러로 채워져요." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="꿀꿀이 Oinky" />
+<meta property="og:title" content="꿀꿀이 — 모을수록 컬러로 차오르는 저금통" />
+<meta property="og:description" content="목표를 정하고 저축하면 흑백 그림이 컬러로 차올라요. 아이가 스스로 모으고 싶어지는 저금통." />
+<meta property="og:url" content="https://savinig.vercel.app/" />
+<meta property="og:image" content="https://savinig.vercel.app/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="ko_KR" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="꿀꿀이 — 모을수록 컬러로 차오르는 저금통" />
+<meta name="twitter:description" content="목표를 정하고 저축하면 흑백 그림이 컬러로 차올라요." />
+<meta name="twitter:image" content="https://savinig.vercel.app/og.png" />
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 <style>
@@ -512,6 +526,42 @@
 <script>try{var _t=localStorage.getItem('theme'); if(_t==='warm'||_t==='light') document.documentElement.setAttribute('data-theme',_t);}catch(e){}</script>
 </head>
 <body class="enter">
+<script>
+(function(){
+  try{
+    var ua = navigator.userAgent || '', url = location.href, kind=null;
+    if(/KAKAOTALK/i.test(ua)) kind='kakao';
+    else if(/\bLine\//i.test(ua)) kind='line';
+    else if(/(NAVER|Instagram|FBAN|FBAV|FB_IAB|Snapchat|Daum|KAKAOSTORY|everytimeApp|Whale)/i.test(ua)) kind='other';
+    if(!kind) return;
+    function openExternal(){
+      if(kind==='kakao'){ location.href='kakaotalk://web/openExternalBrowser?url='+encodeURIComponent(url); return; }
+      if(kind==='line'){ location.href = url + (url.indexOf('?')>-1?'&':'?') + 'openExternalBrowser=1'; return; }
+      if(/Android/i.test(ua)){ try{ location.href='intent://'+url.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package=com.android.chrome;end'; return; }catch(e){} }
+      copyLink();
+    }
+    function copyLink(){ var ok=function(){ alert('주소를 복사했어요. 크롬/사파리 등 기본 브라우저에 붙여넣어 열어주세요.'); };
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(ok).catch(function(){ window.prompt('이 주소를 복사해 브라우저에 붙여넣어 주세요', url); }); }
+      else { window.prompt('이 주소를 복사해 브라우저에 붙여넣어 주세요', url); } }
+    if(kind==='kakao' || kind==='line'){ try{ openExternal(); }catch(e){} }
+    var show=function(){
+      if(document.getElementById('inAppBar')) return;
+      var bar=document.createElement('div'); bar.id='inAppBar';
+      bar.style.cssText='position:fixed;left:0;right:0;top:0;z-index:9999;background:#160F22;color:#fff;font:600 13px/1.45 system-ui,-apple-system,sans-serif;padding:11px 13px;display:flex;gap:9px;align-items:center;box-shadow:0 8px 22px rgba(0,0,0,.45)';
+      var msg=document.createElement('span'); msg.style.cssText='flex:1;min-width:0';
+      msg.innerHTML='구글 로그인은 앱 내 브라우저에서 막혀요. <b>기본 브라우저</b>로 열어주세요.';
+      var open=document.createElement('button'); open.textContent='기본 브라우저로 열기';
+      open.style.cssText='border:none;background:#F25C9A;color:#fff;font-weight:800;padding:8px 12px;border-radius:9px;cursor:pointer;white-space:nowrap';
+      open.onclick=openExternal;
+      var copy=document.createElement('button'); copy.textContent='복사'; copy.setAttribute('aria-label','링크 복사');
+      copy.style.cssText='border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-weight:800;padding:8px 11px;border-radius:9px;cursor:pointer;white-space:nowrap';
+      copy.onclick=copyLink;
+      bar.appendChild(msg); bar.appendChild(open); bar.appendChild(copy); document.body.appendChild(bar);
+    };
+    if(document.body) show(); else document.addEventListener('DOMContentLoaded', show);
+  }catch(e){}
+})();
+</script>
 <div class="app">
   <header class="topbar">
     <button class="brand" id="brandBtn" type="button" aria-label="목표 설정"><span class="logo"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M15,15 L11,6 L20,12 Z" fill="#F25C9A"/><path d="M33,15 L37,6 L28,12 Z" fill="#F25C9A"/><circle cx="24" cy="27" r="17" fill="#F25C9A"/><circle cx="15" cy="30" r="3.4" fill="#FF9EC0"/><circle cx="33" cy="30" r="3.4" fill="#FF9EC0"/><ellipse cx="24" cy="31" rx="9" ry="6.6" fill="#D6347B"/><ellipse cx="21" cy="31" rx="1.7" ry="2.5" fill="#7d1c47"/><ellipse cx="27" cy="31" rx="1.7" ry="2.5" fill="#7d1c47"/><circle cx="18.5" cy="22.5" r="2.5" fill="#241B36"/><circle cx="29.5" cy="22.5" r="2.5" fill="#241B36"/></svg></span>꿀꿀이<span class="gear">🎯</span></button>
