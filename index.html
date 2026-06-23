@@ -164,11 +164,15 @@
   .bankLbl{font-weight:800; font-size:15px; margin:0 2px 12px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
   .bankSub{font-size:12px; font-weight:600; color:var(--muted)}
   .amtRow{display:grid; grid-template-columns:repeat(5,1fr); gap:7px}
-  .amtRow.sub{margin-top:9px}
-  .amt{border:none; cursor:pointer; font-family:inherit; font-weight:800; border-radius:14px; transition:transform .1s, box-shadow .2s; letter-spacing:-.02em}
+  .modeSeg{display:inline-flex; gap:4px; margin:0 0 11px; background:var(--card-2); border:1px solid var(--line-2); border-radius:13px; padding:4px}
+  .modeSeg button{border:none; background:transparent; color:var(--muted); font-family:inherit; font-weight:800; font-size:13.5px; padding:8px 18px; border-radius:10px; cursor:pointer; transition:background .15s,color .15s}
+  .modeSeg button.on{color:#fff}
+  .modeSeg button[data-mode="add"].on{background:var(--grad)}
+  .modeSeg button[data-mode="sub"].on{background:linear-gradient(135deg,#6B7180,#535867)}
+  .amt{border:none; cursor:pointer; font-family:inherit; font-weight:800; border-radius:14px; transition:transform .1s, box-shadow .2s; letter-spacing:-.02em; padding:15px 3px; font-size:clamp(12px,3.4vw,17px)}
   .amt:active{transform:scale(.94)}
-  .amt.up{padding:16px 3px; font-size:clamp(12px,3.4vw,17px); background:var(--grad); color:#fff; box-shadow:0 12px 28px -14px var(--glow); border:1px solid rgba(255,255,255,.14)}
-  .amt.down{padding:10px 3px; font-size:clamp(11px,2.9vw,14px); background:var(--card-2); color:var(--muted); border:1px solid var(--line-2)}
+  .amtRow.add .amt{background:var(--grad); color:#fff; box-shadow:0 12px 28px -14px var(--glow); border:1px solid rgba(255,255,255,.14)}
+  .amtRow.sub .amt{background:var(--card-2); color:var(--ink); border:1px solid var(--line-2); box-shadow:none}
   .amt:disabled{opacity:.4; pointer-events:none}
   .pending{margin-top:12px; padding-top:12px; border-top:1px dashed var(--line-2); animation:risein .28s ease}
   .pending[hidden]{display:none}
@@ -289,8 +293,22 @@
   .photoBtn{flex:1; padding:14px; border:1.4px dashed var(--line-2); border-radius:12px; background:var(--card); color:var(--ink); font-family:inherit; font-weight:700; font-size:15px; cursor:pointer}
   .photoPrev{width:58px; height:58px; border-radius:12px; object-fit:contain; border:1px solid var(--line-2); background:rgba(255,255,255,.06)}
   .photoOpts{margin-top:10px; display:flex; flex-direction:column; gap:9px}
-  .recChip{margin-top:8px; align-self:flex-start; display:inline-block; font-size:12.5px; font-weight:700; color:var(--ink); background:var(--go-soft, rgba(242,92,154,.14)); border:1px solid rgba(242,92,154,.35); border-radius:999px; padding:6px 13px}
-  .recChip b{font-weight:800}
+  .recChip{margin-top:10px; display:flex; align-items:center; gap:9px; flex-wrap:wrap}
+  .recChip .recLbl{font-size:12.5px; font-weight:800; color:var(--ind)}
+  .recThumbs{display:flex; gap:7px}
+  .recThumb{position:relative; width:56px; min-height:64px; border-radius:12px; border:1.5px solid var(--line-2); background:var(--card-2); display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:6px 3px 5px}
+  .recThumb img{width:38px; height:38px; object-fit:contain}
+  .recName{font-size:10px; font-weight:700; color:var(--muted); line-height:1.1; max-width:50px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .recThumb.sel .recName{color:var(--ink)}
+  .recThumb.sel{border-color:var(--ind); box-shadow:0 0 0 2px rgba(242,92,154,.32)}
+  .recThumb.auto::after{content:'✨'; position:absolute; top:-8px; right:-7px; font-size:12px}
+  .recColors{margin-top:9px; display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+  .recColors .rcLbl{font-size:12px; font-weight:700; color:var(--muted)}
+  .recColors .rcDot{width:28px; height:28px; border-radius:50%; border:2px solid rgba(255,255,255,.45); cursor:pointer; padding:0}
+  .recColors .rcDot.sel{outline:2px solid #fff; outline-offset:1px}
+  .recChip .recSwap{margin-left:7px; border:none; background:transparent; color:var(--ind); font-family:inherit; font-weight:800; font-size:12px; cursor:pointer; text-decoration:underline; padding:0}
+  .iconTabs.flash{animation:pickFlash 1.1s ease}
+  @keyframes pickFlash{0%,100%{box-shadow:0 0 0 0 transparent}30%{box-shadow:0 0 0 3px rgba(242,92,154,.5)}}
   .poTog{display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:700; color:var(--ink); cursor:pointer}
   .poTog input{width:18px; height:18px; accent-color:var(--ind)}
   .bgSeg{display:flex; align-items:center; gap:6px; flex-wrap:wrap}
@@ -507,19 +525,16 @@
   <button class="btn next" id="nextGoalBtn" hidden>🎯 다음 목표 정하기</button>
   <div class="bank" id="bank">
     <div class="bankLbl">💰 저축하기 <span class="bankSub" id="bankSub">금액을 눌러 담고, 저축하기를 누르면 보호자 인증 후 저장돼요</span></div>
-    <div class="amtRow add">
-      <button class="amt up" data-amt="10">+10</button>
-      <button class="amt up" data-amt="100">+100</button>
-      <button class="amt up" data-amt="1000">+1,000</button>
-      <button class="amt up" data-amt="5000">+5,000</button>
-      <button class="amt up" data-amt="10000">+10,000</button>
+    <div class="modeSeg" id="modeSeg">
+      <button class="on" data-mode="add" type="button">＋ 담기</button>
+      <button data-mode="sub" type="button">－ 빼기</button>
     </div>
-    <div class="amtRow sub">
-      <button class="amt down" data-amt="-10">−10</button>
-      <button class="amt down" data-amt="-100">−100</button>
-      <button class="amt down" data-amt="-1000">−1,000</button>
-      <button class="amt down" data-amt="-5000">−5,000</button>
-      <button class="amt down" data-amt="-10000">−10,000</button>
+    <div class="amtRow add" id="amtRow">
+      <button class="amt" data-val="10">+10</button>
+      <button class="amt" data-val="100">+100</button>
+      <button class="amt" data-val="1000">+1,000</button>
+      <button class="amt" data-val="5000">+5,000</button>
+      <button class="amt" data-val="10000">+10,000</button>
     </div>
     <div class="pending" id="pending" hidden>
       <div class="pTop">
@@ -577,6 +592,7 @@
     <label style="margin-top:14px">새 목표 만들기</label>
     <input id="gName" type="text" placeholder="목표 이름 (예: 레고 세트)" />
     <div class="recChip" id="recChip" hidden></div>
+    <div class="recColors" id="recColors" hidden></div>
     <input id="gPrice" type="number" min="0" step="1000" inputmode="numeric" placeholder="가격 (원)" style="margin-top:10px" />
     <div class="photoRow">
       <button class="photoBtn" id="photoCam" type="button">📷 사진 찍기</button>
@@ -799,7 +815,8 @@ const ART={
       +`<rect x="350" y="172" width="52" height="46" rx="20" fill="${color}"/>`
       +`<rect x="298" y="252" width="20" height="44" rx="10" fill="${d}"/>`
       +`<g fill="${d}"><path d="M150,182 L168,150 L186,182 Z"/><path d="M188,170 L206,140 L224,170 Z"/><path d="M226,178 L244,150 L262,178 Z"/></g>`
-      +`<circle cx="320" cy="158" r="15" fill="#fff" class="ey"/><circle cx="324" cy="160" r="7.5" fill="#20232A" class="ey"/>`
+      +`<circle cx="320" cy="158" r="15" fill="#fff" class="ey"/><circle cx="324" cy="160" r="7.5" fill="#20232A" class="ey"/><circle cx="321" cy="156" r="2.6" fill="#fff"/>`
+      +`<circle cx="300" cy="192" r="11" fill="#FF9CC2" opacity="0.5"/>`
       +`<path d="M352,206 q22,8 46,1" fill="none" stroke="${d}" stroke-width="4" stroke-linecap="round"/>`;
     return wrap("0 0 420 400", inner);
   },
@@ -824,8 +841,9 @@ const ART={
         +`<circle cx="${x}" cy="${y}" r="8" fill="${ring}"/>`; });
     const inner=`<g stroke="${color}" stroke-width="18" stroke-linecap="round">${arms}</g>${rot}`
       +`<rect x="176" y="136" width="128" height="88" rx="26" fill="${color}"/>`
-      +`<rect x="196" y="150" width="88" height="34" rx="12" fill="${dk}"/>`
-      +`<circle cx="240" cy="208" r="15" fill="#20232A"/>`;
+      +`<rect x="194" y="150" width="92" height="40" rx="14" fill="#20232A"/>`
+      +`<circle cx="219" cy="170" r="9" fill="#6CE5C8"/><circle cx="261" cy="170" r="9" fill="#6CE5C8"/>`
+      +`<path d="M218,202 Q240,216 262,202" fill="none" stroke="${dk}" stroke-width="5" stroke-linecap="round"/>`;
     return wrap("0 0 480 360", inner);
   },
   gift(color){ const d=darken(color,.16);
@@ -839,6 +857,7 @@ const ART={
       +`<rect x="110" y="38" width="140" height="120" rx="26" fill="${color}"/>`
       +`<rect x="128" y="66" width="104" height="64" rx="14" fill="#20232A"/>`
       +`<circle cx="156" cy="98" r="13" fill="#6CE5C8" class="ey"/><circle cx="204" cy="98" r="13" fill="#6CE5C8" class="ey"/>`
+      +`<path d="M150,116 Q180,132 210,116" fill="none" stroke="#6CE5C8" stroke-width="6" stroke-linecap="round"/>`
       +`<rect x="92" y="168" width="176" height="150" rx="26" fill="${color}"/>`
       +`<rect x="128" y="196" width="104" height="64" rx="12" fill="${d}"/>`
       +`<rect x="50" y="180" width="34" height="110" rx="17" fill="${d}"/><rect x="276" y="180" width="34" height="110" rx="17" fill="${d}"/>`
@@ -849,8 +868,10 @@ const ART={
     const inner=`<rect x="114" y="16" width="52" height="34" rx="8" fill="#2A2118"/>`
       +`<rect x="126" y="40" width="28" height="200" rx="6" fill="#3A2E22"/>`
       +`<circle cx="140" cy="300" r="96" fill="${color}"/><circle cx="140" cy="216" r="68" fill="${color}"/>`
-      +`<circle cx="140" cy="266" r="27" fill="#20232A"/>`
-      +`<rect x="116" y="320" width="48" height="14" rx="4" fill="${d}"/>`
+      +`<circle cx="140" cy="250" r="22" fill="#20232A"/>`
+      +`<circle cx="118" cy="300" r="7" fill="#20232A"/><circle cx="162" cy="300" r="7" fill="#20232A"/>`
+      +`<path d="M120,322 Q140,338 160,322" fill="none" stroke="#20232A" stroke-width="4.5" stroke-linecap="round"/>`
+      +`<rect x="116" y="356" width="48" height="14" rx="4" fill="${d}"/>`
       +`<g stroke="#E8E4D7" stroke-width="1.6" opacity="0.85">${str}</g>`;
     return wrap("0 0 280 420", inner); },
   kickboard(color){ const d=darken(color,.16);
@@ -871,18 +892,19 @@ const ART={
       +`<circle cx="170" cy="112" r="66" fill="${color}"/>`
       +`<ellipse cx="170" cy="132" rx="34" ry="26" fill="${muz}"/>`
       +`<ellipse cx="170" cy="120" rx="11" ry="8" fill="#2B2B2E"/>`
+      +`<path d="M152,140 Q170,156 188,140" fill="none" stroke="#2B2B2E" stroke-width="4" stroke-linecap="round"/>`
+      +`<circle cx="132" cy="126" r="11" fill="#FF9CC2" opacity="0.5"/><circle cx="208" cy="126" r="11" fill="#FF9CC2" opacity="0.5"/>`
       +`<circle cx="146" cy="98" r="8" fill="#2B2B2E" class="ey"/><circle cx="194" cy="98" r="8" fill="#2B2B2E" class="ey"/>`;
     return wrap("0 0 340 360", inner); },
   car(color){ const d=darken(color,.16);
-    const inner=`<rect x="40" y="150" width="320" height="92" rx="26" fill="${color}"/>`
-      +`<path d="M100,152 L138,98 Q148,82 168,82 L252,82 Q272,82 285,100 L318,152 Z" fill="${color}"/>`
-      +`<path d="M152,150 L152,98 L208,98 L208,150 Z" fill="#CFE8FF"/>`
-      +`<path d="M224,150 L224,98 L252,98 Q266,98 274,110 L298,150 Z" fill="#CFE8FF"/>`
-      +`<rect x="40" y="206" width="320" height="20" rx="10" fill="${d}"/>`
-      +`<rect x="44" y="168" width="22" height="24" rx="7" fill="#FFE27A"/><rect x="334" y="168" width="22" height="24" rx="7" fill="#FF6B6B"/>`
-      +`<circle cx="122" cy="242" r="40" fill="#2A2B30"/><circle cx="122" cy="242" r="17" fill="#C6C8CE"/>`
-      +`<circle cx="284" cy="242" r="40" fill="#2A2B30"/><circle cx="284" cy="242" r="17" fill="#C6C8CE"/>`;
-    return wrap("0 0 400 300", inner); },
+    const inner=`<path d="M30,210 Q30,176 70,170 L120,168 Q150,120 210,118 L280,120 Q320,128 350,172 L372,182 Q384,188 384,206 L384,214 Q384,228 368,228 L40,228 Q30,228 30,214 Z" fill="${color}"/>`
+      +`<path d="M132,168 Q156,128 206,126 L262,128 Q300,132 322,168 Z" fill="#CFE8FF"/>`
+      +`<path d="M206,126 L210,168 L240,168 L235,127 Z" fill="#BCD9F2"/>`
+      +`<rect x="30" y="206" width="354" height="20" rx="10" fill="${d}"/>`
+      +`<rect x="40" y="186" width="26" height="20" rx="7" fill="#FFE27A"/><rect x="356" y="184" width="24" height="20" rx="7" fill="#FF6B6B"/>`
+      +`<circle cx="112" cy="226" r="40" fill="#2A2B30"/><circle cx="112" cy="226" r="17" fill="#C6C8CE"/>`
+      +`<circle cx="300" cy="226" r="40" fill="#2A2B30"/><circle cx="300" cy="226" r="17" fill="#C6C8CE"/>`;
+    return wrap("0 0 400 280", inner); },
   cake(color){ const d=darken(color,.16), cream='#FFF3F8';
     const inner=`<rect x="84" y="206" width="232" height="118" rx="22" fill="${color}"/>`
       +`<path d="M84,212 q29,26 58,0 q29,26 58,0 q29,26 58,0 q29,26 58,0 L316,236 L84,236 Z" fill="${cream}"/>`
@@ -922,8 +944,35 @@ const ART={
       +`<circle cx="96" cy="118" r="14" fill="#FFD86B"/><circle cx="200" cy="94" r="14" fill="#FFD86B"/><circle cx="304" cy="118" r="14" fill="#FFD86B"/>`
       +`<circle cx="138" cy="284" r="9" fill="#FF6B6B"/><circle cx="200" cy="284" r="9" fill="#5BC8FF"/><circle cx="262" cy="284" r="9" fill="#7BE0A0"/>`;
     return wrap("0 0 400 320", inner); },
+  plane(color){ const d=darken(color,.18);
+    const inner=`<circle cx="96" cy="196" r="26" fill="${color}"/><rect x="96" y="174" width="256" height="44" rx="22" fill="${color}"/>`
+      +`<path d="M158,174 L152,92 L186,92 L238,174 Z" fill="${color}"/><path d="M158,218 L152,300 L186,300 L238,218 Z" fill="${d}"/>`
+      +`<path d="M322,174 L316,132 L344,132 L354,174 Z" fill="${color}"/><rect x="334" y="180" width="30" height="32" rx="9" fill="${d}"/>`
+      +`<circle cx="120" cy="196" r="9" fill="#CFE8FF"/><circle cx="158" cy="196" r="8" fill="#CFE8FF"/><circle cx="196" cy="196" r="8" fill="#CFE8FF"/>`;
+    return wrap("0 0 400 360", inner); },
+  train(color){ const d=darken(color,.18);
+    const inner=`<rect x="60" y="150" width="210" height="130" rx="22" fill="${color}"/><rect x="80" y="100" width="110" height="62" rx="16" fill="${d}"/>`
+      +`<rect x="96" y="116" width="36" height="34" rx="8" fill="#CFE8FF"/><rect x="142" y="116" width="36" height="34" rx="8" fill="#CFE8FF"/>`
+      +`<rect x="214" y="78" width="34" height="50" rx="10" fill="${d}"/><ellipse cx="231" cy="74" rx="26" ry="12" fill="#E6E1EC"/>`
+      +`<circle cx="248" cy="214" r="48" fill="#FBF7F0"/>`
+      +`<circle cx="236" cy="206" r="7" fill="#3A2233"/><circle cx="262" cy="206" r="7" fill="#3A2233"/>`
+      +`<path d="M232,224 Q248,242 264,224" fill="none" stroke="#3A2233" stroke-width="5" stroke-linecap="round"/>`
+      +`<rect x="50" y="270" width="220" height="22" rx="11" fill="${d}"/>`
+      +`<circle cx="100" cy="296" r="26" fill="#2A2B30"/><circle cx="100" cy="296" r="11" fill="#C6C8CE"/><circle cx="180" cy="296" r="26" fill="#2A2B30"/><circle cx="180" cy="296" r="11" fill="#C6C8CE"/>`;
+    return wrap("0 0 320 330", inner); },
+  shoe(color){ const d=darken(color,.2), w='#FBF7F0';
+    const inner=`<path d="M64,200 Q64,150 116,150 Q150,150 170,182 L300,210 Q356,220 356,254 Q356,272 336,272 L88,272 Q64,272 64,250 Z" fill="${color}"/>`
+      +`<path d="M116,150 Q150,150 170,182 L150,196 Q132,168 116,168 Z" fill="${d}"/>`
+      +`<rect x="60" y="270" width="300" height="22" rx="11" fill="${w}"/>`
+      +`<path d="M150,200 L180,214 M168,196 L198,210 M186,194 L216,208" stroke="${w}" stroke-width="7" stroke-linecap="round"/>`;
+    return wrap("0 0 400 312", inner); },
+  headphone(color){ const d=darken(color,.2);
+    const inner=`<path d="M80,212 Q80,82 200,82 Q320,82 320,212" fill="none" stroke="${color}" stroke-width="30" stroke-linecap="round"/>`
+      +`<rect x="56" y="196" width="60" height="104" rx="22" fill="${color}"/><rect x="284" y="196" width="60" height="104" rx="22" fill="${color}"/>`
+      +`<rect x="70" y="212" width="34" height="74" rx="14" fill="${d}"/><rect x="296" y="212" width="34" height="74" rx="14" fill="${d}"/>`;
+    return wrap("0 0 400 320", inner); },
 };
-const ICON_KW=[['bike',['자전거','바이크','bike','세발']],['game',['게임','닌텐도','스위치','플스','콘솔','switch','playstation','엑스박스']],['dino',['공룡','다이노','dino','티라노']],['robot',['로봇','robot','변신','건담','메카']],['guitar',['기타','guitar','우쿨','베이스','악기']],['kickboard',['킥보드','스쿠터','scooter','kickboard']],['teddy',['인형','곰인형','테디','teddy','doll','피규어']],['ball',['축구','농구','야구','배구','볼','공','ball']],['drone',['드론','drone','쿼드']],['car',['자동차','rc카','미니카','경주차','car']],['cake',['케이크','생일케이크','cake']],['rocket',['로켓','우주선','rocket']],['book',['책','도서','동화','전집','만화책','book']],['phone',['휴대폰','핸드폰','스마트폰','아이폰','갤럭시','폰','phone','iphone']],['star',['별','스타','star']],['crown',['왕관','공주','여왕','crown','princess']],['gift',['선물','gift','상자','present']]];
+const ICON_KW=[['bike',['자전거','바이크','bike','세발']],['game',['게임','닌텐도','스위치','플스','콘솔','switch','playstation','엑스박스','마인크래프트','마크','로블록스','브롤스타즈','브롤','마리오','젤다','카트라이더','메이플','포트나이트','오락']],['dino',['공룡','다이노','dino','티라노']],['robot',['로봇','robot','변신','건담','메카','또봇','카봇','트랜스포머','파워레인저']],['guitar',['기타','guitar','우쿨','베이스','악기']],['kickboard',['킥보드','스쿠터','scooter','kickboard']],['teddy',['인형','곰인형','테디','teddy','doll','피규어','콩순이']],['ball',['축구','농구','야구','배구','볼','공','ball']],['drone',['드론','drone','쿼드']],['car',['자동차','rc카','미니카','경주차','car','람보르기니','페라리','포르쉐']],['plane',['비행기','항공기','airplane','plane']],['train',['기차','열차','토마스','train']],['shoe',['운동화','신발','스니커즈','구두','크록스','shoes','sneaker']],['headphone',['헤드폰','헤드셋','이어폰','에어팟','버즈','headphone','earphone','airpod']],['cake',['케이크','생일케이크','cake']],['rocket',['로켓','우주선','rocket']],['book',['책','도서','동화','전집','만화책','book']],['phone',['휴대폰','핸드폰','스마트폰','아이폰','갤럭시','폰','phone','iphone']],['star',['별','스타','star']],['crown',['왕관','공주','여왕','crown','princess']],['gift',['선물','gift','상자','present']]];
 const WEAK=new Set(['인형','장난감','toy','doll','피규어']);
 function iconFromName(name){ const n=(name||'').toLowerCase(); let best=null, score=-1;
   for(const [k,ws] of ICON_KW){ for(const w of ws){ const p=n.lastIndexOf(w.toLowerCase());
@@ -1000,7 +1049,19 @@ const EMOJI_KW=[
   ['🏕️',['캠핑','텐트','camp','tent']],
   ['🔭',['망원경','telescope']],
   ['🔬',['현미경','과학키트','microscope']],
-  ['🧪',['실험','과학','science']]
+  ['🧪',['실험','과학','science']],
+  ['🐧',['뽀로로','펭귄','penguin']],
+  ['🦈',['아기상어','핑크퐁','상어','shark']],
+  ['🚌',['타요','버스','bus']],
+  ['🦁',['라이언','카카오프렌즈','사자','lion']],
+  ['🍑',['어피치','복숭아','peach']],
+  ['❄️',['엘사','겨울왕국','frozen','올라프','눈사람']],
+  ['🕷️',['스파이더맨','거미','spiderman']],
+  ['🦸',['마블','어벤져스','아이언맨','캡틴','히어로','영웅','hero']],
+  ['🐭',['미키','미키마우스','mickey','쥐']],
+  ['⚡',['피카츄','포켓몬','pikachu','pokemon']],
+  ['🐰',['마이멜로디','산리오','쿠로미','토끼','rabbit','bunny']],
+  ['🐱',['헬로키티','키티','고양이','냥','cat']]
 ];
 function emojiFromName(name){ const n=(name||'').toLowerCase().trim(); if(!n) return null; let best=null, blen=0;
   for(const [em,ws] of EMOJI_KW){ for(const w of ws){ if(n.includes(w.toLowerCase()) && w.length>blen){ blen=w.length; best=em; } } }
@@ -1011,6 +1072,37 @@ function recommendInfo(name){ const nm=(name||'').trim(); if(!nm) return null;
   const n=nm.toLowerCase(); let best=null, blen=0;
   for(const [em,ws] of EMOJI_KW){ for(const w of ws){ if(n.includes(w.toLowerCase()) && w.length>blen){ blen=w.length; best=em+' '+ws[0]; } } }
   return best; }
+function emojiSrc(e){ if(!emojiCache[e]) emojiCache[e]=emojiArt(e); return emojiCache[e].src; }
+function bestForToken(tok){ const ic=iconFromName(tok); if(ic) return {type:'icon',key:ic}; const em=emojiFromName(tok); if(em) return {type:'emoji',emoji:em}; return null; }
+function recommendList(name){ const nm=(name||'').trim(); const out=[]; const seen=new Set();
+  const add=c=>{ if(!c) return; const id=c.type+(c.key||c.emoji); if(!seen.has(id)){ seen.add(id); out.push(c); } };
+  if(nm){ const n=nm.toLowerCase();
+    const toks=nm.split(/[\s,·]+/).filter(Boolean);
+    if(toks.length>1) toks.forEach(t=>add(bestForToken(t)));
+    add(bestForToken(nm));
+    const ems=[]; for(const [em,ws] of EMOJI_KW){ let bl=0; for(const w of ws){ if(n.includes(w.toLowerCase())&&w.length>bl) bl=w.length; } if(bl) ems.push([em,bl]); }
+    ems.sort((a,b)=>b[1]-a[1]); ems.forEach(([em])=>add({type:'emoji',emoji:em}));
+    const ics=[]; for(const [k,ws] of ICON_KW){ let bl=0; for(const w of ws){ if(n.includes(w.toLowerCase())&&w.length>bl) bl=w.length; } if(bl) ics.push([k,bl]); }
+    ics.sort((a,b)=>b[1]-a[1]); ics.forEach(([k])=>add({type:'icon',key:k}));
+  }
+  for(const k of ['gift','star','ball','cake']){ if(out.length>=4) break; add({type:'icon',key:k}); }
+  return out.slice(0,4); }
+function candLabel(c){ if(c.type==='icon'){ const l=ICON_LABEL[c.key]; if(l){ const sp=l.indexOf(' '); return sp>=0? l.slice(sp+1):l; } return c.key; }
+  for(const [em,ws] of EMOJI_KW){ if(em===c.emoji) return ws[0]; } return ''; }
+function drawRecStrip(){ const rc=$("#recChip"); if(!rc) return;
+  const nm=$("#gName").value.trim();
+  if(pendingPhoto || !nm){ rc.hidden=true; rc.innerHTML=''; const cb=$("#recColors"); if(cb) cb.hidden=true; return; }
+  const list=recommendList(nm); if(!list.length){ rc.hidden=true; rc.innerHTML=''; return; }
+  const auto = !pickIcon && !pickEmoji;
+  const autoIcon = auto ? iconFromName(nm) : null;
+  const autoEmoji = (auto && !autoIcon) ? emojiFromName(nm) : null;
+  const thumbs=list.map(c=>{ const sel = c.type==='icon' ? (c.key===pickIcon) : (c.emoji===pickEmoji);
+    const isAuto = c.type==='icon' ? (c.key===autoIcon) : (c.emoji===autoEmoji);
+    const src = c.type==='icon' ? ART[c.key](newColorSel).src : emojiSrc(c.emoji);
+    const attr = c.type==='icon' ? `data-pick-icon="${c.key}"` : `data-pick-emoji="${c.emoji}"`;
+    return `<button type="button" class="recThumb${sel?' sel':''}${isAuto?' auto':''}" ${attr}><img src="${src}" alt=""><span class="recName">${candLabel(c)}</span></button>`; }).join("");
+  rc.innerHTML='<span class="recLbl">✨ 추천</span><div class="recThumbs">'+thumbs+'</div><button type="button" class="recSwap" id="recSwap">더 고르기 →</button>';
+  rc.hidden=false; }
 
 /* 꿀꿀이 마스코트 — 채움용 이미지(흑백→컬러로 차오름). 그림 경계에 꽉 차도록 viewBox 타이트하게 */
 const _OINKY_INNER =
@@ -1635,7 +1727,7 @@ function setMainArt(a){ const base=$("#artGray"), col=$("#artColor"), wrap=$("#a
   setArtSize(a.aspect);
   col.style.opacity='1'; col.style.setProperty('--lvl','112%'); $("#surface").style.opacity='0'; }
 function updatePreview(){ const a=previewSrc(); $("#formPrevImg").src=a.src; $("#art").style.setProperty('--prevcol', newColorSel); document.documentElement.style.setProperty('--goalcol', newColorSel);
-  const rc=$("#recChip"); if(rc){ if(pendingPhoto||pickIcon||pickEmoji){ rc.hidden=true; } else { const info=recommendInfo($("#gName").value); if(info){ rc.innerHTML='✨ 추천 그림: <b>'+info+'</b>'; rc.hidden=false; } else rc.hidden=true; } } }
+  const rc=$("#recChip"); if(rc){ drawRecStrip(); } }
 const closeSettings=()=>{ document.body.classList.remove('sheet'); $("#scrim").classList.remove("show"); render(); };
 function celebrate(big){ const art=$("#art"); if(!art) return;
   art.classList.remove('pop','big'); void art.offsetWidth; art.classList.add('pop'); if(big) art.classList.add('big');
@@ -1756,11 +1848,19 @@ function drawEmoji(){ $("#emojiPick").innerHTML=EMOJIS.map(e=>`<button data-e="$
 function clearPhoto(){ pendingPhoto=null; _lastPhotoFile=null; $("#photoPrev").hidden=true; $("#photoPrev").src=""; const cm=$("#photoCam"), up=$("#photoUp"); if(cm) cm.textContent="📷 사진 찍기"; if(up) up.textContent="🖼️ 앨범에서"; }
 
 /* 이벤트 */
-$("#bank").addEventListener("click",e=>{ const b=e.target.closest("[data-amt]"); if(b) addPending(+b.dataset.amt, b); });
+let saveMode='add';
+function fmtAmtBtns(){ const sign = saveMode==='sub'?'−':'+'; document.querySelectorAll('#amtRow .amt').forEach(b=>{ b.textContent = sign + won(+b.dataset.val); }); }
+function setSaveMode(m){ saveMode=m; const seg=$("#modeSeg"); if(seg) seg.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('on', x.dataset.mode===m));
+  const row=$("#amtRow"); if(row){ row.classList.toggle('sub', m==='sub'); row.classList.toggle('add', m!=='sub'); }
+  const sub=$("#bankSub"); if(sub) sub.textContent = m==='sub' ? '잘못 담았을 때 금액을 빼서 바로잡을 수 있어요' : '금액을 눌러 담은 뒤 저축하기를 누르면 보호자 인증 후 저장돼요';
+  fmtAmtBtns(); }
+$("#bank").addEventListener("click",e=>{ const md=e.target.closest("[data-mode]"); if(md){ setSaveMode(md.dataset.mode); return; }
+  const b=e.target.closest("[data-val]"); if(b){ addPending(+b.dataset.val * (saveMode==='sub'?-1:1), b); } });
+setSaveMode('add');
 $("#doneClose").onclick=closeDoneOverlay;
 $("#doneNext").onclick=()=>{ closeDoneOverlay(); continueAfterGoal(); };
 $("#doneNew").onclick=()=>{ closeDoneOverlay(); suggestNewGoal(active()); };
-document.addEventListener("click",e=>{ const b=e.target.closest('button,[role="button"]'); if(!b) return; if(b.hasAttribute('data-amt')) return; fxClick(); });
+document.addEventListener("click",e=>{ const b=e.target.closest('button,[role="button"]'); if(!b) return; if(b.hasAttribute('data-val')) return; fxClick(); });
 $("#pendSave").onclick=saveDeposit; $("#pendClear").onclick=clearPending;
 $("#bioBtn").onclick=onBio;
 $("#keypad").addEventListener("click",e=>{ const b=e.target.closest("[data-k]"); if(b) onKey(b.dataset.k); });
@@ -1924,6 +2024,26 @@ $("#photoCam").onclick=()=>$("#photoInput").click();
 $("#photoUp").onclick=()=>$("#photoInputGal").click();
 $("#photoInput").addEventListener("change", e=>{ const f=e.target.files&&e.target.files[0]; handlePhotoFile(f); e.target.value=""; });
 $("#photoInputGal").addEventListener("change", e=>{ const f=e.target.files&&e.target.files[0]; handlePhotoFile(f); e.target.value=""; });
+let _recPressTimer=null, _recLong=false, recColorFor=null;
+function candFromThumb(t){ if(t.dataset.pickIcon) return {type:'icon',key:t.dataset.pickIcon}; if(t.dataset.pickEmoji) return {type:'emoji',emoji:t.dataset.pickEmoji}; return null; }
+function openRecColors(cand){ recColorFor=cand; const box=$("#recColors"); if(!box) return;
+  box.innerHTML='<span class="rcLbl">🎨 색상</span>'+PAL.map(c=>`<button type="button" class="rcDot${c===newColorSel?' sel':''}" data-rcol="${c}" style="background:${c}"></button>`).join('');
+  box.hidden=false; }
+$("#recChip").addEventListener("touchstart", e=>{ const t=e.target.closest(".recThumb"); if(!t) return; _recLong=false; clearTimeout(_recPressTimer); _recPressTimer=setTimeout(()=>{ _recLong=true; openRecColors(candFromThumb(t)); }, 450); }, {passive:true});
+["touchend","touchmove","touchcancel"].forEach(ev=>$("#recChip").addEventListener(ev, ()=>clearTimeout(_recPressTimer)));
+$("#recChip").addEventListener("contextmenu", e=>{ const t=e.target.closest(".recThumb"); if(t){ e.preventDefault(); openRecColors(candFromThumb(t)); } });
+$("#recChip").addEventListener("click", e=>{
+  if(_recLong){ _recLong=false; return; }
+  const cb=$("#recColors"); if(cb) cb.hidden=true;
+  const ic=e.target.closest("[data-pick-icon]");
+  if(ic){ pickIcon=ic.dataset.pickIcon; pickEmoji=null; clearPhoto(); drawIconPick(); drawEmoji(); updatePreview(); return; }
+  const em=e.target.closest("[data-pick-emoji]");
+  if(em){ pickEmoji=em.dataset.pickEmoji; pickIcon=null; clearPhoto(); drawEmoji(); drawIconPick(); updatePreview(); return; }
+  if(e.target.closest("#recSwap")){ const t=$("#iconTabs"); if(t){ try{ t.scrollIntoView({block:'center',behavior:'smooth'}); }catch(_){} t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash'); } }
+});
+$("#recColors").addEventListener("click", e=>{ const b=e.target.closest("[data-rcol]"); if(!b) return; newColorSel=b.dataset.rcol;
+  if(recColorFor){ if(recColorFor.type==='icon'){ pickIcon=recColorFor.key; pickEmoji=null; } else { pickEmoji=recColorFor.emoji; pickIcon=null; } clearPhoto(); }
+  drawColor('newColor',newColorSel); drawIconPick(); drawEmoji(); updatePreview(); $("#recColors").hidden=true; });
 $("#optSquare").addEventListener("change", e=>{ optSquare=e.target.checked; if(_lastPhotoFile) reprocessPhoto(); });
 $("#bgSeg").addEventListener("click", e=>{ const b=e.target.closest('[data-tol]'); if(!b) return; bgTol=+b.dataset.tol; $("#bgSeg").querySelectorAll('[data-tol]').forEach(x=>x.classList.toggle('on', x===b)); if(_lastPhotoFile) reprocessPhoto(); });
 $("#iconTabs").addEventListener("click",e=>{ const b=e.target.closest("[data-cat]"); if(b){ catSel=+b.dataset.cat; drawIconTabs(); drawIconPick(); }});
