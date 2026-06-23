@@ -113,8 +113,17 @@
   .art .surface{position:absolute; left:9%; right:9%; bottom:0; height:2px; border-radius:3px;
     background:var(--surf-bg); box-shadow:var(--surf-sh);
     transition:bottom .6s cubic-bezier(.22,1,.36,1); opacity:0; pointer-events:none}
+  .art .surface::before{content:""; position:absolute; left:-4%; right:-4%; top:-1px; height:4px; border-radius:4px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.85), transparent); background-size:60% 100%;
+    mix-blend-mode:screen; opacity:.7}
+  .art .surface::after{content:""; position:absolute; left:18%; bottom:1px; width:6px; height:6px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.9), rgba(255,255,255,.15)); opacity:0}
   @keyframes bob{0%,100%{transform:translateY(1.5px)}50%{transform:translateY(-2px)}}
-  @media(prefers-reduced-motion:no-preference){ .art .surface{animation:bob 3s ease-in-out infinite} }
+  @keyframes shimmer{0%{background-position:-60% 0}100%{background-position:160% 0}}
+  @keyframes bubble{0%{opacity:0; transform:translateY(0) scale(.6)}20%{opacity:.9}100%{opacity:0; transform:translateY(-22px) scale(1)}}
+  @media(prefers-reduced-motion:no-preference){ .art .surface{animation:bob 3s ease-in-out infinite}
+    .art .surface::before{animation:shimmer 2.6s linear infinite}
+    .art .surface::after{animation:bubble 2.8s ease-in infinite} }
   @property --p0{ syntax:'<percentage>'; inherits:false; initial-value:0%; }
   @property --p1{ syntax:'<percentage>'; inherits:false; initial-value:0%; }
   .art .prev{ --p0:0%; --p1:0%; opacity:0; transition:opacity .25s ease, --p0 .35s cubic-bezier(.22,1,.36,1), --p1 .35s cubic-bezier(.22,1,.36,1);
@@ -154,12 +163,12 @@
   .bank{background:var(--card); border:1px solid var(--line-2); border-radius:var(--r); padding:14px; box-shadow:var(--shadow)}
   .bankLbl{font-weight:800; font-size:15px; margin:0 2px 12px; display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
   .bankSub{font-size:12px; font-weight:600; color:var(--muted)}
-  .amtRow{display:grid; grid-template-columns:repeat(4,1fr); gap:9px}
+  .amtRow{display:grid; grid-template-columns:repeat(5,1fr); gap:7px}
   .amtRow.sub{margin-top:9px}
-  .amt{border:none; cursor:pointer; font-family:inherit; font-weight:800; border-radius:14px; transition:transform .1s, box-shadow .2s; letter-spacing:-.01em}
+  .amt{border:none; cursor:pointer; font-family:inherit; font-weight:800; border-radius:14px; transition:transform .1s, box-shadow .2s; letter-spacing:-.02em}
   .amt:active{transform:scale(.94)}
-  .amt.up{padding:18px 6px; font-size:18px; background:var(--grad); color:#fff; box-shadow:0 12px 28px -14px var(--glow); border:1px solid rgba(255,255,255,.14)}
-  .amt.down{padding:11px 6px; font-size:14px; background:var(--card-2); color:var(--muted); border:1px solid var(--line-2)}
+  .amt.up{padding:16px 3px; font-size:clamp(12px,3.4vw,17px); background:var(--grad); color:#fff; box-shadow:0 12px 28px -14px var(--glow); border:1px solid rgba(255,255,255,.14)}
+  .amt.down{padding:10px 3px; font-size:clamp(11px,2.9vw,14px); background:var(--card-2); color:var(--muted); border:1px solid var(--line-2)}
   .amt:disabled{opacity:.4; pointer-events:none}
   .pending{margin-top:12px; padding-top:12px; border-top:1px dashed var(--line-2); animation:risein .28s ease}
   .pending[hidden]{display:none}
@@ -263,11 +272,18 @@
   .ordbtn:disabled{opacity:.3; cursor:default}
 
   .shelf{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px}
-  .done{width:98px; padding:10px 8px; border:1px solid var(--line); border-radius:14px; background:var(--card); text-align:center; cursor:pointer; position:relative}
+  .coinPile{position:absolute; left:6%; right:6%; bottom:5%; height:52%; pointer-events:none; z-index:3; cursor:pointer}
+  .coinPile img,.coinPile .pc{position:absolute; width:16px; height:16px; object-fit:contain; transform:translateX(-50%); filter:drop-shadow(0 2px 3px rgba(0,0,0,.4)); opacity:.86; transition:bottom .4s cubic-bezier(.22,1,.36,1)}
+  .coinPile .pc{border-radius:50%; background:radial-gradient(circle at 36% 32%, #FFE27A, #F4B740 58%, #C98A12); display:grid; place-items:center; font-size:10px; font-weight:900; color:#7a5200}
+  .dnRec{display:block; font-size:11px; color:var(--muted); font-weight:700; margin-top:2px; white-space:normal; line-height:1.35}
+  .done{width:108px; padding:10px 8px; border:1px solid var(--line); border-radius:14px; background:var(--card); text-align:center; cursor:pointer; position:relative}
   .done.on{border-color:rgba(242,92,154,.55); background:var(--go-soft)}
-  .done img{width:62px; height:62px; object-fit:contain; display:block; margin:0 auto 4px}
+  .done img{width:58px; height:58px; object-fit:contain; display:block; margin:0 auto 4px}
   .done .dn{display:block; font-size:12px; font-weight:700; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
   .done .ck{display:block; font-size:11px; color:var(--emerald); font-weight:700; margin-top:2px}
+  .done .dctl{display:flex; gap:5px; justify-content:center; margin-top:7px}
+  .done .dbtn{flex:1; border:1px solid var(--line-2); background:var(--card-2); color:var(--ink); border-radius:8px; padding:6px 0; font-size:11.5px; font-weight:700; cursor:pointer; font-family:inherit; line-height:1}
+  .done .dbtn.del{flex:0 0 32px; border-color:rgba(224,86,75,.4); color:#E0564B}
 
   .photoRow{display:flex; align-items:center; gap:12px; margin-top:8px}
   .photoBtn{flex:1; padding:14px; border:1.4px dashed var(--line-2); border-radius:12px; background:var(--card); color:var(--ink); font-family:inherit; font-weight:700; font-size:15px; cursor:pointer}
@@ -323,6 +339,9 @@
   .volMute{font-size:18px; background:none; border:none; color:var(--ink); cursor:pointer; padding:2px 4px; line-height:1; border-radius:8px; transition:transform .12s}
   .volMute:active{transform:scale(.88)}
   .setRow{display:flex; align-items:center; gap:12px; margin:6px 0 4px}
+  .richSeg{display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:10px; background:var(--card-2); border:1px solid var(--line); border-radius:12px; padding:4px}
+  .richBtn{border:none; background:transparent; color:var(--muted); font-family:inherit; font-weight:700; font-size:13px; padding:9px 4px; border-radius:9px; cursor:pointer; transition:background .15s, color .15s}
+  .richBtn.on{background:var(--grad); color:#fff; box-shadow:0 8px 18px -10px var(--glow)}
   .setLbl{font-weight:700; color:var(--muted)}
   .userRow{display:flex; gap:8px; align-items:center; margin-top:8px}
   .userRow input{flex:1; margin:0}
@@ -333,6 +352,40 @@
   .bigStat.done em{color:#FBBF24}
   .bigStat.pop{animation:statPop .7s cubic-bezier(.22,1,.36,1)}
   @keyframes statPop{0%{scale:1}45%{scale:1.3}100%{scale:1}}
+  /* 동전 낙하 */
+  .coin{position:fixed; z-index:96; width:30px; height:30px; border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle at 36% 32%, #FFE27A, #F4B740 58%, #C98A12); color:#7a5200; font-weight:900; font-size:16px;
+    display:grid; place-items:center; box-shadow:0 4px 10px -3px rgba(0,0,0,.5), inset 0 0 0 2px rgba(255,255,255,.35); will-change:transform,opacity}
+  .coin.coinImg{width:34px; height:34px; border-radius:0; background:none; box-shadow:none; object-fit:contain; filter:drop-shadow(0 5px 8px rgba(0,0,0,.45))}
+  /* 레벨업 배지 */
+  .levelBadge{position:fixed; left:50%; top:34%; transform:translate(-50%,-50%) scale(.5); z-index:140; pointer-events:none; opacity:0;
+    padding:14px 26px; border-radius:20px; text-align:center; background:linear-gradient(135deg,#FF8A3D,#F25C9A); color:#fff;
+    box-shadow:0 22px 50px -16px rgba(242,92,154,.8); transition:transform .42s cubic-bezier(.2,1.5,.4,1), opacity .3s}
+  .levelBadge.show{opacity:1; transform:translate(-50%,-50%) scale(1)}
+  .levelBadge b{display:block; font-family:'Jua',sans-serif; font-size:26px; letter-spacing:.02em}
+  .levelBadge span{display:block; font-size:14px; font-weight:700; margin-top:2px; opacity:.95}
+  /* 목표 달성 풀스크린 */
+  .doneOverlay{position:fixed; inset:0; z-index:200; display:flex; align-items:center; justify-content:center; padding:24px;
+    background:radial-gradient(circle at 50% 36%, rgba(242,92,154,.28), rgba(20,14,30,.86) 70%); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    opacity:0; visibility:hidden; transition:opacity .4s, visibility .4s}
+  .doneOverlay.show{opacity:1; visibility:visible}
+  .doneCard{text-align:center; max-width:340px; width:100%; display:flex; flex-direction:column; align-items:center; gap:6px}
+  .doneCrown{font-size:46px; filter:drop-shadow(0 6px 10px rgba(0,0,0,.4)); margin-bottom:-10px; opacity:0}
+  @keyframes crownDrop{0%{transform:translateY(-150px) rotate(-30deg) scale(.5); opacity:0}55%{opacity:1}72%{transform:translateY(8px) rotate(9deg) scale(1.12)}100%{transform:translateY(0) rotate(-6deg) scale(1); opacity:1}}
+  @keyframes crownBob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-7px) rotate(6deg)}}
+  .doneArt{width:160px; height:160px; object-fit:contain; filter:drop-shadow(0 16px 26px rgba(0,0,0,.45))}
+  @keyframes doneHop{0%,100%{transform:translateY(0) scale(1)}28%{transform:translateY(-26px) scale(1.05,.95)}55%{transform:translateY(0) scale(1.02,.98)}72%{transform:translateY(-10px)}}
+  .doneOverlay.show .doneCrown{animation:crownDrop .85s cubic-bezier(.3,1.5,.5,1) forwards, crownBob 1.8s ease-in-out 1.1s infinite}
+  .doneOverlay.show .doneArt{animation:doneHop 1s ease-in-out .2s infinite}
+  .fw{position:fixed; width:9px; height:9px; border-radius:50%; z-index:205; pointer-events:none}
+  .doneTitle{font-size:40px; color:#FFD86B; margin-top:6px; text-shadow:0 4px 0 rgba(0,0,0,.18)}
+  .doneName{font-size:20px; font-weight:800; color:#fff}
+  .doneSub{font-size:14px; color:rgba(255,255,255,.8); margin:2px 0 14px}
+  .doneStats{display:flex; gap:8px; justify-content:center; margin:8px 0 2px; flex-wrap:wrap}
+  .doneStat{background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.16); border-radius:12px; padding:8px 14px; color:#fff; font-weight:800; font-size:14px}
+  .doneStat b{color:#FFD86B; font-family:'Jua',sans-serif; font-size:18px; margin-right:3px}
+  .doneCard .mbtn{width:100%; max-width:280px}
+  @media (prefers-reduced-motion:reduce){ .coin{display:none} .fw{display:none} .doneArt,.doneCrown{animation:none; opacity:1} }
   .pctStat{position:absolute; right:12px; bottom:50%; transform:translateY(-8px); z-index:4; pointer-events:none; white-space:nowrap; transition:bottom .5s cubic-bezier(.22,1,.36,1)}
   .pctStat b{font-family:'Jua',sans-serif; font-weight:400; font-size:clamp(22px,6.8vw,40px); color:var(--ind); line-height:1; text-shadow:0 2px 4px rgba(0,0,0,.6), 0 0 16px rgba(0,0,0,.7), 0 0 22px rgba(242,92,154,.45)}
   .pctStat::before{content:""; display:inline-block; width:9px; height:9px; border-radius:50%; background:var(--ind); box-shadow:0 0 10px var(--ind); margin-right:7px; vertical-align:middle; transform:translateY(-2px)}
@@ -426,6 +479,7 @@
       <img class="layer prev" id="artPrev" alt="" aria-hidden="true" />
       <div class="prevline" id="prevline" aria-hidden="true"><b id="prevlbl"></b></div>
       <div class="surface" id="surface"></div>
+      <div class="coinPile" id="coinPile" aria-hidden="true"></div>
       <div class="bigStat" id="bigStat" aria-hidden="true"><em id="bigAmt">0원</em></div>
       <div class="pctStat" id="pctStat" aria-hidden="true"><b id="bigPct">0%</b></div>
       <div class="needStat" id="needStat" aria-hidden="true">더 모을 돈 <b id="needAmt">0원</b></div>
@@ -445,12 +499,14 @@
   <div class="bank" id="bank">
     <div class="bankLbl">💰 저축하기 <span class="bankSub" id="bankSub">금액을 눌러 담고, 저축하기를 누르면 보호자 인증 후 저장돼요</span></div>
     <div class="amtRow add">
+      <button class="amt up" data-amt="10">+10</button>
       <button class="amt up" data-amt="100">+100</button>
       <button class="amt up" data-amt="1000">+1,000</button>
       <button class="amt up" data-amt="5000">+5,000</button>
       <button class="amt up" data-amt="10000">+10,000</button>
     </div>
     <div class="amtRow sub">
+      <button class="amt down" data-amt="-10">−10</button>
       <button class="amt down" data-amt="-100">−100</button>
       <button class="amt down" data-amt="-1000">−1,000</button>
       <button class="amt down" data-amt="-5000">−5,000</button>
@@ -485,6 +541,20 @@
   </div>
 </div>
 
+<div class="doneOverlay" id="doneOverlay">
+  <div class="doneCard">
+    <div class="doneCrown">👑</div>
+    <img class="doneArt" id="doneOvArt" alt="" />
+    <div class="doneTitle jua">목표 달성!</div>
+    <div class="doneName" id="doneOvName"></div>
+    <div class="doneStats" id="doneOvStats"></div>
+    <div class="doneSub">정말 잘했어요! 다음 목표도 모아볼까요?</div>
+    <button class="mbtn primary" id="doneNext">🎯 다음 목표</button>
+    <button class="mbtn ghost" id="doneNew">➕ 새 목표 만들기</button>
+    <button class="mbtn ghost" id="doneClose">닫기</button>
+  </div>
+</div>
+
 <div class="scrim" id="scrim">
   <div class="modal" role="dialog" aria-modal="true" aria-label="목표 설정">
     <h2 class="jua">목표 설정</h2>
@@ -499,10 +569,12 @@
     <input id="gName" type="text" placeholder="목표 이름 (예: 레고 세트)" />
     <input id="gPrice" type="number" min="0" step="1000" inputmode="numeric" placeholder="가격 (원)" style="margin-top:10px" />
     <div class="photoRow">
-      <button class="photoBtn" id="photoBtn" type="button">📷 사진 찍기 / 올리기</button>
+      <button class="photoBtn" id="photoCam" type="button">📷 사진 찍기</button>
+      <button class="photoBtn" id="photoUp" type="button">🖼️ 앨범에서</button>
       <img class="photoPrev" id="photoPrev" alt="미리보기" hidden />
     </div>
     <input type="file" id="photoInput" accept="image/*" capture="environment" hidden />
+    <input type="file" id="photoInputGal" accept="image/*" hidden />
     <p class="hint">장난감만 크게, 단순한 배경에서 찍어 주세요. 사진을 올리면 배경을 지우고 흑백 그림으로 바뀌어, 저축할수록 컬러로 차올라요.</p>
     <div class="orline" style="margin-top:14px">그림 색</div>
     <div class="colorPick" id="newColor"></div>
@@ -538,7 +610,7 @@
     <div class="histCompare" id="histCompare"></div>
     <div class="histFilters" id="histFilters"></div>
     <div id="histList" class="histList"></div>
-    <div class="orline" id="doneTitle" hidden style="margin-top:14px">🏆 내가 이룬 목표</div>
+    <div class="orline" id="doneTitle" hidden style="margin-top:14px">🗄 보관함 · 이룬 목표</div>
     <div id="doneList" class="shelf"></div>
     <div class="mActions"><button class="mbtn ghost" id="recordClose">닫기</button></div>
   </div>
@@ -554,6 +626,12 @@
       <span class="setLbl" id="soundLbl">소리 켜짐</span>
     </div>
     <div class="volRow"><button class="volMute" id="volMute" type="button" aria-label="소리 끄기/켜기">🔊</button><input type="range" id="volRange" min="0" max="100" step="1" aria-label="소리 크기" /><span class="volPct" id="volPct">65%</span></div>
+    <div class="richSeg" id="richSeg">
+      <button class="richBtn" data-rich="soft" type="button">🤫 조용</button>
+      <button class="richBtn" data-rich="normal" type="button">🔊 보통</button>
+      <button class="richBtn" data-rich="rich" type="button">🎉 풍성</button>
+    </div>
+    <div class="setRow" style="margin-top:12px"><button class="themeBtn" id="pileBtn" type="button" aria-label="동전 더미">🪙</button><span class="setLbl" id="pileLbl">동전 더미 켜짐</span></div>
     <div class="orline" style="margin-top:16px">🌙 화면 테마</div>
     <div class="pills" id="themePills"></div>
     <div class="orline" style="margin-top:16px">🙋 사용자</div>
@@ -852,6 +930,8 @@ const db = {
     await sb.from('goals').insert({child_id:cid,...g}); },
   async delGoal(gid){ if(!LIVE){ demoDB.goals=demoDB.goals.filter(g=>g.id!==gid); demoDB.deposits=demoDB.deposits.filter(d=>d.goal_id!==gid); return; }
     await sb.from('goals').delete().eq('id',gid); },
+  async resetGoal(gid){ if(!LIVE){ demoDB.deposits=demoDB.deposits.filter(d=>d.goal_id!==gid); return; }
+    await sb.from('deposits').delete().eq('goal_id',gid); await sb.from('goals').update({ms_seen:0}).eq('id',gid); },
   async editGoal(gid,fields){ if(!LIVE){ const g=demoDB.goals.find(x=>x.id===gid); if(g) Object.assign(g,fields); return; }
     await sb.from('goals').update(fields).eq('id',gid); },
   async addKid(name,color,sort){ if(!LIVE){ const id='c'+Date.now(); demoDB.children.push({id,name,active_goal:null,color:color||'#F25C9A',sort:sort||demoDB.children.length}); return id; }
@@ -963,7 +1043,7 @@ function render(){
   drawGoalTabs();
   if(g && g.id!==_lastGoal){ pend=0; _lastGoal=g.id; }
   drawPending();
-  if(!g){ $("#goalName").textContent="목표를 추가해 주세요"; $("#cheer").textContent=""; $("#meter").style.width="0%"; $("#dSaved").textContent=$("#dTarget").textContent="0원"; $("#dPct").textContent="0%"; const _bs=$("#bigStat"); if(_bs) _bs.style.display="none"; const _ps=$("#pctStat"); if(_ps) _ps.style.display="none"; const _ns=$("#needStat"); if(_ns) _ns.style.display="none"; $("#artGray").src=$("#artColor").src=""; $("#artGray").dataset.src=$("#artColor").dataset.src=""; $("#surface").style.opacity="0"; $("#nextGoalBtn").hidden=true; $("#axisL").innerHTML=$("#axisR").innerHTML=""; return; }
+  if(!g){ $("#goalName").textContent="목표를 추가해 주세요"; $("#cheer").textContent=""; $("#meter").style.width="0%"; $("#dSaved").textContent=$("#dTarget").textContent="0원"; $("#dPct").textContent="0%"; const _bs=$("#bigStat"); if(_bs) _bs.style.display="none"; const _ps=$("#pctStat"); if(_ps) _ps.style.display="none"; const _ns=$("#needStat"); if(_ns) _ns.style.display="none"; $("#artGray").src=$("#artColor").src=""; $("#artGray").dataset.src=$("#artColor").dataset.src=""; $("#surface").style.opacity="0"; { const _cp=$("#coinPile"); if(_cp) _cp.innerHTML=""; } $("#nextGoalBtn").hidden=true; $("#axisL").innerHTML=$("#axisR").innerHTML=""; return; }
   { const _bs=$("#bigStat"); if(_bs) _bs.style.display=""; }
   const saved=savedFor(g.id), pct=Math.min(100,Math.round((saved/g.price)*100)), left=Math.max(0,g.price-saved);
 
@@ -987,6 +1067,7 @@ function render(){
   /* 물이 차오르듯 부드러운 경계 */
   col.style.setProperty('--lvl', (pct>=100?112:pct)+'%');
   const surf=$("#surface"); surf.style.bottom=pct+'%'; surf.style.opacity=(pct>3&&pct<99)?'0.85':'0';
+  drawCoinPile(g, pct);
 
   $("#dSaved").textContent=wonKo(saved);
   $("#dTarget").textContent=wonKo(g.price);
@@ -1016,9 +1097,11 @@ async function commit(amount, serial, type){
     toast(res.dup?"이미 저축한 지폐예요!":"저장에 실패했어요. 다시 시도해 주세요.", true); return; }
   if(amount<0){ mascotCheer(pick(CHEER_MINUS),'sad'); toast(josaIga(S.childName)+" "+won(-amount)+"원 뺐어요.", false); if(document.body.classList.contains('sheet')) drawHistory(); return; }
   const bPct=Math.min(100,Math.round((before/g.price)*100)), aPct=Math.min(100,Math.round(((before+amount)/g.price)*100));
-  if(before<g.price && before+amount>=g.price){ mascotCheer(pick(CHEER_DONE),'sparkle'); { const _bs=$("#bigStat"); if(_bs){ _bs.classList.remove('pop'); void _bs.offsetWidth; _bs.classList.add('pop'); } } party(); celebrate(true); fxGoal(); toast(g.name+" 다 모았어요! 🎉", false); }
+  const _done = before<g.price && before+amount>=g.price;
+  countUp($("#dSaved"), before, before+amount, 760); if(!_done) countUp($("#bigAmt"), before, before+amount, 760);
+  if(_done){ mascotCheer(pick(CHEER_DONE),'sparkle'); { const _bs=$("#bigStat"); if(_bs){ _bs.classList.remove('pop'); void _bs.offsetWidth; _bs.classList.add('pop'); } } party(); celebrate(true); fxGoal(); goalDoneOverlay(g); toast(g.name+" 다 모았어요! 🎉", false); }
   else { let ms=0; for(const th of [25,50,75]) if(bPct<th && aPct>=th) ms=th;
-    if(ms && ms>msSeen(g)){ await setMsSeen(g,ms); mascotCheer(pick(CHEER_MS[ms]),'ms'); celebrate(false); fxMilestone(); toast(({25:"좋아요! 벌써 25%나 모았어요 👏",50:"절반이나 모았어요! 🙌",75:"거의 다 왔어요! 75% 돌파 🔥"})[ms], false); }
+    if(ms && ms>msSeen(g)){ await setMsSeen(g,ms); mascotCheer(pick(CHEER_MS[ms]),'ms'); celebrate(false); levelBadge(ms); fxMilestone(); toast(({25:"좋아요! 벌써 25%나 모았어요 👏",50:"절반이나 모았어요! 🙌",75:"거의 다 왔어요! 75% 돌파 🔥"})[ms], false); }
     else { mascotCheer(pick(CHEER_SAVE),'happy'); toast(josaIga(S.childName)+" "+won(amount)+"원 저축했어요!", false); } }
   if(document.body.classList.contains('sheet')) drawHistory();
 }
@@ -1072,7 +1155,13 @@ async function requestAuth(){ return await openAuth(!AUTH.isSet()); }
 let pend=0, _lastGoal=null;
 let sndMode='sound'; try{ const v=lsGet('sound'); sndMode = v==='off'?'silent':(v==='vibe'||v==='silent'?v:'sound'); }catch(e){}
 let volVal=65; try{ const v=lsGet('vol'); if(v!=null){ const map={low:35,mid:65,high:100}; volVal = (v in map)?map[v]:Math.max(0,Math.min(100,parseInt(v,10)||65)); } }catch(e){}
-function _volMul(){ return (volVal/100)*1.6; }
+let sndRich='normal'; try{ const v=lsGet('rich'); if(v==='soft'||v==='rich') sndRich=v; }catch(e){}
+let pileOn=true; try{ if(lsGet('pile')==='off') pileOn=false; }catch(e){}
+function _richVol(){ return sndRich==='soft'?0.6 : sndRich==='rich'?1.18 : 1; }
+function _richN(base){ return Math.max(1, Math.round(base*(sndRich==='soft'?0.5 : sndRich==='rich'?1.6 : 1))); }
+function _volMul(){ return (volVal/100)*1.6*_richVol(); }
+function applyRich(){ if(_master) _master.gain.value=_volMul(); try{ lsSet('rich',sndRich); }catch(e){} drawRichSeg(); }
+function drawRichSeg(){ const el=$("#richSeg"); if(!el) return; el.querySelectorAll('[data-rich]').forEach(b=>b.classList.toggle('on', b.dataset.rich===sndRich)); }
 function vibe(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
 /* 효과음 엔진 (Web Audio) */
 let _actx=null, _master=null;
@@ -1100,7 +1189,10 @@ function sparkle(){ if(sndMode!=='sound') return; try{ const c=_AC();
   [1568,2093,2637].forEach((f,i)=> _tone(c,{f:f, t:i*0.06, dur:0.16, type:'sine', peak:0.04})); }catch(e){} }
 /* 꿀꿀이 "꿀!" — 로우패스 통과 톱니로 콧소리 흉내 */
 function oink(){ if(sndMode!=='sound') return; try{ const c=_AC();
-  [0,0.16].forEach(t0=> _tone(c,{f:300, f2:170, t:t0, dur:0.13, type:'sawtooth', peak:0.06, filter:900})); }catch(e){} }
+  const grunt=(t0,base)=>{ _tone(c,{f:base*1.25, f2:base*0.6, t:t0, dur:0.15, type:'sawtooth', peak:0.075, filter:1100});
+    _tone(c,{f:base*0.6, f2:base*0.32, t:t0, dur:0.16, type:'sawtooth', peak:0.05, filter:600});
+    _tone(c,{f:base*2.0, f2:base*1.1, t:t0+0.01, dur:0.07, type:'square', peak:0.013, filter:1700}); };
+  grunt(0,320); grunt(0.185,300); }catch(e){} }
 /* 100% 완성: 매번 다른 레벨업 멜로디 + 종소리 */
 const FANFARES=[
   [523,587,659,784,880,1046,1318],
@@ -1115,7 +1207,18 @@ function fanfare(){ if(sndMode!=='sound') return; try{ const c=_AC();
   const tail=run[run.length-1];
   [tail*0.5,tail,tail*1.5].forEach(f=> _tone(c,{f:f, t:0.55, dur:0.7, type:'triangle', peak:0.038}));
   [1046.5,1568,2093,2637].forEach(f=> _tone(c,{f:f, t:0.6, dur:1.15, type:'sine', peak:0.026})); }catch(e){} }
-function fxTap(amt){ if(sndMode==='sound') blip(amt); else if(sndMode==='vibe') vibe(12); }
+/* 금액별 코인 사운드 */
+function coinTick(){ if(sndMode!=='sound')return; try{ const c=_AC(); _tone(c,{f:2200,f2:1500,dur:0.05,type:'sine',peak:0.04}); _tone(c,{f:3300,dur:0.03,type:'sine',peak:0.014}); }catch(e){} } /* 똑 */
+function jangle(){ if(sndMode!=='sound')return; try{ const c=_AC(); [0,0.05,0.1].forEach((t,i)=>{ _tone(c,{f:1600+i*260,f2:1100,t,dur:0.09,type:'triangle',peak:0.04}); _tone(c,{f:3000+i*320,t,dur:0.05,type:'sine',peak:0.012}); }); }catch(e){} } /* 짤랑 */
+function coinPour(){ if(sndMode!=='sound')return; try{ const c=_AC(); for(let i=0;i<10;i++){ const t=i*0.042+Math.random()*0.02, f=1400+Math.random()*1300; _tone(c,{f,f2:f*0.7,t,dur:0.08,type:'triangle',peak:0.03}); _tone(c,{f:f*1.9,t,dur:0.04,type:'sine',peak:0.01}); } }catch(e){} } /* 차르릉 */
+function cashReg(){ if(sndMode!=='sound')return; try{ const c=_AC();
+  _tone(c,{f:1318,t:0,dur:0.13,type:'triangle',peak:0.05}); _tone(c,{f:1760,t:0.1,dur:0.18,type:'triangle',peak:0.058}); _tone(c,{f:880,t:0,dur:0.05,type:'square',peak:0.02,filter:1300});
+  for(let i=0;i<7;i++){ const t=0.27+i*0.045, f=1500+Math.random()*1100; _tone(c,{f,t,dur:0.07,type:'triangle',peak:0.026}); } }catch(e){} } /* 짜잔~ 캐시 레지스터 */
+function fxTap(amt){ const a=Math.abs(amt);
+  if(sndMode==='sound'){ if(a>=10000) cashReg(); else if(a>=5000) coinPour(); else if(a>=1000) oink(); else if(a>=100) jangle(); else coinTick(); }
+  else if(sndMode==='vibe') vibe(amt>0?Math.min(45,8+Math.floor(a/400)):12); }
+function uiTick(){ if(sndMode!=='sound') return; try{ const c=_AC(); _tone(c,{f:1150, dur:0.026, type:'sine', peak:0.02}); _tone(c,{f:1720, dur:0.018, type:'sine', peak:0.009}); }catch(e){} }
+function fxClick(){ if(sndMode==='sound') uiTick(); else if(sndMode==='vibe') vibe(7); }
 function fxSave(){ if(sndMode==='sound') chime(); else if(sndMode==='vibe') vibe([22,40,22]); }
 function fxMilestone(){ if(sndMode==='sound') sparkle(); else if(sndMode==='vibe') vibe([16,30,16]); }
 function fxGoal(){ if(sndMode==='sound'){ fanfare(); setTimeout(oink,760); } else if(sndMode==='vibe') vibe([28,40,28,40,70]); }
@@ -1174,10 +1277,11 @@ function drawPending(){ const el=$("#pending"); if(!el) return; el.hidden = pend
     $("#pendSave").textContent = reached ? "🎉 목표 달성하고 저축하기" : (pend>0?"👆 "+won(pend)+"원 저축하기":"👆 "+won(-pend)+"원 빼기");
     $("#pendSave").classList.toggle('goal', !!reached); }
   updatePreviewFill(); }
-function addPending(amt){ const g=active(); if(!g){ toast("먼저 목표를 정해요.", true); openSettings(); return; }
+function addPending(amt, srcEl){ const g=active(); if(!g){ toast("먼저 목표를 정해요.", true); openSettings(); return; }
   const saved=savedFor(g.id); let np=pend+amt;
   if(saved+np<0){ np=-saved; toast("더 뺄 수 없어요.", true); }
-  pend=np; fxTap(amt); drawPending(); popVal(); }
+  const applied = np-pend;
+  pend=np; fxTap(amt); if(applied!==0){ bumpArt(applied); if(applied>0) dropCoin(applied, srcEl); } drawPending(); popVal(); }
 function clearPending(){ pend=0; drawPending(); }
 async function saveDeposit(){ if(pend===0) return; const ok=await requestAuth(); if(!ok) return;
   const amt=pend; pend=0; drawPending(); if(amt>0) fxSave(); await commit(amt, null, 'manual'); }
@@ -1254,8 +1358,8 @@ function refreshHistFull(){ drawHistChart(); drawFilterChips('histFullFilters');
 let toastT;
 function toast(m,w){ const e=$("#toast"); e.textContent=m; e.className="toast show"+(w?" warn":""); clearTimeout(toastT); toastT=setTimeout(()=>e.className="toast"+(w?" warn":""),2200); }
 function party(){ if(matchMedia("(prefers-reduced-motion:reduce)").matches) return;
-  const cols=["#F4B740","#2DB67D","#E0564B","#3F86C9","#D24B86"];
-  for(let i=0;i<44;i++){ const p=document.createElement("div"); p.className="pop"; p.style.background=cols[i%cols.length];
+  const cols=["#F4B740","#2DB67D","#E0564B","#3F86C9","#D24B86"]; const N=_richN(44);
+  for(let i=0;i<N;i++){ const p=document.createElement("div"); p.className="pop"; p.style.background=cols[i%cols.length];
     p.style.left=(45+Math.random()*10)+"vw"; p.style.top="40vh"; document.body.appendChild(p);
     const dx=(Math.random()-.5)*600, dy=200+Math.random()*280, rot=Math.random()*720;
     p.animate([{transform:"translate(0,0) rotate(0)",opacity:1},{transform:`translate(${dx}px,${dy}px) rotate(${rot}deg)`,opacity:0}],{duration:1500+Math.random()*600,easing:"cubic-bezier(.2,.6,.3,1)"}).onfinish=()=>p.remove(); } }
@@ -1263,9 +1367,10 @@ function party(){ if(matchMedia("(prefers-reduced-motion:reduce)").matches) retu
 /* 설정 모달 */
 let pickEmoji=null, pendingPhoto=null, newColorSel=PAL[0], pickIcon=null;
 function openSettings(){ document.body.classList.add('sheet'); drawKids(); drawGoals(); drawIconTabs(); drawIconPick(); drawEmoji(); drawColor('newColor',newColorSel); drawColor('goalColor',(active()&&active().color)||PAL[0]); updatePreview(); $("#scrim").classList.add("show"); }
-function openRecord(){ const nm=$("#recName"); if(nm) nm.textContent=(S.childName||'')+"의"; drawGoals(); drawHistory(); document.body.classList.add('modalview'); $("#recordScrim").classList.add("show"); }
+function openRecord(){ const nm=$("#recName"); if(nm) nm.textContent=(S.childName||'')+"의"; drawGoals(); drawHistFilters(); drawHistory(); document.body.classList.add('modalview'); $("#recordScrim").classList.add("show"); }
 const closeRecord=()=>{ $("#recordScrim").classList.remove("show"); if(!$("#setScrim").classList.contains('show')) document.body.classList.remove('modalview'); };
-function openSet(){ const ni=$("#kidName"); if(ni) ni.value=S.childName||''; const nk=$("#newKid"); if(nk) nk.value=''; drawVol(); applySound(); drawThemePills(); drawKidManage(); updateLoginState(); document.body.classList.add('modalview'); $("#setScrim").classList.add("show"); }
+function openSet(){ const ni=$("#kidName"); if(ni) ni.value=S.childName||''; const nk=$("#newKid"); if(nk) nk.value=''; drawVol(); applySound(); drawRichSeg(); applyPileLbl(); drawThemePills(); drawKidManage(); updateLoginState(); document.body.classList.add('modalview'); $("#setScrim").classList.add("show"); }
+function applyPileLbl(){ const b=$("#pileBtn"), l=$("#pileLbl"); if(b) b.textContent=pileOn?'🪙':'🚫'; if(l) l.textContent=pileOn?'동전 더미 켜짐':'동전 더미 꺼짐'; }
 const closeSet=()=>{ $("#setScrim").classList.remove("show"); if(!$("#recordScrim").classList.contains('show')) document.body.classList.remove('modalview'); };
 function drawThemePills(){ const el=$("#themePills"); if(!el) return; const LB={dark:'밤',warm:'노을',light:'낮'};
   el.innerHTML=THEMES.map(t=>`<button class="pill ${t===curTheme?'on':''}" data-theme="${t}">${TICON[t]} ${LB[t]}</button>`).join(""); }
@@ -1387,10 +1492,97 @@ function celebrate(big){ const art=$("#art"); if(!art) return;
     if(big) s.style.fontSize='30px';
     s.style.animationDelay=(i*30)+'ms'; burst.appendChild(s); });
   art.appendChild(burst); setTimeout(()=>burst.remove(), big?1500:1100); }
+const _noMotion=()=>matchMedia("(prefers-reduced-motion:reduce)").matches;
+/* 저금통 통통/점프 (금액 클수록 크게) */
+function bumpArt(amt){ if(_noMotion()) return; const art=$("#art"); if(!art) return; const a=Math.abs(amt);
+  art.classList.remove('pop','big','hop'); void art.offsetWidth;
+  if(a>=5000) art.classList.add('hop'); else if(a>=1000) art.classList.add('pop','big'); else art.classList.add('pop'); }
+/* 동전이 통 안으로 떨어지는 연출 */
+function dropCoin(amt, srcEl){ if(amt<=0 || _noMotion()) return; const art=$("#art"); if(!art) return;
+  const ar=art.getBoundingClientRect(); const sr=srcEl?srcEl.getBoundingClientRect():{left:innerWidth/2-20,top:ar.bottom,width:40};
+  const g=active(); let icon=null; try{ if(g){ const a=artFor(g); icon=a&&a.src; } }catch(e){}
+  const base=amt>=10000?6:amt>=5000?5:amt>=1000?3:amt>=100?2:1, n=_richN(base);
+  for(let i=0;i<n;i++){ let el;
+    if(icon){ el=document.createElement('img'); el.className='coin coinImg'; el.src=icon; }
+    else { el=document.createElement('div'); el.className='coin'; el.textContent='₩'; }
+    const sx=sr.left+sr.width/2+(Math.random()-.5)*30, sy=sr.top;
+    const tx=ar.left+ar.width/2+(Math.random()-.5)*ar.width*0.4, ty=ar.top+ar.height*0.62;
+    el.style.left=sx+'px'; el.style.top=sy+'px'; document.body.appendChild(el);
+    el.animate([{transform:'translate(0,0) scale(.6) rotate(0)',opacity:0},
+      {transform:'translate(0,-16px) scale(1) rotate(15deg)',opacity:1,offset:.18},
+      {transform:`translate(${tx-sx}px,${ty-sy}px) scale(.8) rotate(${(Math.random()<.5?-1:1)*(120+Math.random()*120)}deg)`,opacity:1,offset:.85},
+      {transform:`translate(${tx-sx}px,${ty-sy+12}px) scale(.5)`,opacity:0}],
+      {duration:560+Math.random()*180, delay:i*55, easing:'cubic-bezier(.45,.05,.5,1)'}).onfinish=()=>{ el.remove(); restPile(icon, ar); }; } }
+/* 모은 금액 롤링 카운트업 + 미세 틱 */
+let _cuRAF=null;
+function countUp(el, from, to, dur){ if(!el) return; if(from===to || _noMotion()){ el.textContent=wonKo(to); return; }
+  const t0=performance.now(); let lastT=0;
+  (function tick(now){ const k=Math.min(1,(now-t0)/(dur||700)), e=1-Math.pow(1-k,3); el.textContent=wonKo(Math.round(from+(to-from)*e));
+    if(sndMode==='sound' && now-lastT>72){ lastT=now; uiTick(); }
+    if(k<1) requestAnimationFrame(tick); else el.textContent=wonKo(to); })(performance.now()); }
+/* 25/50/75% 레벨업 배지 */
+function levelBadge(pct){ const b=document.createElement('div'); b.className='levelBadge';
+  b.innerHTML='<b>LEVEL UP!</b><span>'+pct+'% 달성 🔥</span>'; document.body.appendChild(b);
+  requestAnimationFrame(()=>b.classList.add('show'));
+  setTimeout(()=>{ b.classList.remove('show'); setTimeout(()=>b.remove(),420); }, 1500); }
+/* 목표 달성 풀스크린 */
+function fireworks(){ if(_noMotion()) return; const cols=["#FFD86B","#FF8A3D","#F25C9A","#5BC8FF","#7BE0A0","#C9A7FF"];
+  const waves=_richN(3);
+  for(let w=0; w<waves; w++){ setTimeout(()=>{ const cx=15+Math.random()*70, cy=18+Math.random()*42, N=_richN(18);
+    for(let i=0;i<N;i++){ const p=document.createElement('div'); p.className='fw'; p.style.background=cols[i%cols.length];
+      p.style.left=cx+'vw'; p.style.top=cy+'vh'; document.body.appendChild(p);
+      const ang=(i/N)*Math.PI*2+Math.random()*0.3, d=80+Math.random()*120;
+      p.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${(Math.cos(ang)*d).toFixed(0)}px,${(Math.sin(ang)*d).toFixed(0)}px) scale(.3)`,opacity:0}],{duration:900+Math.random()*500,easing:'cubic-bezier(.15,.7,.3,1)'}).onfinish=()=>p.remove(); }
+    if(sndMode==='sound') sparkle(); }, w*430); } }
+function ymd(t){ const d=new Date(t||Date.now()), p=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
+function goalRecord(g){ const ds=(S.deposits||[]).filter(d=>d.goal_id===g.id && (d.amount||0)>0).slice().sort((a,b)=>(a.t||0)-(b.t||0));
+  const count=ds.length; if(!count) return {count:0, days:1, achieve:Date.now()};
+  const first=ds[0].t||Date.now(); let sum=0, achieve=ds[ds.length-1].t||Date.now();
+  for(const d of ds){ sum+=d.amount||0; if(sum>=g.price){ achieve=d.t||achieve; break; } }
+  const days=Math.max(1, Math.ceil((achieve-first)/86400000)); return {count, days, achieve}; }
+function drawCoinPile(g, pct){ const el=$("#coinPile"); if(!el) return;
+  if(!pileOn || !g || pct<=0){ el.innerHTML=''; el.style.pointerEvents='none'; return; }
+  let icon=null; try{ icon=artFor(g).src; }catch(e){}
+  const n=Math.max(1, Math.min(15, Math.round(pct/7))), cs=16;
+  const pos=[]; let idx=0, row=0; while(idx<n){ const inRow=row+1; for(let k=0;k<inRow&&idx<n;k++){ pos.push({row,k,inRow}); idx++; } row++; }
+  el.innerHTML=pos.map(p=>{ const bottom=p.row*cs*0.5, leftPct=50+(p.k-(p.inRow-1)/2)*7.0;
+    const st=`left:${leftPct}%; bottom:${bottom}px`;
+    return icon?`<img src="${icon}" alt="" style="${st}">`:`<span class="pc" style="${st}">₩</span>`; }).join("");
+  el.style.pointerEvents='auto'; }
+function _noise(c,o){ o=o||{}; const t0=c.currentTime+(o.t||0), dur=o.dur||0.05, peak=o.peak||0.05;
+  const len=Math.max(1,Math.floor(c.sampleRate*dur)), buf=c.createBuffer(1,len,c.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=Math.random()*2-1;
+  const src=c.createBufferSource(); src.buffer=buf; const g=c.createGain();
+  g.gain.setValueAtTime(0.0001,t0); g.gain.exponentialRampToValueAtTime(peak,t0+0.004); g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  let node=src; if(o.filter){ const lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=o.filter; src.connect(lp); node=lp; }
+  node.connect(g); g.connect(_master||c.destination); src.start(t0); src.stop(t0+dur+0.02); }
+function applause(){ if(sndMode!=='sound') return; try{ const c=_AC();
+  for(let i=0;i<24;i++){ _noise(c,{t:Math.random()*0.95, dur:0.04+Math.random()*0.03, peak:0.03+Math.random()*0.035, filter:1500+Math.random()*2600}); }
+  _tone(c,{f:660,t:0.12,dur:0.5,type:'triangle',peak:0.02}); _tone(c,{f:990,t:0.12,dur:0.5,type:'triangle',peak:0.016}); }catch(e){} }
+function restPile(icon, ar){ if(_noMotion()) return; let el;
+  if(icon){ el=document.createElement('img'); el.className='coin coinImg coinRest'; el.src=icon; }
+  else { el=document.createElement('div'); el.className='coin coinRest'; el.textContent='₩'; }
+  const x=ar.left+ar.width*(0.3+Math.random()*0.4), y=ar.top+ar.height*(0.78+Math.random()*0.06);
+  el.style.left=x+'px'; el.style.top=y+'px'; document.body.appendChild(el);
+  el.animate([{transform:'translateY(-6px) scale(.5)',opacity:0},{transform:'translateY(0) scale(.78)',opacity:1,offset:.22},
+    {transform:'translateY(0) scale(.78)',opacity:1,offset:.68},{transform:'translateY(3px) scale(.66)',opacity:0}],
+    {duration:820, easing:'ease-out'}).onfinish=()=>el.remove(); }
+function goalDoneOverlay(g){ const ov=$("#doneOverlay"); if(!ov) return; const nm=$("#doneOvName"); if(nm) nm.textContent=g.name;
+  const art=$("#doneOvArt"); if(art){ const a=artFor(g); art.src=a.src; }
+  const st=$("#doneOvStats"); if(st){ const r=goalRecord(g); st.innerHTML='<span class="doneStat">🗓 <b>'+(r.days===1?'하루':r.days+'일')+'</b> 만에</span><span class="doneStat">💰 <b>'+r.count+'</b>번 저축</span>'; }
+  const nx=nextOpenGoal(g.id), dn=$("#doneNext"), dnew=$("#doneNew");
+  if(dn) dn.textContent = nx ? ('▶ 다음 목표 모으기') : '➕ 새 목표 만들기';
+  if(dnew) dnew.hidden = !nx;
+  ov.classList.remove('show'); void ov.offsetWidth; ov.classList.add('show');
+  setTimeout(()=>{ if(sndMode==='sound') sparkle(); else if(sndMode==='vibe') vibe([10,30,10]); }, 560);
+  if(sndMode==='sound' && sndRich==='rich') setTimeout(applause, 240);
+  fireworks(); }
+function closeDoneOverlay(){ const ov=$("#doneOverlay"); if(ov) ov.classList.remove('show'); }
 function drawKids(){ $("#kidPills").innerHTML=children.map(c=>`<button class="pill kpill ${c.id===S.childId?'on':''}" data-kid="${c.id}"><span class="kavatar xs">${kidFace(c.color)}</span>${c.name}</button>`).join(""); }
 function drawGoalTabs(){ const el=$("#goalTabs"); if(!el) return;
   if(!S.goals||!S.goals.length){ el.innerHTML='<button class="gtab plus" data-add="1">＋ 목표 만들기</button>'; return; }
-  const tabs=S.goals.map(g=>{ const done=savedFor(g.id)>=g.price, on=g.id===S.activeId;
+  const visible=S.goals.filter(g=> savedFor(g.id)<g.price || g.id===S.activeId );
+  const tabs=visible.map(g=>{ const done=savedFor(g.id)>=g.price, on=g.id===S.activeId;
     return `<button class="gtab ${on?'on':''} ${done?'done':''}" data-go="${g.id}"><span class="dot" style="background:${g.color}"></span>${g.name}${done?' ✅':''}</button>`; }).join("");
   el.innerHTML=tabs+'<button class="gtab plus" data-add="1">＋</button>';
   const onEl=el.querySelector('.gtab.on'); if(onEl){ try{ onEl.scrollIntoView({inline:'center',block:'nearest'}); }catch(e){} } }
@@ -1403,13 +1595,17 @@ function drawGoals(){
       <span class="gctl"><button class="ordbtn" data-edit="${g.id}" aria-label="수정">✏️</button><button class="ordbtn" data-up="${g.id}" ${gi<=0?'disabled':''} aria-label="위로">▲</button><button class="ordbtn" data-down="${g.id}" ${gi>=S.goals.length-1?'disabled':''} aria-label="아래로">▼</button>${on?'<span class="now">지금</span>':(S.goals.length>1?`<button class="del" data-del="${g.id}">삭제</button>`:'')}</span></div>`;
   }).join("") || '<div class="pr" style="color:var(--muted)">진행 중인 목표가 없어요. 아래에서 새 목표를 만들어요.</div>';
   $("#doneTitle").hidden = done.length===0;
-  $("#doneList").innerHTML = done.map(g=>`<div class="done ${g.id===S.activeId?'on':''}" data-go="${g.id}"><img src="${artFor(g).src}" alt=""><span class="dn">${g.name}</span><span class="ck">완료 ✅</span></div>`).join("");
+  $("#doneList").innerHTML = done.map(g=>{ const r=goalRecord(g); return `<div class="done ${g.id===S.activeId?'on':''}" data-go="${g.id}"><img src="${artFor(g).src}" alt=""><span class="dn">${g.name}<span class="dnRec">🗓 ${r.days===1?'하루':r.days+'일'} 만에 · 💰 ${r.count}번<br>${ymd(r.achieve)} 달성 · ${wonKo(g.price)}</span></span><span class="dctl"><button class="dbtn redo" data-redo="${g.id}">🔄 다시</button><button class="dbtn del" data-delgoal="${g.id}" aria-label="삭제">🗑</button></span></div>`; }).join("");
 }
 function drawEmoji(){ $("#emojiPick").innerHTML=EMOJIS.map(e=>`<button data-e="${e}" class="${(!pendingPhoto&&e===pickEmoji)?'sel':''}">${e}</button>`).join(""); }
-function clearPhoto(){ pendingPhoto=null; $("#photoPrev").hidden=true; $("#photoPrev").src=""; $("#photoBtn").textContent="📷 사진 찍기 / 올리기"; }
+function clearPhoto(){ pendingPhoto=null; $("#photoPrev").hidden=true; $("#photoPrev").src=""; const cm=$("#photoCam"), up=$("#photoUp"); if(cm) cm.textContent="📷 사진 찍기"; if(up) up.textContent="🖼️ 앨범에서"; }
 
 /* 이벤트 */
-$("#bank").addEventListener("click",e=>{ const b=e.target.closest("[data-amt]"); if(b) addPending(+b.dataset.amt); });
+$("#bank").addEventListener("click",e=>{ const b=e.target.closest("[data-amt]"); if(b) addPending(+b.dataset.amt, b); });
+$("#doneClose").onclick=closeDoneOverlay;
+$("#doneNext").onclick=()=>{ closeDoneOverlay(); continueAfterGoal(); };
+$("#doneNew").onclick=()=>{ closeDoneOverlay(); suggestNewGoal(active()); };
+document.addEventListener("click",e=>{ const b=e.target.closest('button,[role="button"]'); if(!b) return; if(b.hasAttribute('data-amt')) return; fxClick(); });
 $("#pendSave").onclick=saveDeposit; $("#pendClear").onclick=clearPending;
 $("#bioBtn").onclick=onBio;
 $("#keypad").addEventListener("click",e=>{ const b=e.target.closest("[data-k]"); if(b) onKey(b.dataset.k); });
@@ -1467,7 +1663,16 @@ $("#goalTabs").addEventListener("pointermove",e=>{ if(_tabHold && Math.hypot(e.c
 $("#goalTabs").addEventListener("click",async e=>{ if(_tabHeld){ _tabHeld=false; e.preventDefault(); return; }
   if(e.target.closest("[data-add]")){ openSettings(); return; }
   const b=e.target.closest("[data-go]"); if(b){ S.activeId=b.dataset.go; await db.setActive(S.childId,S.activeId); render(); } });
-$("#nextGoalBtn").onclick=openSettings;
+async function switchGoal(id){ if(!id) return; S.activeId=id; try{ await db.setActive(S.childId,id); }catch(e){} render(); }
+function nextOpenGoal(excludeId){ return S.goals.find(x=>x.id!==excludeId && savedFor(x.id)<x.price); }
+function suggestNewGoal(lastG){ openSettings();
+  const sug = lastG ? Math.max(5000, Math.round(lastG.price*1.2/1000)*1000) : 10000;
+  const gp=$("#gPrice"); if(gp) gp.value=sug; const gn=$("#gName"); if(gn) gn.value='';
+  try{ updatePreview(); }catch(e){}
+  setTimeout(()=>{ const gn2=$("#gName"); if(gn2){ try{ gn2.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} gn2.focus(); } }, 320); }
+async function continueAfterGoal(){ const g=active(); const nx=nextOpenGoal(g&&g.id);
+  if(nx){ await switchGoal(nx.id); toast('다음 목표: '+nx.name+' 모으기! 🎯', false); } else { suggestNewGoal(g); } }
+$("#nextGoalBtn").onclick=continueAfterGoal;
 window.addEventListener("resize",()=>{ const g=active(); if(g) setArtSize(artFor(g).aspect); });
 
 /* 낮·밤·따뜻한 테마 전환, 첫 등장 시퀀스 */
@@ -1529,6 +1734,10 @@ $("#kidPills").addEventListener("click",e=>{ const b=e.target.closest("[data-kid
 $("#volRange").addEventListener("input", e=> setVol(+e.target.value, false));
 $("#volRange").addEventListener("change", e=> setVol(+e.target.value, true));
 $("#volMute").onclick=()=>{ sndMode = (sndMode==='sound')?'silent':'sound'; applySound(); drawVol(); if(sndMode==='sound') blip(1000); };
+$("#richSeg").addEventListener("click",e=>{ const b=e.target.closest('[data-rich]'); if(!b) return; sndRich=b.dataset.rich; applyRich(); if(sndMode==='sound'){ _AC(); coinPour(); } else if(sndMode==='vibe') vibe(16); });
+function applyPile(){ const b=$("#pileBtn"), l=$("#pileLbl"); if(b) b.textContent=pileOn?'🪙':'🚫'; if(l) l.textContent=pileOn?'동전 더미 켜짐':'동전 더미 꺼짐'; try{ lsSet('pile', pileOn?'on':'off'); }catch(e){} render(); }
+$("#pileBtn").onclick=()=>{ pileOn=!pileOn; applyPile(); };
+$("#coinPile").addEventListener("click",()=>{ const g=active(); if(!g) return; histGoal=g.id; openRecord(); });
 $("#goalList").addEventListener("click",async e=>{
   const ed=e.target.closest("[data-edit]"), up=e.target.closest("[data-up]"), dn=e.target.closest("[data-down]"), del=e.target.closest("[data-del]");
   if(ed){ e.stopPropagation(); openGoalEdit(ed.dataset.edit); return; }
@@ -1538,17 +1747,26 @@ $("#goalList").addEventListener("click",async e=>{
   const it=e.target.closest("[data-go]");
   if(it){ S.activeId=it.dataset.go; await db.setActive(S.childId,S.activeId); render(); drawGoals(); }
 });
-$("#doneList").addEventListener("click",async e=>{ const it=e.target.closest("[data-go]");
+async function redoGoal(gid){ const g=S.goals.find(x=>x.id===gid); if(!g) return;
+  if(!(await uiConfirm({title:"다시 도전할까요?", msg:"‘"+g.name+"’의 모은 기록을 0원으로 초기화하고 처음부터 다시 모아요.", ok:"다시 도전", face:"happy"}))) return;
+  const ok=await requestAuth(); if(!ok){ toast("보호자 인증이 필요해요.", true); return; }
+  await db.resetGoal(gid); await loadChild(S.childId); S.activeId=gid; try{ await db.setActive(S.childId,gid); }catch(e){}
+  render(); drawGoals(); toast("‘"+g.name+"’ 다시 도전! 처음부터 모아요. 🔄", false); }
+$("#doneList").addEventListener("click",async e=>{
+  const redo=e.target.closest("[data-redo]"); if(redo){ await redoGoal(redo.dataset.redo); return; }
+  const del=e.target.closest("[data-delgoal]"); if(del){ await askDeleteGoal(del.dataset.delgoal); drawGoals(); return; }
+  const it=e.target.closest("[data-go]");
   if(it){ S.activeId=it.dataset.go; await db.setActive(S.childId,S.activeId); render(); drawGoals(); }
 });
-$("#photoBtn").onclick=()=>$("#photoInput").click();
-$("#photoInput").addEventListener("change", async e=>{
-  const f=e.target.files&&e.target.files[0]; if(!f) return;
-  $("#photoBtn").textContent="배경 지우는 중…";
-  try{ pendingPhoto=await processImage(f); const pv=$("#photoPrev"); pv.src=pendingPhoto.preview; pv.hidden=false; $("#photoBtn").textContent="📷 사진 바꾸기"; drawEmoji(); updatePreview(); }
-  catch(err){ $("#photoBtn").textContent="📷 사진 찍기 / 올리기"; toast("사진을 불러오지 못했어요.", true); }
-  e.target.value="";
-});
+async function handlePhotoFile(f){ if(!f) return;
+  const cm=$("#photoCam"), up=$("#photoUp"); cm.disabled=up.disabled=true; cm.textContent="배경 지우는 중…";
+  try{ pendingPhoto=await processImage(f); const pv=$("#photoPrev"); pv.src=pendingPhoto.preview; pv.hidden=false; cm.textContent="📷 다시 찍기"; up.textContent="🖼️ 다시 고르기"; drawEmoji(); updatePreview(); }
+  catch(err){ cm.textContent="📷 사진 찍기"; up.textContent="🖼️ 앨범에서"; toast("사진을 불러오지 못했어요.", true); }
+  finally{ cm.disabled=up.disabled=false; } }
+$("#photoCam").onclick=()=>$("#photoInput").click();
+$("#photoUp").onclick=()=>$("#photoInputGal").click();
+$("#photoInput").addEventListener("change", e=>{ const f=e.target.files&&e.target.files[0]; handlePhotoFile(f); e.target.value=""; });
+$("#photoInputGal").addEventListener("change", e=>{ const f=e.target.files&&e.target.files[0]; handlePhotoFile(f); e.target.value=""; });
 $("#iconTabs").addEventListener("click",e=>{ const b=e.target.closest("[data-cat]"); if(b){ catSel=+b.dataset.cat; drawIconTabs(); drawIconPick(); }});
 $("#iconPick").addEventListener("click",e=>{ const b=e.target.closest("[data-icon]"); if(b){ pickIcon=b.dataset.icon; pickEmoji=null; clearPhoto(); drawIconPick(); drawEmoji(); updatePreview(); }});
 $("#emojiPick").addEventListener("click",e=>{ const b=e.target.closest("[data-e]"); if(b){ pickEmoji=b.dataset.e; pickIcon=null; clearPhoto(); drawEmoji(); drawIconPick(); updatePreview(); }});
