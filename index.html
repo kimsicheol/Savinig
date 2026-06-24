@@ -473,7 +473,12 @@
   body.modalview .stage, body.sheet .stage{visibility:hidden}
   #goalEditScrim{align-items:center}
   #obScrim{align-items:center; background:var(--bg,#1A1326); -webkit-backdrop-filter:none; backdrop-filter:none; z-index:120}
-  .obCard{max-width:380px !important; text-align:left}
+  .obCard{max-width:380px !important; text-align:left; max-height:90vh; overflow:auto}
+  .obIntro{margin:4px 0 12px; display:flex; flex-direction:column; gap:8px}
+  .obItem{display:flex; gap:10px; align-items:flex-start; background:var(--card-2); border:1px solid var(--line-2); border-radius:12px; padding:10px 12px}
+  .obItem .ic{font-size:18px; line-height:1.35; flex:0 0 auto}
+  .obItem .tx{font-size:13px; line-height:1.5; color:var(--ink)}
+  .obItem .tx b{color:#F25C9A}
   .obIcon{width:96px; height:96px; margin:2px auto 12px; border-radius:26px; overflow:hidden; box-shadow:0 18px 44px -16px rgba(242,92,154,.7)}
   .obIcon svg{width:100%; height:100%; display:block}
   .obHint{font-size:12.5px; color:var(--muted); margin:8px 2px 0; line-height:1.5}
@@ -779,7 +784,12 @@
     <div class="obIcon" id="obIcon"></div>
     <h2 class="jua" style="text-align:center">보는 저축이 습관이 됩니다</h2>
     <p style="text-align:center; color:#F25C9A; font-weight:800; font-size:13.5px; margin:3px 0 10px">자기조절을 키우는 우리집 시각화 저금통</p>
-    <p class="sub" id="obSub" style="text-align:center">구글로 로그인하면 시작할 수 있어요.</p>
+    <div class="obIntro" id="obIntro">
+      <div class="obItem"><span class="ic">🎯</span><span class="tx"><b>목표를 눈으로</b> — 갖고 싶은 걸 정하면 흑백 그림이 되고, 모을수록 컬러로 채워져요.</span></div>
+      <div class="obItem"><span class="ic">🧠</span><span class="tx"><b>스스로 모으는 힘</b> — 사고 싶은 걸 참고 끝까지 모으며 자기조절·끈기를 키워요.</span></div>
+      <div class="obItem"><span class="ic">💪</span><span class="tx"><b>저축이 습관으로</b> — 매일의 작은 저축이 눈에 보이며 습관이 됩니다.</span></div>
+    </div>
+    <p class="sub" id="obSub" style="text-align:center">아래 ‘구글로 로그인’을 누르면 시작할 수 있어요.</p>
     <button class="mbtn primary" id="obGoogle" style="width:100%; margin-top:6px">☁️ 구글로 로그인</button>
     <p class="obHint" id="obLoginState">내 가족 저금통은 내 구글 계정에만 저장돼요.</p>
     <div id="obStep2" hidden>
@@ -2224,9 +2234,10 @@ $("#addGoal").onclick=async()=>{
 let _session=null;
 async function refreshSession(){ if(!(LIVE&&sb)) return null; try{ const {data}=await sb.auth.getSession(); _session=data&&data.session||null; }catch(e){ _session=null; } updateLoginState(); return _session; }
 function _email(){ return (_session&&_session.user&&(_session.user.email||''))||''; }
-function updateLoginState(){ const el=$("#obLoginState"), sub=$("#obSub"), g=$("#obGoogle"), st=$("#obStep2");
-  if(el){ if(_session){ el.textContent='로그인됨 ✓ '+_email(); el.classList.add('ok'); } else { el.textContent='내 가족 저금통은 내 구글 계정에만 저장돼요.'; el.classList.remove('ok'); } }
-  if(sub) sub.textContent=_session?'아이 이름을 정해 주세요.':'구글로 로그인하면 시작할 수 있어요.';
+function updateLoginState(){ const el=$("#obLoginState"), sub=$("#obSub"), g=$("#obGoogle"), st=$("#obStep2"), intro=$("#obIntro");
+  if(el){ if(_session){ el.textContent='로그인됨 ✓ '+_email(); el.classList.add('ok'); } else { el.textContent='내 가족 저금통은 보호자의 구글 계정에만 안전하게 저장돼요.'; el.classList.remove('ok'); } }
+  if(sub) sub.textContent=_session?'아이 이름을 정해 주세요.':'아래 ‘구글로 로그인’을 누르면 시작할 수 있어요.';
+  if(intro) intro.style.display=_session?'none':'';
   if(g) g.style.display=_session?'none':'';
   if(st) st.hidden=!_session;
   const lb=$("#authLogin"); if(lb) lb.textContent=_session?('☁️ 로그아웃 ('+(_email()||'구글')+')'):'☁️ 구글로 로그인'; }
