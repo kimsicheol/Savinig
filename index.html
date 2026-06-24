@@ -20,8 +20,11 @@
 <meta property="og:description" content="목표를 정하고 저축하면 흑백 그림이 컬러로 차올라요. 아이가 스스로 모으고 싶어지는 저금통." />
 <meta property="og:url" content="https://savinig.vercel.app/" />
 <meta property="og:image" content="https://savinig.vercel.app/og.png" />
+<meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="꿀꿀이 — 모을수록 컬러로 차오르는 저금통" />
+<link rel="image_src" href="https://savinig.vercel.app/og.png" />
 <meta property="og:locale" content="ko_KR" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="꿀꿀이 — 모을수록 컬러로 차오르는 저금통" />
@@ -534,29 +537,32 @@
     else if(/\bLine\//i.test(ua)) kind='line';
     else if(/(NAVER|Instagram|FBAN|FBAV|FB_IAB|Snapchat|Daum|KAKAOSTORY|everytimeApp|Whale)/i.test(ua)) kind='other';
     if(!kind) return;
+    var hasExt = /[?&]openExternalBrowser=1/.test(url);
+    function extUrl(){ return url + (url.indexOf('?')>-1?'&':'?') + 'openExternalBrowser=1'; }
+    function copyLink(){ var ok=function(){ alert('주소를 복사했어요. 크롬/사파리 등 기본 브라우저 주소창에 붙여넣어 열어주세요.'); };
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(ok).catch(function(){ window.prompt('이 주소를 복사해 브라우저에 붙여넣어 주세요', url); }); }
+      else { window.prompt('이 주소를 복사해 브라우저에 붙여넣어 주세요', url); } }
     function openExternal(){
-      if(kind==='kakao'){ location.href='kakaotalk://web/openExternalBrowser?url='+encodeURIComponent(url); return; }
-      if(kind==='line'){ location.href = url + (url.indexOf('?')>-1?'&':'?') + 'openExternalBrowser=1'; return; }
+      if(kind==='kakao'){ if(!hasExt){ location.href = extUrl(); } else { location.href='kakaotalk://web/openExternalBrowser?url='+encodeURIComponent(url); } return; }
+      if(kind==='line'){ location.href = hasExt ? url : extUrl(); return; }
       if(/Android/i.test(ua)){ try{ location.href='intent://'+url.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package=com.android.chrome;end'; return; }catch(e){} }
       copyLink();
     }
-    function copyLink(){ var ok=function(){ alert('주소를 복사했어요. 크롬/사파리 등 기본 브라우저에 붙여넣어 열어주세요.'); };
-      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(ok).catch(function(){ window.prompt('이 주소를 복사해 브라우저에 붙여넣어 주세요', url); }); }
-      else { window.prompt('이 주소를 복사해 브라우저에 붙여넣어 주세요', url); } }
-    if(kind==='kakao' || kind==='line'){ try{ openExternal(); }catch(e){} }
+    if((kind==='kakao'||kind==='line') && !hasExt){ openExternal(); }
     var show=function(){
       if(document.getElementById('inAppBar')) return;
       var bar=document.createElement('div'); bar.id='inAppBar';
-      bar.style.cssText='position:fixed;left:0;right:0;top:0;z-index:9999;background:#160F22;color:#fff;font:600 13px/1.45 system-ui,-apple-system,sans-serif;padding:11px 13px;display:flex;gap:9px;align-items:center;box-shadow:0 8px 22px rgba(0,0,0,.45)';
-      var msg=document.createElement('span'); msg.style.cssText='flex:1;min-width:0';
-      msg.innerHTML='구글 로그인은 앱 내 브라우저에서 막혀요. <b>기본 브라우저</b>로 열어주세요.';
+      bar.style.cssText='position:fixed;left:0;right:0;top:0;z-index:9999;background:#160F22;color:#fff;font:600 13px/1.45 system-ui,-apple-system,sans-serif;padding:11px 13px;box-shadow:0 8px 22px rgba(0,0,0,.45)';
+      var row=document.createElement('div'); row.style.cssText='display:flex;gap:9px;align-items:center';
+      var msg=document.createElement('span'); msg.style.cssText='flex:1;min-width:0'; msg.innerHTML='구글 로그인은 앱 내 브라우저에서 막혀요.';
       var open=document.createElement('button'); open.textContent='기본 브라우저로 열기';
-      open.style.cssText='border:none;background:#F25C9A;color:#fff;font-weight:800;padding:8px 12px;border-radius:9px;cursor:pointer;white-space:nowrap';
-      open.onclick=openExternal;
+      open.style.cssText='border:none;background:#F25C9A;color:#fff;font-weight:800;padding:8px 12px;border-radius:9px;cursor:pointer;white-space:nowrap'; open.onclick=openExternal;
       var copy=document.createElement('button'); copy.textContent='복사'; copy.setAttribute('aria-label','링크 복사');
-      copy.style.cssText='border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-weight:800;padding:8px 11px;border-radius:9px;cursor:pointer;white-space:nowrap';
-      copy.onclick=copyLink;
-      bar.appendChild(msg); bar.appendChild(open); bar.appendChild(copy); document.body.appendChild(bar);
+      copy.style.cssText='border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-weight:800;padding:8px 11px;border-radius:9px;cursor:pointer;white-space:nowrap'; copy.onclick=copyLink;
+      row.appendChild(msg); row.appendChild(open); row.appendChild(copy);
+      var hint=document.createElement('div'); hint.style.cssText='margin-top:6px;font-size:11.5px;color:#B6A6CE';
+      hint.textContent='안 열리면 오른쪽 위 ⋮ 메뉴 → ‘다른 브라우저로 열기’를 누르거나, [복사] 후 크롬/사파리에 붙여넣어 주세요.';
+      bar.appendChild(row); bar.appendChild(hint); document.body.appendChild(bar);
     };
     if(document.body) show(); else document.addEventListener('DOMContentLoaded', show);
   }catch(e){}
