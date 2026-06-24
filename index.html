@@ -528,6 +528,37 @@
   .kavatar.xs{width:18px; height:18px; margin-right:6px}
   .kpill{display:inline-flex; align-items:center; gap:0}
   .kidtag{display:inline-flex; align-items:center; gap:7px}
+  .kidNow{display:flex; align-items:center; justify-content:center; gap:8px; margin:10px auto 0; max-width:92%; padding:8px 16px; background:var(--card-2); border:1px solid var(--line); border-radius:999px; font-weight:800; font-size:15.5px; color:var(--ink); cursor:pointer; transition:transform .12s, border-color .2s}
+  .kidNow:active{transform:scale(.97)}
+  .kidNow .kavatar{width:26px; height:26px; margin:0}
+  .kidNow .swap{font-size:12px; font-weight:800; color:var(--muted); margin-left:2px}
+  .kidPickList{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:8px 0 4px}
+  .kidPickItem{display:flex; flex-direction:column; align-items:center; gap:9px; padding:18px 12px; background:var(--card-2); border:1px solid var(--line-2); border-radius:16px; cursor:pointer; font-family:inherit; font-weight:800; font-size:15px; color:var(--ink); transition:transform .12s, border-color .2s}
+  .kidPickItem:active{transform:scale(.97)}
+  .kidPickItem.on{border-color:#F25C9A; box-shadow:0 0 0 2px rgba(242,92,154,.3)}
+  .kidPickItem .kavatar{width:54px; height:54px; margin:0}
+  .kidPickItem .kpName{font-size:15px}
+  .kidPickItem .kpGoalRow{display:flex; align-items:center; gap:6px; justify-content:center; max-width:100%}
+  .kidPickItem .kpThumb{width:22px; height:22px; border-radius:6px; object-fit:cover; background:var(--line-2); display:none; flex:0 0 auto}
+  .kidPickItem .kpGoal{font-size:11.5px; font-weight:700; color:var(--muted); min-height:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .kidPickItem .kpBar{width:100%; height:7px; border-radius:99px; background:var(--line-2); overflow:hidden}
+  .kidPickItem .kpBar i{display:block; height:100%; width:0; background:#F25C9A; border-radius:99px; transition:width .45s ease}
+  .kidPickItem .kpRemain{font-size:11px; font-weight:700; color:var(--muted); min-height:13px}
+  .kidPickItem .kpRemain.done{color:var(--emerald)}
+  .famTotal .famMonth{cursor:pointer}
+  .famTrend{margin:2px 0 6px; padding:10px 12px; background:var(--card-2); border:1px solid var(--line-2); border-radius:12px}
+  .famTrendChart{display:flex; align-items:flex-end; justify-content:space-between; gap:6px; height:78px}
+  .ftCol{flex:1; display:flex; flex-direction:column; align-items:center; gap:4px}
+  .ftBarWrap{height:56px; display:flex; align-items:flex-end}
+  .ftBar{width:60%; max-width:26px; min-width:14px; background:var(--line-2); border-radius:5px 5px 0 0}
+  .ftCol.cur .ftBar{background:#FFD86B}
+  .ftLbl{font-size:10.5px; font-weight:700; color:var(--muted)}
+  .ftCol.cur .ftLbl{color:#FFD86B}
+  .famTotal{text-align:center; margin:8px 0 2px; padding:11px 12px; background:var(--card-2); border:1px solid var(--line-2); border-radius:13px; font-weight:800; font-size:14px; color:var(--ink)}
+  .famTotal b{color:#F25C9A; font-size:16px}
+  .famTotal .famMonth{font-size:12px; font-weight:700; color:var(--muted); margin-top:3px}
+  .famTotal .famMonth b{font-size:13px}
+  .famTotal .up{color:var(--emerald)} .famTotal .down{color:var(--warn)}
   .kidM .kbtn.kcolor{width:26px; height:26px; padding:0; border-radius:50%; border:2px solid rgba(255,255,255,.5)}
   .pop{position:fixed; width:12px; height:12px; z-index:95; pointer-events:none; border-radius:3px}
   @media(prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important} }
@@ -582,6 +613,7 @@
       <span class="kidtag" id="kidTag" role="button" tabindex="0" aria-label="설정"></span>
     </div>
   </header>
+  <div class="kidNow" id="kidNow" role="button" tabindex="0" aria-label="아이 바꾸기"></div>
   <nav class="goaltabs" id="goalTabs" aria-label="목표 탭"></nav>
   <div class="head">
     <h1 class="goalName jua" id="goalName">—</h1>
@@ -760,9 +792,23 @@
     <div class="userRow"><input id="kidName" type="text" placeholder="이름" /><button class="mbtn small" id="kidSave">이름 저장</button></div>
     <div class="userRow"><input id="newKid" type="text" placeholder="새 사용자 이름" /><button class="mbtn small" id="kidAdd">＋ 추가</button></div>
     <p class="hint">사용자(아이)를 새로 만들거나 이름을 바꿀 수 있어요.</p>
-    <div class="setJump"><button class="mbtn ghost" id="toRecord">📒 저축 기록 보기</button></div>
+    <div class="setRow" style="margin-top:6px"><button class="themeBtn" id="kidPickBtn" type="button" aria-label="시작 시 아이 선택">🙋</button><span class="setLbl" id="kidPickLbl">시작할 때 아이 선택 끔</span></div>
+    <p class="hint">여러 아이가 한 기기를 함께 쓸 때 켜면, 앱을 열 때 아이를 고르는 화면이 먼저 나와요. (이 기기에만 적용)</p>
+    <div class="setJump"><button class="mbtn ghost" id="toFamily" style="width:100%">💰 전체 저축 보기</button></div>
+    <div class="setJump" style="margin-top:8px"><button class="mbtn ghost" id="toRecord">📒 저축 기록 보기</button></div>
     <div class="setJump" style="margin-top:8px"><button class="mbtn ghost" id="authLogin" style="width:100%">☁️ 구글로 로그인</button></div>
     <div class="mActions"><button class="mbtn ghost" id="setClose">닫기</button></div>
+  </div>
+</div>
+
+<div class="scrim" id="kidPickScrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="아이 선택">
+    <h2 class="jua" style="text-align:center">오늘은 누구의 저금통?</h2>
+    <p class="sub" style="text-align:center">사용할 아이를 골라 주세요. 이 기기에 기억돼요 🧠</p>
+    <div class="famTotal" id="kidPickTotal">우리 가족이 함께 모은 돈 💰 <b>—</b></div>
+    <div class="famTrend" id="famTrend" hidden><div class="famTrendChart" id="famTrendChart"></div></div>
+    <div class="kidPickList" id="kidPickList"></div>
+    <div class="mActions"><button class="mbtn ghost" id="famShare">📷 이미지로 저장·공유</button><button class="mbtn ghost" id="kidPickClose">닫기</button></div>
   </div>
 </div>
 
@@ -1372,9 +1418,12 @@ function artFor(g){
   return ART.gift(g.color||'#E0564B');
 }
 
+function saveLastChild(id){ try{ localStorage.setItem('oinky_last_child', String(id)); }catch(e){} }
+function getLastChild(){ try{ return localStorage.getItem('oinky_last_child'); }catch(e){ return null; } }
 async function loadChild(id){
   const c=await db.child(id), goals=await db.goals(id), deps=await db.deposits(id);
   S={ childId:id, childName:c.name, activeId:c.active_goal||(goals[0]&&goals[0].id), goals, deposits:deps };
+  saveLastChild(id);
   render();
 }
 
@@ -1830,7 +1879,10 @@ function kidFace(color){ const c=color||'#F25C9A', earIn=_mix(c,'#ffffff',.5), c
    +`<circle cx="96" cy="118" r="6" fill="#241B36"/><circle cx="148" cy="118" r="6" fill="#241B36"/>`
    +`<path d="M100,202 q20,16 40,0" stroke="${nostril}" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`; }
 function kidColorOf(cid){ const c=children.find(x=>x.id===cid); return (c&&c.color)||'#F25C9A'; }
-function setKidTag(){ const el=$("#kidTag"); if(!el) return; el.innerHTML='<span class="kavatar">'+kidFace(kidColorOf(S.childId))+'</span>'+(S.childName||''); }
+function setKidTag(){ const el=$("#kidTag"); if(el) el.innerHTML='<span class="kavatar">'+kidFace(kidColorOf(S.childId))+'</span>'+(S.childName||'');
+  const nb=$("#kidNow"); if(nb){ const col=kidColorOf(S.childId)||'#F25C9A';
+    nb.style.borderColor=col; nb.style.boxShadow='0 8px 22px -14px '+col;
+    nb.innerHTML='<span class="kavatar">'+kidFace(col)+'</span><span><b style="color:'+col+'">'+(S.childName||'')+'</b>의 저금통</span><span class="swap">바꾸기 ▾</span>'; } }
 function persistOrder(){ if(!LIVE) return; children.forEach((c,i)=>{ try{ db.setKidSort(c.id,i); }catch(e){} }); }
 function reorderLocal(cid,dir){ const a=children, i=a.findIndex(c=>c.id===cid), j=i+dir; if(i<0||j<0||j>=a.length) return; const t=a[i]; a[i]=a[j]; a[j]=t;
   if(!LIVE){ const b=demoDB.children, x=b.findIndex(c=>c.id===cid), y=x+dir; if(x>=0&&y>=0&&y<b.length){ const tt=b[x]; b[x]=b[y]; b[y]=tt; } } }
@@ -2122,7 +2174,7 @@ $("#kidManage").addEventListener("click",async e=>{
     await db.delKid(id); children=await db.children();
     if(S.childId===id && children[0]) await loadChild(children[0].id);
     drawKidManage(); drawKids(); const ni=$("#kidName"); if(ni) ni.value=S.childName; setKidTag(); toast("사용자를 삭제했어요.", false); return; }
-  if(sw){ const id=sw.dataset.switch; if(id!==S.childId){ await loadChild(id); drawKidManage(); drawKids(); const ni=$("#kidName"); if(ni) ni.value=S.childName; setKidTag(); } }
+  if(sw){ const id=sw.dataset.switch; if(id!==S.childId){ await loadChild(id); drawKidManage(); drawKids(); const ni=$("#kidName"); if(ni) ni.value=S.childName; setKidTag(); notifyRemember(S.childName); } }
 });
 $("#kidSave").onclick=async()=>{ const v=$("#kidName").value.trim(); if(!v){ toast("이름을 입력해 주세요.", true); return; }
   await db.renameKid(S.childId,v); S.childName=v; children=await db.children(); drawKids(); drawKidManage(); setKidTag(); toast("이름을 '"+v+"'(으)로 바꿨어요.", false); };
@@ -2149,7 +2201,7 @@ document.addEventListener("keydown", e=>{ if(e.key==='Escape' && closeTopModal()
   const sync=()=>{ const n=cnt(); if(n>depth){ for(let i=0;i<n-depth;i++){ try{ history.pushState({oinkyModal:1},''); }catch(_){} } } depth=n; };
   try{ const mo=new MutationObserver(sync); scrims.forEach(s=>mo.observe(s,{attributes:true,attributeFilter:['class']})); }catch(_){}
   window.addEventListener("popstate", ()=>{ if(cnt()>0){ closeTopModal(); depth=cnt(); } }); })();
-$("#kidPills").addEventListener("click",e=>{ const b=e.target.closest("[data-kid]"); if(b) loadChild(b.dataset.kid).then(openSettings); });
+$("#kidPills").addEventListener("click",e=>{ const b=e.target.closest("[data-kid]"); if(b) loadChild(b.dataset.kid).then(()=>{ setKidTag(); notifyRemember(S.childName); openSettings&&openSettings(); }); });
 $("#volRange").addEventListener("input", e=> setVol(+e.target.value, false));
 $("#volRange").addEventListener("change", e=> setVol(+e.target.value, true));
 $("#volMute").onclick=()=>{ sndMode = (sndMode==='sound')?'silent':'sound'; applySound(); drawVol(); if(sndMode==='sound') blip(1000); };
@@ -2258,11 +2310,79 @@ $("#obStart").onclick=async()=>{ const v=($("#obName").value||'').trim(); if(!v)
   toast('환영해요! 🐷', false); };
 $("#obName").addEventListener('keydown',e=>{ if(e.key==='Enter') $("#obStart").click(); });
 
+function _rr(x,X,Y,W,H,r){ x.beginPath(); x.moveTo(X+r,Y); x.arcTo(X+W,Y,X+W,Y+H,r); x.arcTo(X+W,Y+H,X,Y+H,r); x.arcTo(X,Y+H,X,Y,r); x.arcTo(X,Y,X+W,Y,r); x.closePath(); }
+function drawFamilyCanvas(s){ return new Promise(res=>{
+  const W=720, pad=46, rowH=72, headH=232, footH=64, H=headH + Math.max(1,s.rows.length)*rowH + footH;
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H; const x=cv.getContext('2d');
+  const g=x.createLinearGradient(0,0,W,H); g.addColorStop(0,'#1B1230'); g.addColorStop(1,'#241634'); x.fillStyle=g; x.fillRect(0,0,W,H);
+  x.fillStyle='#fff'; x.font='800 36px system-ui,-apple-system,sans-serif'; x.textBaseline='alphabetic'; x.fillText('가족 저축 현황', pad, 66);
+  x.fillStyle='#B6A6CE'; x.font='600 20px system-ui,sans-serif'; x.textAlign='right'; x.fillText(s.date, W-pad, 62); x.textAlign='left';
+  x.fillStyle='#D9CEEC'; x.font='700 20px system-ui,sans-serif'; x.fillText('우리 가족이 함께 모은 돈', pad, 120);
+  x.fillStyle='#F25C9A'; x.font='800 46px system-ui,sans-serif'; x.fillText(won(s.grand)+'원', pad, 170);
+  const mTxt=(s.month>=0?'+':'−')+won(Math.abs(s.month))+'원'; x.fillStyle=s.month>=0?'#2BC4A0':'#F2A65C'; x.font='800 26px system-ui,sans-serif'; x.textAlign='right'; x.fillText('이번 달 '+mTxt, W-pad, 168); x.textAlign='left';
+  x.strokeStyle='rgba(255,255,255,.13)'; x.lineWidth=1; x.beginPath(); x.moveTo(pad,headH-24); x.lineTo(W-pad,headH-24); x.stroke();
+  s.rows.forEach((r,i)=>{ const y=headH + i*rowH;
+    x.fillStyle=r.color; x.beginPath(); x.arc(pad+13, y+24, 13, 0, Math.PI*2); x.fill();
+    x.fillStyle='#fff'; x.font='800 23px system-ui,sans-serif'; x.fillText(r.name, pad+40, y+32);
+    x.fillStyle='#B6A6CE'; x.font='600 18px system-ui,sans-serif'; x.textAlign='right';
+    x.fillText(r.done?'목표 달성!':(r.goal+'  '+r.pct+'%  ·  남은 '+wonShort(r.remain)+'원'), W-pad, y+32); x.textAlign='left';
+    const bx=pad+40, bw=W-pad-bx, by=y+44, bh=9; x.fillStyle='rgba(255,255,255,.13)'; _rr(x,bx,by,bw,bh,4.5); x.fill();
+    x.fillStyle=r.color; _rr(x,bx,by,Math.max(7,bw*Math.min(100,r.pct)/100),bh,4.5); x.fill(); });
+  x.fillStyle='#8E80A8'; x.font='700 18px system-ui,sans-serif'; x.fillText('꿀꿀이 · 보는 저축이 습관이 됩니다', pad, H-26);
+  x.textAlign='right'; x.fillText('savinig.vercel.app', W-pad, H-26); x.textAlign='left';
+  cv.toBlob(b=>res(b), 'image/png'); }); }
+async function shareFamilyCard(){ if(!_famSummary){ toast('잠시 후 다시 시도해 주세요.', true); return; }
+  let blob; try{ blob=await drawFamilyCanvas(_famSummary); }catch(e){ blob=null; }
+  if(!blob){ toast('이미지를 만들지 못했어요.', true); return; }
+  const file=new File([blob],'family-savings.png',{type:'image/png'});
+  try{ if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'가족 저축 현황'}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+  try{ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='family-savings.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),3000); toast('이미지를 저장했어요. 배우자에게 공유해 보세요!', false); }
+  catch(e){ toast('저장에 실패했어요.', true); } }
+function notifyRemember(name){ if(name) toast('이 기기는 ‘'+name+'’(으)로 기억할게요 🧠', false); }
+function kidPickerOn(){ try{ return localStorage.getItem('oinky_kid_picker')==='1'; }catch(e){ return false; } }
+function setKidPicker(on){ try{ localStorage.setItem('oinky_kid_picker', on?'1':'0'); }catch(e){} updKidPickLbl(); toast(on?'시작할 때 아이 선택 화면을 켰어요.':'시작할 때 아이 선택 화면을 껐어요.', false); }
+function updKidPickLbl(){ const l=$("#kidPickLbl"); if(l) l.textContent= kidPickerOn()?'시작할 때 아이 선택 켬':'시작할 때 아이 선택 끔'; const b=$("#kidPickBtn"); if(b) b.textContent= kidPickerOn()?'✅':'🙋'; }
+let _famSummary=null;
+async function buildKidPick(){ const el=$("#kidPickList"); if(!el) return;
+  el.innerHTML=children.map(c=>'<button class="kidPickItem '+(c.id===S.childId?'on':'')+'" data-pick="'+c.id+'"><span class="kavatar">'+kidFace(c.color)+'</span><span class="kpName">'+c.name+'</span><span class="kpGoalRow"><img class="kpThumb" id="kpt_'+c.id+'" alt=""><span class="kpGoal" id="kpg_'+c.id+'">불러오는 중…</span></span><span class="kpBar"><i id="kpb_'+c.id+'"></i></span><span class="kpRemain" id="kpr_'+c.id+'"></span></button>').join('');
+  let grand=0, month=0; const now=new Date(), cy=now.getFullYear(), cm=now.getMonth(); const magg={}, rows=[];
+  for(const c of children){ try{
+    const gs=await db.goals(c.id), ch=await db.child(c.id), deps=await db.deposits(c.id);
+    deps.forEach(d=>{ const a=d.amount||0; grand+=a; const dt=new Date(d.t||0); const k=dt.getFullYear()+'-'+dt.getMonth(); magg[k]=(magg[k]||0)+a; if(dt.getFullYear()===cy&&dt.getMonth()===cm) month+=a; });
+    const act=gs.find(g=>g.id===(ch&&ch.active_goal))||gs[0];
+    const gEl=$("#kpg_"+c.id), bEl=$("#kpb_"+c.id), tEl=$("#kpt_"+c.id), rEl=$("#kpr_"+c.id);
+    if(act){ const saved=deps.filter(d=>d.goal_id===act.id).reduce((s,d)=>s+(d.amount||0),0);
+      const pct=Math.max(0,Math.min(100,Math.round(saved/((act.price)||1)*100))), remain=Math.max(0,(act.price||0)-saved), done=saved>=(act.price||0);
+      if(gEl) gEl.textContent=act.name+' '+pct+'%'; if(bEl){ bEl.style.width=pct+'%'; bEl.style.background=c.color||'#F25C9A'; }
+      if(tEl){ try{ const a=artFor(act); if(a&&a.src){ tEl.src=a.src; tEl.style.display='block'; } }catch(_){} }
+      if(rEl){ if(done){ rEl.textContent='🎉 목표 달성!'; rEl.classList.add('done'); } else { rEl.textContent=act.name+'까지 '+wonShort(remain)+'원'; } }
+      rows.push({name:c.name, color:c.color||'#F25C9A', goal:act.name, pct, remain, done}); }
+    else { if(gEl) gEl.textContent='목표 없음'; rows.push({name:c.name, color:c.color||'#F25C9A', goal:'목표 없음', pct:0, remain:0, done:false}); }
+  }catch(e){ const gEl=$("#kpg_"+c.id); if(gEl) gEl.textContent=''; } }
+  const tot=$("#kidPickTotal"); if(tot){ const mTxt=month>=0?('+'+won(month)):('−'+won(-month));
+    tot.innerHTML='<div>우리 가족이 함께 모은 돈 💰 <b>'+won(grand)+'원</b></div><div class="famMonth" id="famMonthTap">이번 달 <b class="'+(month>=0?'up':'down')+'">'+mTxt+'원</b> ▾</div>'; }
+  const monthly=[]; for(let i=5;i>=0;i--){ let y=cy, mo=cm-i; while(mo<0){ mo+=12; y-=1; } monthly.push({mo:mo+1, val:magg[y+'-'+mo]||0, cur:i===0}); }
+  drawFamTrend(monthly);
+  _famSummary={ grand, month, date: cy+'.'+String(cm+1).padStart(2,'0')+'.'+String(now.getDate()).padStart(2,'0'), rows }; }
+function drawFamTrend(monthly){ const el=$("#famTrendChart"); if(!el) return; const max=Math.max(1,...monthly.map(m=>Math.max(0,m.val)));
+  el.innerHTML=monthly.map(m=>{ const h=Math.round(Math.max(0,m.val)/max*54); return '<div class="ftCol'+(m.cur?' cur':'')+'"><div class="ftBarWrap"><div class="ftBar" style="height:'+(h+(m.val>0?2:0))+'px"></div></div><div class="ftLbl">'+m.mo+'월</div></div>'; }).join(''); }
+function openKidPicker(){ const tot=$("#kidPickTotal"); if(tot) tot.innerHTML='<div>우리 가족이 함께 모은 돈 💰 <b>—</b></div><div class="famMonth">이번 달 <b>—</b></div>'; const tr=$("#famTrend"); if(tr) tr.hidden=true; buildKidPick(); $("#kidPickScrim").classList.add('show'); }
+(function(){ const c=$("#kidPickClose"); if(c) c.onclick=()=>$("#kidPickScrim").classList.remove('show');
+  const sc=$("#kidPickScrim"); if(sc) sc.addEventListener("click",e=>{ if(e.target===sc) sc.classList.remove('show'); });
+  const b=$("#kidPickBtn"); if(b) b.onclick=()=>setKidPicker(!kidPickerOn());
+  const kn=$("#kidNow"); if(kn){ kn.onclick=()=>{ if(children.length>1) openKidPicker(); else if(typeof openSettings==='function') openSettings(); };
+    kn.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); kn.click(); } }; }
+  const fam=$("#toFamily"); if(fam) fam.onclick=()=>{ if(typeof closeSet==='function') closeSet(); else $("#setScrim").classList.remove('show'); openKidPicker(); };
+  const lst=$("#kidPickList"); if(lst) lst.addEventListener("click",async e=>{ const t=e.target.closest("[data-pick]"); if(!t) return; const id=t.dataset.pick; $("#kidPickScrim").classList.remove('show'); if(id!==S.childId){ await loadChild(id); drawKids(); setKidTag(); notifyRemember(S.childName); } });
+  const totBox=$("#kidPickTotal"); if(totBox) totBox.addEventListener("click",e=>{ if(e.target.closest(".famMonth")){ const tr=$("#famTrend"); if(tr) tr.hidden=!tr.hidden; } });
+  const sh=$("#famShare"); if(sh) sh.onclick=shareFamilyCard;
+})();
 async function init(){
   if(LIVE){ const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2'); sb=createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY); await refreshSession(); }
   children=await db.children();
   if(LIVE && children.length===0){ showOnboarding(); }
-  else { if(children.length) await loadChild(children[0].id); if(!AUTH.isSet()){ setTimeout(()=>openAuth(true),700); } }
+  else { if(children.length){ const last=getLastChild(); const found=last?children.find(c=>String(c.id)===String(last)):null; await loadChild((found||children[0]).id); if(kidPickerOn() && children.length>1) openKidPicker(); } if(!AUTH.isSet()){ setTimeout(()=>openAuth(true),700); } }
+  updKidPickLbl();
   if('serviceWorker' in navigator){ try{ await navigator.serviceWorker.register('./sw.js'); }catch(e){} }
 }
 init();
