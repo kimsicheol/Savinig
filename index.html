@@ -13,22 +13,23 @@
 <link rel="apple-touch-icon" href="./icon-192.png" />
 <link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png" />
 <title>꿀꿀이 · Oinky</title>
-<meta name="description" content="모을수록 컬러로 차오르는 아이 저금통. 목표를 정하고 저축하면 흑백 그림이 컬러로 채워져요." />
+<meta name="description" content="목표를 눈으로 그리고 스스로 모으며, 만족을 미루고 끝까지 해내는 힘을 길러요. 저축 습관·자기조절을 키우는 아이 시각화 저금통." />
+<!-- 예비(감성형) 카피: 제목 "눈에 보이면 끝까지 모은다 · 시각화로 목표를 이루는 저금통" / 설명 "갖고 싶은 목표를 눈앞에 그려두고, 채워지는 걸 보며 아이가 스스로 끝까지 모아 이뤄내요." / 이미지 og-emotion.png -->
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="꿀꿀이 Oinky" />
-<meta property="og:title" content="꿀꿀이 — 모을수록 컬러로 차오르는 저금통" />
-<meta property="og:description" content="목표를 정하고 저축하면 흑백 그림이 컬러로 차올라요. 아이가 스스로 모으고 싶어지는 저금통." />
+<meta property="og:title" content="보는 저축이 습관이 됩니다 · 자기조절을 키우는 아이 저금통" />
+<meta property="og:description" content="목표를 눈으로 그리고 스스로 모으며, 만족을 미루고 끝까지 해내는 힘을 길러요. 저축 습관·자기조절 훈련." />
 <meta property="og:url" content="https://savinig.vercel.app/" />
 <meta property="og:image" content="https://savinig.vercel.app/og.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="꿀꿀이 — 모을수록 컬러로 차오르는 저금통" />
+<meta property="og:image:alt" content="보는 저축이 습관이 됩니다 · 자기조절을 키우는 시각화 저금통 꿀꿀이" />
 <link rel="image_src" href="https://savinig.vercel.app/og.png" />
 <meta property="og:locale" content="ko_KR" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="꿀꿀이 — 모을수록 컬러로 차오르는 저금통" />
-<meta name="twitter:description" content="목표를 정하고 저축하면 흑백 그림이 컬러로 차올라요." />
+<meta name="twitter:title" content="보는 저축이 습관이 됩니다 · 자기조절을 키우는 아이 저금통" />
+<meta name="twitter:description" content="목표를 눈으로 그리고 스스로 모으며, 만족을 미루고 끝까지 해내는 힘을 길러요." />
 <meta name="twitter:image" content="https://savinig.vercel.app/og.png" />
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
@@ -607,7 +608,7 @@
   </div>
   <button class="btn next" id="nextGoalBtn" hidden>🎯 다음 목표 정하기</button>
   <div class="bank" id="bank">
-    <div class="bankLbl">💰 저축하기 <span class="bankSub" id="bankSub">금액을 눌러 담고, 저축하기를 누르면 보호자 인증 후 저장돼요</span></div>
+    <div class="bankLbl">💰 저축하기 <span class="bankSub" id="bankSub">조금씩 꾸준히 모으는 습관 · 담고 ‘저축하기’를 누르면 보호자 인증 후 저장돼요</span></div>
     <div class="modeSeg" id="modeSeg">
       <button class="on" data-mode="add" type="button">＋ 담기</button>
       <button data-mode="sub" type="button">－ 빼기</button>
@@ -655,7 +656,7 @@
     <div class="doneTitle jua">목표 달성!</div>
     <div class="doneName" id="doneOvName"></div>
     <div class="doneStats" id="doneOvStats"></div>
-    <div class="doneSub">정말 잘했어요! 다음 목표도 모아볼까요?</div>
+    <div class="doneSub">끝까지 참고 모았어요! 스스로 해낸 게 정말 멋져요 🎉</div>
     <button class="mbtn primary" id="doneNext">🎯 다음 목표</button>
     <button class="mbtn ghost" id="doneNew">➕ 새 목표 만들기</button>
     <button class="mbtn ghost" id="doneClose">닫기</button>
@@ -776,7 +777,8 @@
 <div class="scrim ob" id="obScrim">
   <div class="modal obCard" role="dialog" aria-modal="true" aria-label="시작하기">
     <div class="obIcon" id="obIcon"></div>
-    <h2 class="jua" style="text-align:center">우리집 저금통 시작하기</h2>
+    <h2 class="jua" style="text-align:center">보는 저축이 습관이 됩니다</h2>
+    <p style="text-align:center; color:#F25C9A; font-weight:800; font-size:13.5px; margin:3px 0 10px">자기조절을 키우는 우리집 시각화 저금통</p>
     <p class="sub" id="obSub" style="text-align:center">구글로 로그인하면 시작할 수 있어요.</p>
     <button class="mbtn primary" id="obGoogle" style="width:100%; margin-top:6px">☁️ 구글로 로그인</button>
     <p class="obHint" id="obLoginState">내 가족 저금통은 내 구글 계정에만 저장돼요.</p>
@@ -1605,7 +1607,7 @@ function drawPending(){ const el=$("#pending"); if(!el) return; el.hidden = pend
     $("#pendSave").textContent = reached ? "🎉 목표 달성하고 저축하기" : (pend>0?"👆 "+won(pend)+"원 저축하기":"👆 "+won(-pend)+"원 빼기");
     $("#pendSave").classList.toggle('goal', !!reached); }
   updatePreviewFill(); }
-function addPending(amt, srcEl){ const g=active(); if(!g){ toast("먼저 목표를 정해요.", true); openSettings(); return; }
+function addPending(amt, srcEl){ const g=active(); if(!g){ toast("먼저 모을 목표를 정해요. 작게 시작해도 좋아요!", true); openSettings(); return; }
   const saved=savedFor(g.id); let np=pend+amt;
   if(saved+np<0){ np=-saved; toast("더 뺄 수 없어요.", true); }
   const applied = np-pend;
@@ -1747,6 +1749,25 @@ const APP_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 5
  +'<ellipse cx="0" cy="44" rx="90" ry="66" fill="#D6347B"/><ellipse cx="-30" cy="44" rx="15" ry="23" fill="#7d1c47"/><ellipse cx="30" cy="44" rx="15" ry="23" fill="#7d1c47"/>'
  +'<circle cx="-58" cy="-44" r="24" fill="#241B36"/><circle cx="58" cy="-44" r="24" fill="#241B36"/><circle cx="-64" cy="-50" r="7" fill="#fff"/><circle cx="52" cy="-50" r="7" fill="#fff"/>'
  +'<path d="M-46,118 q46,38 92,0" stroke="#9B2360" stroke-width="12" fill="none" stroke-linecap="round"/></g></svg>';
+function obHeroSVG(){
+  var anim = !_noMotion();
+  var pg=function(b,sl,sn,no,ey,ch){ return '<path d="M-58 -28 L-72 -64 L-30 -38 Z" fill="'+b+'"/><path d="M58 -28 L72 -64 L30 -38 Z" fill="'+b+'"/>'
+    +'<circle cx="0" cy="6" r="86" fill="'+b+'"/><rect x="-30" y="-30" width="60" height="12" rx="6" fill="'+sl+'"/>'
+    +'<ellipse cx="0" cy="22" rx="46" ry="33" fill="'+sn+'"/><circle cx="-14" cy="22" r="8.5" fill="'+no+'"/><circle cx="14" cy="22" r="8.5" fill="'+no+'"/>'
+    +'<circle cx="-26" cy="-12" r="9.5" fill="'+ey+'"/><circle cx="26" cy="-12" r="9.5" fill="'+ey+'"/><circle cx="-23" cy="-15" r="3.2" fill="#fff"/><circle cx="29" cy="-15" r="3.2" fill="#fff"/>'
+    +'<circle cx="-44" cy="14" r="12" fill="'+ch+'" opacity="0.8"/><circle cx="44" cy="14" r="12" fill="'+ch+'" opacity="0.8"/>'; };
+  var GRAY=pg('#6E6A75','#46434B','#9A949F','#46434B','#3A3740','#8A858F');
+  var COLOR=pg('#F25C9A','#7A2B50','#FFB3CF','#7A2B50','#3A2233','#FF9CC2');
+  var sp='calcMode="spline" keyTimes="0;1" keySplines="0.22 1 0.36 1"';
+  var cy=anim?92:-17, ch0=anim?0:109, wy=anim?92:-19.5;
+  var aClip=anim?('<animate attributeName="y" values="92;-17" dur="1.7s" begin="0.35s" fill="freeze" '+sp+'/><animate attributeName="height" values="0;109" dur="1.7s" begin="0.35s" fill="freeze" '+sp+'/>'):'';
+  var aWl=anim?('<animate attributeName="y" values="92;-19.5" dur="1.7s" begin="0.35s" fill="freeze" '+sp+'/>'):'';
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">'
+    +'<defs><clipPath id="obFill" clipPathUnits="userSpaceOnUse"><rect x="-95" y="'+cy+'" width="190" height="'+ch0+'">'+aClip+'</rect></clipPath></defs>'
+    +'<rect width="96" height="96" rx="26" fill="#FFFFFF"/>'
+    +'<g transform="translate(48,51) scale(0.49)"><g opacity="0.9">'+GRAY+'</g><g clip-path="url(#obFill)">'+COLOR+'</g>'
+    +'<rect x="-80" y="'+wy+'" width="160" height="5" rx="2.5" fill="#fff" opacity="0.9">'+aWl+'</rect></g></svg>';
+}
 function openIcon(){ const p=$("#iconPrev"); if(p) p.innerHTML=APP_ICON_SVG; updateInstallUI(); document.body.classList.add('modalview'); $("#iconScrim").classList.add("show"); }
 function closeIcon(){ $("#iconScrim").classList.remove("show"); if(!$("#recordScrim").classList.contains('show') && !$("#setScrim").classList.contains('show')) document.body.classList.remove('modalview'); }
 function downloadIcon(){
@@ -1960,7 +1981,7 @@ let saveMode='add';
 function fmtAmtBtns(){ const sign = saveMode==='sub'?'−':'+'; document.querySelectorAll('#amtRow .amt').forEach(b=>{ b.textContent = sign + won(+b.dataset.val); }); }
 function setSaveMode(m){ saveMode=m; const seg=$("#modeSeg"); if(seg) seg.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('on', x.dataset.mode===m));
   const row=$("#amtRow"); if(row){ row.classList.toggle('sub', m==='sub'); row.classList.toggle('add', m!=='sub'); }
-  const sub=$("#bankSub"); if(sub) sub.textContent = m==='sub' ? '잘못 담았을 때 금액을 빼서 바로잡을 수 있어요' : '금액을 눌러 담은 뒤 저축하기를 누르면 보호자 인증 후 저장돼요';
+  const sub=$("#bankSub"); if(sub) sub.textContent = m==='sub' ? '잘못 담았을 때 금액을 빼서 바로잡을 수 있어요' : '조금씩 꾸준히 모으는 습관 · 담고 ‘저축하기’를 누르면 보호자 인증 후 저장돼요';
   fmtAmtBtns(); }
 $("#bank").addEventListener("click",e=>{ const md=e.target.closest("[data-mode]"); if(md){ setSaveMode(md.dataset.mode); return; }
   const b=e.target.closest("[data-val]"); if(b){ addPending(+b.dataset.val * (saveMode==='sub'?-1:1), b); } });
@@ -2214,7 +2235,7 @@ async function loginGoogle(){ if(!(LIVE&&sb)){ toast('먼저 저장(서버) 연�
   catch(e){ toast('구글 로그인에 실패했어요. 잠시 후 다시 시도해 주세요.', true); } }
 async function logoutGoogle(){ if(!(LIVE&&sb)) return; try{ await sb.auth.signOut(); }catch(e){} _session=null;
   closeSet&&closeSet(); children=await db.children(); showOnboarding(); toast('로그아웃했어요.', false); }
-function showOnboarding(){ const ic=$("#obIcon"); if(ic) ic.innerHTML=APP_ICON_SVG; updateLoginState(); $("#obScrim").classList.add('show'); const n=$("#obName"); if(n) setTimeout(()=>n.focus(),200); }
+function showOnboarding(){ const ic=$("#obIcon"); if(ic) ic.innerHTML=obHeroSVG(); updateLoginState(); $("#obScrim").classList.add('show'); const n=$("#obName"); if(n) setTimeout(()=>n.focus(),200); }
 $("#obGoogle").onclick=loginGoogle;
 $("#authLogin").onclick=()=>{ if(_session) logoutGoogle(); else loginGoogle(); };
 $("#obStart").onclick=async()=>{ const v=($("#obName").value||'').trim(); if(!v){ toast('아이 이름을 입력해 주세요.', true); return; }
