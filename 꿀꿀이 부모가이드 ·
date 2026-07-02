@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>꿀꿀이 · 부모용 사용 가이드</title>
+<style>
+  :root{ --pink:#F25C9A; --mint:#2BC4A0; --gold:#E8A93C; --ink:#241634; --muted:#6E6480; --line:#EDE6F4; --bg:#FBF8FE; }
+  *{ box-sizing:border-box; margin:0; padding:0 }
+  body{ font-family:'Pretendard','Apple SD Gothic Neo',system-ui,sans-serif; color:var(--ink); background:var(--bg); line-height:1.6 }
+  .page{ max-width:860px; margin:0 auto; padding:36px 28px 44px }
+  header{ display:flex; align-items:center; gap:14px; margin-bottom:6px }
+  .logo{ width:52px; height:52px; border-radius:15px; background:linear-gradient(135deg,#34234C,#160E20); display:grid; place-items:center; font-size:28px }
+  h1{ font-size:26px; letter-spacing:-.02em }
+  h1 small{ display:block; font-size:13px; color:var(--muted); font-weight:600 }
+  .tagline{ margin:10px 0 20px; padding:12px 16px; background:#fff; border:1px solid var(--line); border-left:5px solid var(--pink); border-radius:10px; font-weight:700 }
+  h2{ font-size:16px; margin:22px 0 8px; color:var(--pink) }
+  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
+  .card{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px }
+  .card b{ color:var(--ink) }
+  .step{ display:flex; gap:10px; margin-bottom:8px }
+  .step .n{ flex:0 0 26px; height:26px; border-radius:50%; background:var(--pink); color:#fff; font-weight:800; display:grid; place-items:center; font-size:14px }
+  ul{ padding-left:18px } li{ margin:3px 0 }
+  .tip{ font-size:13px; color:var(--muted) }
+  .foot{ margin-top:24px; padding-top:12px; border-top:1px solid var(--line); display:flex; justify-content:space-between; font-size:13px; color:var(--muted); font-weight:700 }
+  .url{ color:var(--pink) }
+  @media print{ body{ background:#fff } .page{ padding:10mm } .card{ break-inside:avoid } }
+  @media (max-width:640px){ .grid{ grid-template-columns:1fr } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="logo">🐷</div>
+    <h1>꿀꿀이 Oinky — 부모용 사용 가이드 <small>보는 저축이 습관이 됩니다 · 자기조절을 키우는 우리집 시각화 저금통</small></h1>
+  </header>
+
+  <div class="tagline">아이가 갖고 싶은 목표를 <b>흑백 그림</b>으로 정하고, 저축할 때마다 <b>컬러로 차오르는</b> 걸 눈으로 보며 스스로 끝까지 모으는 앱입니다. 모든 저축·빼기는 <b>보호자 인증(지문/PIN)</b> 후에만 저장됩니다.</div>
+
+  <h2>① 처음 시작 (5분)</h2>
+  <div class="card">
+    <div class="step"><div class="n">1</div><div><b>접속·로그인</b> — <span class="url">savinig.vercel.app</span> 을 크롬/사파리로 열고 구글로 로그인합니다. (카톡 링크가 막히면 상단 ‘기본 브라우저로 열기’)</div></div>
+    <div class="step"><div class="n">2</div><div><b>아이 등록</b> — 아이 이름을 넣으면 시작됩니다. 형제는 설정 → 사용자에서 ‘＋추가’.</div></div>
+    <div class="step"><div class="n">3</div><div><b>보호자 인증 설정</b> — 처음에 지문(또는 4자리 PIN)을 등록합니다. 이후 모든 저축·빼기에 필요합니다.</div></div>
+    <div class="step"><div class="n">4</div><div><b>첫 목표 만들기</b> — ‘＋’에서 이름·가격을 정하면 그림이 자동 추천됩니다(사진·이모지·색 변경 가능).</div></div>
+  </div>
+
+  <h2>② 매일 쓰는 법</h2>
+  <div class="grid">
+    <div class="card"><b>💰 저축하기</b><ul><li>+10 ~ +10,000 버튼으로 담고 → 큰 분홍 버튼 → 보호자 인증</li><li>잘못 담았으면 ‘－빼기’ 토글로 바로잡기</li><li>그림이 아래에서 위로 컬러로 차올라요</li></ul></div>
+    <div class="card"><b>🔥 연속 저축(스트릭)</b><ul><li>매일 한 번이라도 저축하면 기록이 쌓여요</li><li>3·7·14·30일마다 축하, 7일 이상마다 ❄️ ‘하루 쉬어가기’ 1개(최대 2개)</li><li>하루 빠져도 ❄️가 자동으로 기록을 지켜줘요</li><li>🔥칩을 누르면 ‘내 아이템’에서 보유·사용 내역 확인</li></ul></div>
+    <div class="card"><b>📊 기록·통계</b><ul><li>‘저축 기록 보기’ → 월별 그래프(6/12개월), 달별 필터</li><li>목표별 필터, 이번 달 합계·전달 비교</li></ul></div>
+    <div class="card"><b>👨‍👩‍👧‍👦 가족 대시보드</b><ul><li>상단 ‘○○의 저금통’ 배너 탭 → 아이 전환</li><li>가족 전체 모은 돈 + 이번 달 + 아이별 진행률</li><li>‘📷 이미지로 저장·공유’로 배우자에게 현황 공유</li></ul></div>
+  </div>
+
+  <h2>③ 편리한 설정 (기기별 적용)</h2>
+  <div class="card">
+    <ul>
+      <li><b>기기별 아이 기억</b> — 각 태블릿에서 마지막에 고른 아이로 자동 시작 (첫째 기기=첫째, 둘째 기기=둘째)</li>
+      <li><b>시작할 때 아이 선택</b> — 형제가 한 기기를 같이 쓰면 켜두세요 (설정 → 사용자)</li>
+      <li><b>🔔 저축 알림</b> — 시간을 정하면(기본 19:30) 앱이 켜져 있을 때 ‘오늘도 모아볼까요?’ 알림 (안 쓰는 태블릿을 상시 저금통으로 두면 최고!)</li>
+      <li><b>앱 설치</b> — 브라우저 메뉴 → ‘홈 화면에 추가’로 앱처럼 사용</li>
+    </ul>
+  </div>
+
+  <h2>④ 실제 돈과 연결하는 팁</h2>
+  <div class="card">
+    <ul>
+      <li><b>실물 병행</b> — 앱에 담을 때 실제 저금통·봉투에도 같이 넣기 (어린 아이에게 효과 최고)</li>
+      <li><b>통장 미러링</b> — 카카오뱅크 mini·토스 아이통장에 같은 금액 이체, 월 1회 잔액 맞추기</li>
+      <li><b>부모 이자·매칭</b> — ‘한 달 모으면 5% 보너스’처럼 인내에 보상 주기</li>
+      <li><b>달성 의식</b> — 100% 달성 시 모은 돈으로 아이가 직접 결제하게 하기</li>
+    </ul>
+    <p class="tip" style="margin-top:6px">※ 앱은 기록·시각화 도구이며, 실제 돈은 보호자와 은행이 관리합니다.</p>
+  </div>
+
+  <div class="foot"><span>🐷 꿀꿀이 Oinky</span><span class="url">savinig.vercel.app</span></div>
+</div>
+</body>
+</html>
