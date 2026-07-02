@@ -532,6 +532,10 @@
   .kidNow:active{transform:scale(.97)}
   .kidNow .kavatar{width:26px; height:26px; margin:0}
   .kidNow .swap{font-size:12px; font-weight:800; color:var(--muted); margin-left:2px}
+  .streakChip{display:flex; align-items:center; justify-content:center; gap:6px; width:max-content; margin:8px auto 0; padding:6px 14px; background:linear-gradient(135deg, rgba(255,150,60,.18), rgba(242,92,154,.14)); border:1px solid rgba(255,160,80,.45); border-radius:999px; font-weight:800; font-size:13px; color:var(--ink)}
+  .streakChip b{color:#FF9E4A}
+  .streakChip.pop{animation:stPop .5s cubic-bezier(.3,1.6,.5,1)}
+  @keyframes stPop{0%{transform:scale(.7)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
   .kidPickList{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:8px 0 4px}
   .kidPickItem{display:flex; flex-direction:column; align-items:center; gap:9px; padding:18px 12px; background:var(--card-2); border:1px solid var(--line-2); border-radius:16px; cursor:pointer; font-family:inherit; font-weight:800; font-size:15px; color:var(--ink); transition:transform .12s, border-color .2s}
   .kidPickItem:active{transform:scale(.97)}
@@ -614,6 +618,7 @@
     </div>
   </header>
   <div class="kidNow" id="kidNow" role="button" tabindex="0" aria-label="아이 바꾸기"></div>
+  <div class="streakChip" id="streakChip" hidden></div>
   <nav class="goaltabs" id="goalTabs" aria-label="목표 탭"></nav>
   <div class="head">
     <h1 class="goalName jua" id="goalName">—</h1>
@@ -794,10 +799,37 @@
     <p class="hint">사용자(아이)를 새로 만들거나 이름을 바꿀 수 있어요.</p>
     <div class="setRow" style="margin-top:6px"><button class="themeBtn" id="kidPickBtn" type="button" aria-label="시작 시 아이 선택">🙋</button><span class="setLbl" id="kidPickLbl">시작할 때 아이 선택 끔</span></div>
     <p class="hint">여러 아이가 한 기기를 함께 쓸 때 켜면, 앱을 열 때 아이를 고르는 화면이 먼저 나와요. (이 기기에만 적용)</p>
+    <div class="setRow" style="margin-top:6px"><button class="themeBtn" id="remindBtn" type="button" aria-label="저축 알림">🔔</button><span class="setLbl" id="remindLbl">저축 알림 끔</span><input type="time" id="remindTime" value="19:30" style="margin-left:auto; padding:8px 10px; border-radius:10px; border:1px solid var(--line-2); background:var(--card-2); color:var(--ink); font-family:inherit; font-size:14px"></div>
+    <p class="hint">앱이 켜져 있으면, 정한 시간에 ‘오늘도 모아볼까요?’ 알림을 보여줘요. 항상 켜둔 저금통 태블릿에 딱 좋아요. (이 기기에만 적용)</p>
     <div class="setJump"><button class="mbtn ghost" id="toFamily" style="width:100%">💰 전체 저축 보기</button></div>
     <div class="setJump" style="margin-top:8px"><button class="mbtn ghost" id="toRecord">📒 저축 기록 보기</button></div>
     <div class="setJump" style="margin-top:8px"><button class="mbtn ghost" id="authLogin" style="width:100%">☁️ 구글로 로그인</button></div>
     <div class="mActions"><button class="mbtn ghost" id="setClose">닫기</button></div>
+  </div>
+</div>
+
+<div class="scrim" id="itemsScrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="내 아이템">
+    <h2 class="jua" style="text-align:center">🎒 내 아이템</h2>
+    <div id="itemsBody"></div>
+    <div class="obIntro" style="margin-top:10px">
+      <div class="obItem"><span class="ic">❄️</span><span class="tx"><b>하루 쉬어가기</b> — 하루 빠져도 연속 기록이 이어져요. <b>7일 연속</b>을 넘을 때마다 1개(최대 2개) 받아요.</span></div>
+      <div class="obItem"><span class="ic">🔥</span><span class="tx"><b>연속 저축</b> — 매일 한 번이라도 저축하면 기록이 쌓여요. 3·7·14·30일마다 축하가 기다려요!</span></div>
+    </div>
+    <div class="mActions"><button class="mbtn ghost" id="itemsClose">닫기</button></div>
+  </div>
+</div>
+
+<div class="scrim" id="coachScrim">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="사용 방법">
+    <h2 class="jua" style="text-align:center">꿀꿀이, 이렇게 써요!</h2>
+    <div class="obIntro">
+      <div class="obItem"><span class="ic">1️⃣</span><span class="tx"><b>목표 정하기</b> — 위쪽 ‘＋’로 갖고 싶은 것과 가격을 정하면 흑백 그림이 생겨요.</span></div>
+      <div class="obItem"><span class="ic">2️⃣</span><span class="tx"><b>금액 담기</b> — 아래 <b>+100, +1,000</b> 버튼을 눌러 모은 돈을 담아요.</span></div>
+      <div class="obItem"><span class="ic">3️⃣</span><span class="tx"><b>저축하기</b> — 큰 분홍 버튼을 누르고 <b>보호자 인증</b>하면 그림이 컬러로 차올라요!</span></div>
+    </div>
+    <p class="sub" style="text-align:center">매일 조금씩 모으면 🔥 연속 저축 기록도 쌓여요.</p>
+    <div class="mActions"><button class="mbtn primary" id="coachOk" style="width:100%">알겠어요, 시작할래요!</button></div>
   </div>
 </div>
 
@@ -1440,6 +1472,7 @@ function render(){
   $("#cheer").innerHTML = left<=0 ? "🎉 목표 달성!" : ("목표 <b>"+wonKo(g.price)+"</b>");
   document.documentElement.style.setProperty('--goalcol', g.color);
   setKidTag();
+  drawStreak();
   const moneyTicks=niceMoneyTicks(g.price), pctTicks=[0,25,50,75,100];
   $("#axisL").innerHTML = moneyTicks.map(v=>`<span class="t" style="bottom:${g.price>0?Math.min(100,v/g.price*100):0}%">${wonShort(v)}</span>`).join("") + `<span class="cur" style="bottom:${Math.min(100,pct)}%; color:${g.color}">${wonShort(saved)}</span>`;
   $("#axisR").innerHTML = pctTicks.map(p=>`<span class="t" style="bottom:${p}%">${p}%</span>`).join("") + `<span class="cur" style="bottom:${Math.min(100,pct)}%; color:${g.color}">${pct}%</span>`;
@@ -1492,6 +1525,10 @@ async function commit(amount, serial, type){
   else { let ms=0; for(const th of [25,50,75]) if(bPct<th && aPct>=th) ms=th;
     if(ms && ms>msSeen(g)){ await setMsSeen(g,ms); mascotCheer(pick(CHEER_MS[ms]),'ms'); celebrate(false); levelBadge(ms); fxMilestone(); toast(({25:"좋아요! 벌써 25%나 모았어요 👏",50:"절반이나 모았어요! 🙌",75:"거의 다 왔어요! 75% 돌파 🔥"})[ms], false); }
     else { mascotCheer(pick(CHEER_SAVE),'happy'); toast(josaIga(S.childName)+" "+won(amount)+"원 저축했어요!", false); } }
+  { const st=calcStreak(); drawStreak(true);
+    if(st.savedToday && [3,7,14,30,50,100].includes(st.days) && _stSeen()!==st.days){ _stMark(st.days);
+      setTimeout(()=>{ toast('🔥 '+st.days+'일 연속 저축 달성! 습관이 되고 있어요 👏', false); if(typeof celebrate==='function') celebrate(false); }, 1700);
+      if(st.days>=7 && _frzN()<2){ _frzSetN(_frzN()+1); setTimeout(()=>{ toast('❄️ ‘하루 쉬어가기’ 아이템 1개 획득! 하루 빠져도 기록이 이어져요.', false); drawStreak(); }, 3400); } } }
   if(document.body.classList.contains('sheet')) drawHistory();
 }
 
@@ -2339,6 +2376,39 @@ async function shareFamilyCard(){ if(!_famSummary){ toast('잠시 후 다시 시
   try{ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='family-savings.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),3000); toast('이미지를 저장했어요. 배우자에게 공유해 보세요!', false); }
   catch(e){ toast('저장에 실패했어요.', true); } }
 function notifyRemember(name){ if(name) toast('이 기기는 ‘'+name+'’(으)로 기억할게요 🧠', false); }
+function _dkey(d){ return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); }
+function _frzN(){ try{ return +(localStorage.getItem('oinky_frz_'+S.childId)||0); }catch(e){ return 0; } }
+function _frzSetN(n){ try{ localStorage.setItem('oinky_frz_'+S.childId, String(Math.max(0,Math.min(2,n)))); }catch(e){} }
+function _frzUsedSet(){ try{ return new Set(JSON.parse(localStorage.getItem('oinky_frzu_'+S.childId)||'[]')); }catch(e){ return new Set(); } }
+function _frzUse(dk){ try{ const s=_frzUsedSet(); s.add(dk); localStorage.setItem('oinky_frzu_'+S.childId, JSON.stringify([...s])); }catch(e){} _frzSetN(_frzN()-1); }
+function calcStreak(){ const days=new Set(); (S.deposits||[]).forEach(d=>{ if((d.amount||0)>0) days.add(_dkey(new Date(d.t||0))); });
+  const today=new Date(); const savedToday=days.has(_dkey(today)); const used=_frzUsedSet(); let frozeUsed=false;
+  let n=0; const cur=new Date(today); if(!savedToday) cur.setDate(cur.getDate()-1);
+  for(let guard=0; guard<400; guard++){ const dk=_dkey(cur);
+    if(days.has(dk)){ n++; cur.setDate(cur.getDate()-1); continue; }
+    if(used.has(dk)){ cur.setDate(cur.getDate()-1); continue; }
+    const prev=new Date(cur); prev.setDate(prev.getDate()-1);
+    if(_frzN()>0 && days.has(_dkey(prev)) && dk!==_dkey(today)){ _frzUse(dk); frozeUsed=true; cur.setDate(cur.getDate()-1); continue; }
+    break; }
+  return { days:n, savedToday, frozeUsed }; }
+function drawStreak(popped){ const el=$("#streakChip"); if(!el) return; const st=calcStreak(); const fz=_frzN(); const fzTxt=fz>0?' <span style="opacity:.85">· ❄️×'+fz+'</span>':'';
+  if(st.frozeUsed) setTimeout(()=>toast('❄️ 쉬어가기 아이템으로 연속 기록을 지켰어요!', false), 300);
+  if(st.days>=2){ el.hidden=false; el.innerHTML='🔥 <b>'+st.days+'일 연속</b> 저축 중'+(st.savedToday?'':' · 오늘도 이어가요!')+fzTxt;
+    if(popped){ el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); } }
+  else if(st.days===1 && !st.savedToday){ el.hidden=false; el.innerHTML='🔥 어제 저축 성공! <b>오늘도 이어가면 2일 연속</b>'+fzTxt; }
+  else el.hidden=true; }
+function _stSeen(){ try{ return +(localStorage.getItem('oinky_st_'+S.childId)||0); }catch(e){ return 0; } }
+function _stMark(n){ try{ localStorage.setItem('oinky_st_'+S.childId, String(n)); }catch(e){} }
+function openItems(){ const b=$("#itemsBody"); if(!b) return; const st=calcStreak(), fz=_frzN(), used=[..._frzUsedSet()];
+  const usedHtml = used.length? used.slice(-5).reverse().map(k=>{ const p=k.split('-'); return '<span style="display:inline-block; margin:2px 4px 0 0; padding:3px 9px; background:var(--card-2); border:1px solid var(--line-2); border-radius:99px; font-size:11.5px; font-weight:700; color:var(--muted)">'+(+p[1]+1)+'/'+p[2]+' 사용</span>'; }).join('') : '<span style="font-size:12px; color:var(--muted)">아직 사용한 적 없어요</span>';
+  b.innerHTML='<div class="famTotal" style="margin-top:0"><div>'+(S.childName||'')+'의 연속 저축 🔥 <b>'+st.days+'일</b>'+(st.savedToday?' · 오늘 완료 ✅':'')+'</div>'
+    +'<div class="famMonth">❄️ 하루 쉬어가기 보유 <b>'+fz+'개</b> / 최대 2개</div></div>'
+    +'<div style="margin-top:8px; font-size:12.5px; font-weight:700; color:var(--muted)">❄️ 사용 기록</div><div style="margin-top:4px">'+usedHtml+'</div>';
+  $("#itemsScrim").classList.add('show'); }
+function maybeShowCoach(){ try{ if(localStorage.getItem('oinky_coach_done')==='1') return; }catch(e){ return; }
+  const sc=$("#coachScrim"); if(sc) sc.classList.add('show'); }
+function closeCoach(){ try{ localStorage.setItem('oinky_coach_done','1'); }catch(e){} const sc=$("#coachScrim"); if(sc) sc.classList.remove('show');
+  if(S && (!S.goals || !S.goals.length)){ setTimeout(()=>{ openSettings(); toast('첫 목표를 만들어 볼까요? 이름과 가격을 정해요 ✏️', false); }, 300); } }
 function kidPickerOn(){ try{ return localStorage.getItem('oinky_kid_picker')==='1'; }catch(e){ return false; } }
 function setKidPicker(on){ try{ localStorage.setItem('oinky_kid_picker', on?'1':'0'); }catch(e){} updKidPickLbl(); toast(on?'시작할 때 아이 선택 화면을 켰어요.':'시작할 때 아이 선택 화면을 껐어요.', false); }
 function updKidPickLbl(){ const l=$("#kidPickLbl"); if(l) l.textContent= kidPickerOn()?'시작할 때 아이 선택 켬':'시작할 때 아이 선택 끔'; const b=$("#kidPickBtn"); if(b) b.textContent= kidPickerOn()?'✅':'🙋'; }
@@ -2376,13 +2446,43 @@ function openKidPicker(){ const tot=$("#kidPickTotal"); if(tot) tot.innerHTML='<
   const lst=$("#kidPickList"); if(lst) lst.addEventListener("click",async e=>{ const t=e.target.closest("[data-pick]"); if(!t) return; const id=t.dataset.pick; $("#kidPickScrim").classList.remove('show'); if(id!==S.childId){ await loadChild(id); drawKids(); setKidTag(); notifyRemember(S.childName); } });
   const totBox=$("#kidPickTotal"); if(totBox) totBox.addEventListener("click",e=>{ if(e.target.closest(".famMonth")){ const tr=$("#famTrend"); if(tr) tr.hidden=!tr.hidden; } });
   const sh=$("#famShare"); if(sh) sh.onclick=shareFamilyCard;
+  const co=$("#coachOk"); if(co) co.onclick=closeCoach;
+  const cs=$("#coachScrim"); if(cs) cs.addEventListener("click",e=>{ if(e.target===cs) closeCoach(); });
+  const stc=$("#streakChip"); if(stc){ stc.style.cursor='pointer'; stc.onclick=openItems; }
+  const ic=$("#itemsClose"); if(ic) ic.onclick=()=>$("#itemsScrim").classList.remove('show');
+  const isr=$("#itemsScrim"); if(isr) isr.addEventListener("click",e=>{ if(e.target===isr) isr.classList.remove('show'); });
 })();
+function _remOn(){ try{ return localStorage.getItem('oinky_rem_on')==='1'; }catch(e){ return false; } }
+function _remTime(){ try{ return localStorage.getItem('oinky_rem_time')||'19:30'; }catch(e){ return '19:30'; } }
+function updRemindUI(){ const l=$("#remindLbl"), b=$("#remindBtn"), t=$("#remindTime");
+  if(l) l.textContent=_remOn()?('저축 알림 켬 · 매일 '+_remTime()):'저축 알림 끔';
+  if(b) b.textContent=_remOn()?'✅':'🔔'; if(t) t.value=_remTime(); }
+function initReminder(){ const b=$("#remindBtn"), t=$("#remindTime"); updRemindUI();
+  if(t) t.onchange=()=>{ try{ localStorage.setItem('oinky_rem_time', t.value||'19:30'); }catch(e){} updRemindUI(); };
+  if(b) b.onclick=async()=>{ const on=!_remOn(); try{ localStorage.setItem('oinky_rem_on', on?'1':'0'); }catch(e){}
+    if(on && 'Notification' in window && Notification.permission==='default'){ try{ await Notification.requestPermission(); }catch(e){} }
+    updRemindUI(); toast(on?('매일 '+_remTime()+'에 저축 알림을 보여줄게요 🔔'):'저축 알림을 껐어요.', false); };
+  setInterval(()=>{ if(!_remOn()) return; const now=new Date(); const hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+    if(hm!==_remTime()) return; const dk=_dkey(now); let last=null; try{ last=localStorage.getItem('oinky_rem_last'); }catch(e){}
+    if(last===dk) return; try{ localStorage.setItem('oinky_rem_last', dk); }catch(e){}
+    const st=calcStreak(); if(st.savedToday) return;
+    const g=(typeof active==='function')?active():null; const nm=S.childName||'우리 아이';
+    const remain=g?Math.max(0,(g.price||0)-(S.deposits||[]).filter(d=>d.goal_id===g.id).reduce((s,d)=>s+(d.amount||0),0)):0;
+    const cands=[ nm+', 오늘도 모아볼까요? 작게 시작해도 좋아요!' ];
+    if(g&&remain>0){ cands.push(g.name+'까지 '+wonShort(remain)+'원 남았어요! 오늘 한 칸 더 채워볼까요?'); cands.push(nm+'의 '+g.name+'이(가) 조금씩 컬러로 차오르고 있어요 🎨'); }
+    if(st.days>=1){ cands.push('🔥 '+st.days+'일 연속 기록이 기다려요! 오늘도 이어가요.'); }
+    if(g&&remain>0&&st.days>=1){ cands.push('오늘 저축하면 '+(st.days+1)+'일 연속! '+g.name+'도 더 가까워져요.'); }
+    const msg=cands[new Date().getDate()%cands.length];
+    if('Notification' in window && Notification.permission==='granted'){ try{ new Notification('🐷 꿀꿀이 저축 시간', {body:msg}); }catch(e){} }
+    toast('🔔 '+msg, false); if(typeof mascotCheer==='function') try{ mascotCheer('저축 시간이야! ⏰','happy'); }catch(e){}
+  }, 30000); }
 async function init(){
   if(LIVE){ const {createClient}=await import('https://esm.sh/@supabase/supabase-js@2'); sb=createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY); await refreshSession(); }
   children=await db.children();
   if(LIVE && children.length===0){ showOnboarding(); }
-  else { if(children.length){ const last=getLastChild(); const found=last?children.find(c=>String(c.id)===String(last)):null; await loadChild((found||children[0]).id); if(kidPickerOn() && children.length>1) openKidPicker(); } if(!AUTH.isSet()){ setTimeout(()=>openAuth(true),700); } }
+  else { if(children.length){ const last=getLastChild(); const found=last?children.find(c=>String(c.id)===String(last)):null; await loadChild((found||children[0]).id); if(kidPickerOn() && children.length>1) openKidPicker(); else setTimeout(maybeShowCoach, 900); } if(!AUTH.isSet()){ setTimeout(()=>openAuth(true),700); } }
   updKidPickLbl();
+  initReminder();
   if('serviceWorker' in navigator){ try{ await navigator.serviceWorker.register('./sw.js'); }catch(e){} }
 }
 init();
